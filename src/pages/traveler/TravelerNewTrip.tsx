@@ -1,0 +1,112 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Send } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useTravellerProfile } from "@/hooks/useTravellerProfile";
+import { toast } from "@/hooks/use-toast";
+import { TravelerNav } from "@/components/TravelerNav";
+
+const inputClasses =
+  "w-full bg-background border border-border rounded-lg px-4 py-3 font-body text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow";
+
+const TravelerNewTrip = () => {
+  const { travellerProfile } = useTravellerProfile();
+  const navigate = useNavigate();
+  const [form, setForm] = useState({
+    originCountry: "",
+    originCity: "",
+    destinationCountry: "",
+    destinationCity: "",
+    departureDate: "",
+    arrivalDate: "",
+    capacityKg: "",
+    restrictions: "",
+  });
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!travellerProfile) return;
+    setLoading(true);
+
+    const capacity = parseFloat(form.capacityKg) || 0;
+
+    const { error } = await supabase.from("trips").insert({
+      traveller_id: travellerProfile.id,
+      origin_country: form.originCountry,
+      origin_city: form.originCity,
+      destination_country: form.destinationCountry,
+      destination_city: form.destinationCity,
+      departure_date: form.departureDate,
+      arrival_date: form.arrivalDate || form.departureDate,
+      capacity_kg: capacity,
+      available_kg: capacity,
+      restricted_item_preferences: form.restrictions || null,
+      status: "open",
+    });
+
+    setLoading(false);
+
+    if (error) {
+      toast({ title: "Error", description: "Failed to post your trip. Please try again.", variant: "destructive" });
+      return;
+    }
+
+    toast({ title: "Trip posted", description: "We'll match you with requests along this route." });
+    navigate("/traveler");
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      <TravelerNav />
+      <div className="container mx-auto px-6 py-10 max-w-xl">
+        <h1 className="font-display text-2xl font-bold text-foreground mb-6">Share a trip</h1>
+        <form onSubmit={handleSubmit} className="bg-card rounded-2xl p-8 border border-border shadow-[var(--shadow-card)]">
+          <div className="grid sm:grid-cols-2 gap-5 mb-5">
+            <div>
+              <label className="font-display text-sm font-semibold text-foreground mb-1.5 block">From (country)</label>
+              <input type="text" required className={inputClasses} placeholder="e.g. United States" value={form.originCountry} onChange={(e) => setForm({ ...form, originCountry: e.target.value })} />
+            </div>
+            <div>
+              <label className="font-display text-sm font-semibold text-foreground mb-1.5 block">From (city)</label>
+              <input type="text" required className={inputClasses} placeholder="e.g. New York" value={form.originCity} onChange={(e) => setForm({ ...form, originCity: e.target.value })} />
+            </div>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-5 mb-5">
+            <div>
+              <label className="font-display text-sm font-semibold text-foreground mb-1.5 block">To (country)</label>
+              <input type="text" required className={inputClasses} placeholder="e.g. Ghana" value={form.destinationCountry} onChange={(e) => setForm({ ...form, destinationCountry: e.target.value })} />
+            </div>
+            <div>
+              <label className="font-display text-sm font-semibold text-foreground mb-1.5 block">To (city)</label>
+              <input type="text" required className={inputClasses} placeholder="e.g. Accra" value={form.destinationCity} onChange={(e) => setForm({ ...form, destinationCity: e.target.value })} />
+            </div>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-5 mb-5">
+            <div>
+              <label className="font-display text-sm font-semibold text-foreground mb-1.5 block">Departure date</label>
+              <input type="date" required className={inputClasses} value={form.departureDate} onChange={(e) => setForm({ ...form, departureDate: e.target.value })} />
+            </div>
+            <div>
+              <label className="font-display text-sm font-semibold text-foreground mb-1.5 block">Arrival date</label>
+              <input type="date" className={inputClasses} value={form.arrivalDate} onChange={(e) => setForm({ ...form, arrivalDate: e.target.value })} />
+            </div>
+          </div>
+          <div className="mb-5">
+            <label className="font-display text-sm font-semibold text-foreground mb-1.5 block">Available capacity (kg)</label>
+            <input type="number" step="0.5" min="0" required className={inputClasses} placeholder="5" value={form.capacityKg} onChange={(e) => setForm({ ...form, capacityKg: e.target.value })} />
+          </div>
+          <div className="mb-8">
+            <label className="font-display text-sm font-semibold text-foreground mb-1.5 block">Anything you'd rather not carry? (optional)</label>
+            <textarea className={`${inputClasses} resize-none`} rows={2} placeholder="e.g. no perishables" value={form.restrictions} onChange={(e) => setForm({ ...form, restrictions: e.target.value })} />
+          </div>
+          <button type="submit" disabled={loading} className="w-full bg-gradient-gold text-accent-foreground font-display font-bold py-4 rounded-lg text-base hover:opacity-90 transition-opacity flex items-center justify-center gap-2 disabled:opacity-50">
+            {loading ? "Posting..." : "Post trip"} <Send className="w-5 h-5" />
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default TravelerNewTrip;

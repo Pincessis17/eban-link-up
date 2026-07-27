@@ -1,0 +1,11 @@
+-- SUPERSEDED: this migration created a `bookings` table on the OLD Supabase
+-- project (lruxczdutkbgwryzlhns), which the app no longer points to.
+--
+-- The app now runs on the "EBAN" Supabase project (caiwzsdsfplizsoqlham),
+-- which already has a full schema (profiles, sender_profiles,
+-- traveller_profiles, delivery_requests, trips, matches,
+-- pricing_breakdowns, payments, payouts, verifications, handoff_preferences,
+-- ratings, disputes, notifications) with role-based RLS via is_admin().
+--
+-- This file is kept only for history and intentionally left inert.
+-- See EBAN_system_spec_v1.md for the current data model.
