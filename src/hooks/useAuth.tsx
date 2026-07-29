@@ -20,8 +20,8 @@ type AuthContextType = {
     password: string,
     fullName: string,
     role: "Sender" | "Traveller"
-  ) => Promise<{ error: string | null }>;
-  signIn: (email: string, password: string) => Promise<{ error: string | null }>;
+  ) => Promise<{ error: string | null; needsConfirmation: boolean }>;
+  signIn: (email: string, password: string) => Promise<{ error: string | null; role: string | null }>;
   signOut: () => Promise<void>;
 };
 
@@ -60,30 +60,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signUp: AuthContextType["signUp"] = async (email, password, fullName, role) => {
-    const { data, error } = await supabase.auth.signUp({ email, password });
-    if (error) return { error: error.message };
-    if (!data.user) return { error: "Something went wrong creating your account." };
-
-    const { error: profileError } = await supabase.from("profiles").insert({
-      id: data.user.id,
+    // Profile creation (profiles + sender_profiles/traveller_profiles) happens
+    // server-side via the on_auth_user_created trigger, reading full_name/role
+    // from this metadata. Doing it client-side right after signUp() breaks
+    // whenever email confirmation is required, since there's no active session
+    // yet and the profiles_insert RLS check (auth.uid() = id) fails.
+    const { data, error } = await supabase.auth.signUp({
       email,
-      full_name: fullName,
-      role,
+      password,
+      options: { data: { full_name: fullName, role } },
     });
-    if (profileError) return { error: profileError.message };
+    if (error) return { error: error.message, needsConfirmation: false };
+    if (!data.user) return { error: "Something went wrong creating your account.", needsConfirmation: false };
 
-    if (role === "Sender") {
-      await supabase.from("sender_profiles").insert({ user_id: data.user.id, name: fullName });
-    } else {
-      await supabase.from("traveller_profiles").insert({ user_id: data.user.id, name: fullName });
-    }
-
-    return { error: null };
+    return { error: null, needsConfirmation: !data.session };
   };
 
   const signIn: AuthContextType["signIn"] = async (email, password) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return { error: error ? error.message : null };
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) return { error: error.message, role: null };
+
+    // Fetch role directly rather than reading it off context state, since the
+    // context's profile hasn't necessarily finished loading yet at this point.
+    const { data: profileRow } = await supabase.from("profiles").select("role").eq("id", data.user.id).maybeSingle();
+    return { error: null, role: profileRow?.role ?? null };
   };
 
   const signOut = async () => {

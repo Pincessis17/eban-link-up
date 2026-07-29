@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,45 +6,46 @@
 
 @layer base {
   :root {
-    --background: 40 33% 96%;
-    --foreground: 30 10% 12%;
+    --background: 40 55% 96%;
+    --foreground: 0 0% 10%;
 
-    --card: 40 30% 98%;
-    --card-foreground: 30 10% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 10%;
 
-    --popover: 40 30% 98%;
-    --popover-foreground: 30 10% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 10%;
 
-    --primary: 30 10% 12%;
-    --primary-foreground: 40 33% 96%;
+    --primary: 0 0% 10%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 38 60% 90%;
-    --secondary-foreground: 30 10% 12%;
+    --secondary: 44 65% 92%;
+    --secondary-foreground: 0 0% 10%;
 
-    --muted: 38 20% 92%;
-    --muted-foreground: 30 10% 40%;
+    --muted: 40 20% 94%;
+    --muted-foreground: 0 0% 40%;
 
-    --accent: 40 90% 55%;
-    --accent-foreground: 30 10% 8%;
+    --accent: 44 54% 54%;
+    --accent-foreground: 180 70% 11%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 38 25% 85%;
-    --input: 38 25% 85%;
-    --ring: 40 90% 55%;
+    --border: 180 20% 87%;
+    --input: 180 20% 87%;
+    --ring: 44 54% 54%;
 
     --radius: 0.75rem;
 
-    --gold: 40 90% 55%;
-    --gold-dark: 35 85% 42%;
-    --charcoal: 30 10% 12%;
-    --cream: 40 33% 96%;
+    --gold: 44 54% 54%;
+    --gold-dark: 44 55% 40%;
+    --gold-light: 42 67% 66%;
+    --charcoal: 180 70% 6%;
+    --cream: 40 55% 96%;
     --terracotta: 15 65% 52%;
-    --earth: 25 30% 28%;
+    --earth: 180 70% 11%;
 
-    --font-display: 'Space Grotesk', sans-serif;
-    --font-body: 'Outfit', sans-serif;
+    --font-display: 'Cormorant Garamond', serif;
+    --font-body: 'Jost', sans-serif;
 
     --shadow-card: 0 4px 24px -4px hsl(30 10% 12% / 0.08);
     --shadow-elevated: 0 12px 40px -8px hsl(30 10% 12% / 0.15);

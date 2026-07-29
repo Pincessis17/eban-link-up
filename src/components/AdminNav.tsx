@@ -28,7 +28,7 @@ export const AdminNav = () => {
           <Link to="/admin/intake" className={linkClasses("/admin/intake")}>Intake / handoff</Link>
           <Link to="/admin/verifications" className={linkClasses("/admin/verifications")}>Verifications</Link>
           <Link to="/admin/payouts" className={linkClasses("/admin/payouts")}>Payouts</Link>
-          <Link to="/" className="text-sm font-display font-semibold text-muted-foreground hover:text-foreground transition-colors">
+          <Link to="/?view=site" className="text-sm font-display font-semibold text-muted-foreground hover:text-foreground transition-colors">
             Site
           </Link>
           <button onClick={signOut} className="flex items-center gap-2 text-sm font-display font-semibold text-muted-foreground hover:text-foreground transition-colors">

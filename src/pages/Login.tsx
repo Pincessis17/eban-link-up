@@ -18,13 +18,15 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    const { error } = await signIn(email, password);
+    const { error, role } = await signIn(email, password);
     setLoading(false);
     if (error) {
       setError(error);
       return;
     }
-    navigate("/");
+    if (role === "Admin") navigate("/admin/bookings");
+    else if (role === "Traveller") navigate("/traveler");
+    else navigate("/sender/requests");
   };
 
   return (

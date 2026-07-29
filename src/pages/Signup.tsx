@@ -15,19 +15,45 @@ const Signup = () => {
   const [role, setRole] = useState<"Sender" | "Traveller">("Sender");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [needsConfirmation, setNeedsConfirmation] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    const { error } = await signUp(email, password, fullName, role);
+    const { error, needsConfirmation } = await signUp(email, password, fullName, role);
     setLoading(false);
     if (error) {
       setError(error);
       return;
     }
-    navigate("/");
+    if (needsConfirmation) {
+      setNeedsConfirmation(true);
+      return;
+    }
+    if (role === "Traveller") navigate("/traveler");
+    else navigate("/sender/requests");
   };
+
+  if (needsConfirmation) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center px-6 py-12">
+        <div className="w-full max-w-md bg-card rounded-2xl p-8 border border-border shadow-[var(--shadow-card)] text-center">
+          <div className="flex items-center gap-3 mb-8 justify-center">
+            <img src={ebanSymbol} alt="EBAN" className="w-9 h-9" />
+            <span className="font-display text-2xl font-bold text-foreground">EBAN</span>
+          </div>
+          <h1 className="font-display text-xl font-bold text-foreground mb-3">Check your email</h1>
+          <p className="font-body text-sm text-muted-foreground mb-6">
+            We sent a confirmation link to <span className="font-semibold text-foreground">{email}</span>. Click it, then come back and log in.
+          </p>
+          <Link to="/login" className="inline-block bg-gradient-gold text-accent-foreground font-display font-semibold px-6 py-3 rounded-lg text-sm hover:opacity-90 transition-opacity">
+            Go to log in
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-6 py-12">

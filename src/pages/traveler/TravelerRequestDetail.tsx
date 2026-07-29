@@ -309,12 +309,12 @@ const TravelerRequestDetail = () => {
                 </button>
               )}
               {request.status === "in_transit" && (
-                <button onClick={() => advanceStatus("delivered")} disabled={busy} className="w-full bg-gradient-gold text-accent-foreground font-display font-bold py-3 rounded-lg text-sm hover:opacity-90 transition-opacity disabled:opacity-50">
-                  Mark delivered
-                </button>
+                <p className="font-body text-sm text-muted-foreground text-center py-4">
+                  Once you land, hand the item to EBAN staff. They'll confirm receipt and let the sender know it's ready for pickup.
+                </p>
               )}
               {["delivered", "completed"].includes(request.status) && (
-                <p className="font-body text-sm text-green-700 text-center">Delivered &mdash; thank you!</p>
+                <p className="font-body text-sm text-green-700 text-center py-4">EBAN has received the item from you &mdash; thank you!</p>
               )}
             </div>
           )}

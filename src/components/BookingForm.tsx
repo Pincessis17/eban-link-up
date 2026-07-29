@@ -77,7 +77,10 @@ const BookingForm = () => {
               <Send className="w-7 h-7 text-accent-foreground" />
             </div>
             <h2 className="font-display text-3xl font-bold text-foreground mb-3">Request received!</h2>
-            <p className="font-body text-muted-foreground text-lg">We'll match you with a traveler and update you here.</p>
+            <p className="font-body text-muted-foreground text-lg mb-6">We'll match you with a traveler and update you here.</p>
+            <Link to="/sender/requests" className="inline-block bg-gradient-gold text-accent-foreground font-display font-semibold px-6 py-3 rounded-lg text-sm hover:opacity-90 transition-opacity">
+              Track my requests
+            </Link>
           </div>
         </div>
       </section>

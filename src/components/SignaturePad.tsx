@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface SignaturePadProps {
   onCapture: (blob: Blob) => void;
@@ -9,6 +9,26 @@ export const SignaturePad = ({ onCapture, onCancel }: SignaturePadProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const drawing = useRef(false);
   const [hasDrawn, setHasDrawn] = useState(false);
+
+  // The canvas's internal drawing buffer must match its actual rendered size,
+  // or mouse/touch coordinates (measured in CSS pixels) fall out of sync with
+  // canvas coordinates (measured in buffer pixels), so strokes land in the
+  // wrong place or get clipped. Sync them on mount and on resize.
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const syncSize = () => {
+      const rect = canvas.getBoundingClientRect();
+      const ratio = window.devicePixelRatio || 1;
+      canvas.width = Math.round(rect.width * ratio);
+      canvas.height = Math.round(rect.height * ratio);
+      const ctx = canvas.getContext("2d");
+      ctx?.scale(ratio, ratio);
+    };
+    syncSize();
+    window.addEventListener("resize", syncSize);
+    return () => window.removeEventListener("resize", syncSize);
+  }, []);
 
   const getPos = (e: React.MouseEvent | React.TouchEvent) => {
     const canvas = canvasRef.current;
@@ -64,9 +84,7 @@ export const SignaturePad = ({ onCapture, onCancel }: SignaturePadProps) => {
       <p className="font-body text-xs text-muted-foreground mb-2">Sign below to confirm you received the package.</p>
       <canvas
         ref={canvasRef}
-        width={400}
-        height={160}
-        className="w-full border border-border rounded-lg bg-background touch-none"
+        className="w-full h-40 border border-border rounded-lg bg-background touch-none"
         style={{ touchAction: "none" }}
         onMouseDown={start}
         onMouseMove={move}

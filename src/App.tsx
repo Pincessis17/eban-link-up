@@ -20,6 +20,9 @@ import AdminMatch from "./pages/admin/AdminMatch.tsx";
 import AdminIntake from "./pages/admin/AdminIntake.tsx";
 import AdminVerifications from "./pages/admin/AdminVerifications.tsx";
 import AdminPayouts from "./pages/admin/AdminPayouts.tsx";
+import SenderRequests from "./pages/sender/SenderRequests.tsx";
+import SenderRequestDetail from "./pages/sender/SenderRequestDetail.tsx";
+import SenderNewRequest from "./pages/sender/SenderNewRequest.tsx";
 
 const queryClient = new QueryClient();
 
@@ -119,6 +122,30 @@ const App = () => (
               element={
                 <ProtectedRoute requireRole="Traveller">
                   <TravelerEarnings />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/sender/requests"
+              element={
+                <ProtectedRoute requireRole="Sender">
+                  <SenderRequests />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/sender/requests/:id"
+              element={
+                <ProtectedRoute requireRole="Sender">
+                  <SenderRequestDetail />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/sender/new-request"
+              element={
+                <ProtectedRoute requireRole="Sender">
+                  <SenderNewRequest />
                 </ProtectedRoute>
               }
             />

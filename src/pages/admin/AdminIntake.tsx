@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { AdminNav } from "@/components/AdminNav";
-import { PackageCheck, Send } from "lucide-react";
+import { PackageCheck, Send, CheckCircle2 } from "lucide-react";
 
 interface IntakeRequest {
   id: string;
@@ -26,7 +26,7 @@ const AdminIntake = () => {
       .select(
         "id, origin_city, destination_city, item_type, status, handoff_preferences(type, scheduled_time, location), traveller_profiles:matched_traveller_id(name)"
       )
-      .in("status", ["accepted_by_traveller", "paid", "dropped_off"])
+      .in("status", ["accepted_by_traveller", "paid", "dropped_off", "in_transit"])
       .order("created_at", { ascending: true });
     setRequests((data as unknown as IntakeRequest[]) || []);
     setLoading(false);
@@ -64,8 +64,24 @@ const AdminIntake = () => {
     load();
   };
 
-  const awaitingDropOff = requests.filter((r) => r.status !== "dropped_off");
+  const markReceivedFromTraveller = async (id: string) => {
+    setBusy(id);
+    const { error } = await supabase
+      .from("delivery_requests")
+      .update({ status: "delivered", delivered_at: new Date().toISOString() })
+      .eq("id", id);
+    setBusy(null);
+    if (error) {
+      toast({ title: "Error", description: "Couldn't update. Try again.", variant: "destructive" });
+      return;
+    }
+    toast({ title: "Marked as received", description: "The sender will see it's ready for pickup." });
+    load();
+  };
+
+  const awaitingDropOff = requests.filter((r) => ["accepted_by_traveller", "paid"].includes(r.status));
   const readyForPickup = requests.filter((r) => r.status === "dropped_off");
+  const awaitingDestinationHandoff = requests.filter((r) => r.status === "in_transit");
 
   const handoffLabel = (r: IntakeRequest) => {
     if (!r.handoff_preferences) return "No handoff preference yet";
@@ -82,7 +98,7 @@ const AdminIntake = () => {
 
         {loading && <div className="font-body text-sm text-muted-foreground">Loading...</div>}
 
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid md:grid-cols-3 gap-8">
           <div>
             <p className="font-display text-sm font-semibold text-foreground mb-3">Awaiting drop-off from sender</p>
             {!loading && awaitingDropOff.length === 0 && (
@@ -131,6 +147,33 @@ const AdminIntake = () => {
                     className="mt-3 w-full flex items-center justify-center gap-2 bg-gradient-gold text-accent-foreground font-display font-semibold py-2 rounded-lg text-xs hover:opacity-90 transition-opacity disabled:opacity-50"
                   >
                     <Send className="w-4 h-4" /> Mark handed to traveler
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <p className="font-display text-sm font-semibold text-foreground mb-3">Awaiting handoff at destination</p>
+            {!loading && awaitingDestinationHandoff.length === 0 && (
+              <div className="text-center py-10 bg-card rounded-xl border border-border font-body text-sm text-muted-foreground">
+                Nothing in transit right now.
+              </div>
+            )}
+            <div className="grid gap-2">
+              {awaitingDestinationHandoff.map((r) => (
+                <div key={r.id} className="p-4 rounded-xl border border-border bg-card">
+                  <p className="font-display text-sm font-bold text-foreground">
+                    {r.origin_city} &rarr; {r.destination_city}
+                  </p>
+                  <p className="font-body text-xs text-muted-foreground mt-1">{r.item_type}</p>
+                  <p className="font-body text-xs text-muted-foreground">Traveler: {r.traveller_profiles?.name ?? "-"}</p>
+                  <button
+                    onClick={() => markReceivedFromTraveller(r.id)}
+                    disabled={busy === r.id}
+                    className="mt-3 w-full flex items-center justify-center gap-2 bg-gradient-gold text-accent-foreground font-display font-semibold py-2 rounded-lg text-xs hover:opacity-90 transition-opacity disabled:opacity-50"
+                  >
+                    <CheckCircle2 className="w-4 h-4" /> Mark received from traveler
                   </button>
                 </div>
               ))}

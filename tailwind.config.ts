@@ -14,8 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ['Space Grotesk', 'sans-serif'],
-        body: ['Outfit', 'sans-serif'],
+        display: ['Cormorant Garamond', 'serif'],
+        body: ['Jost', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -54,6 +54,7 @@ export default {
         gold: {
           DEFAULT: "hsl(var(--gold))",
           dark: "hsl(var(--gold-dark))",
+          light: "hsl(var(--gold-light))",
         },
         charcoal: "hsl(var(--charcoal))",
         cream: "hsl(var(--cream))",

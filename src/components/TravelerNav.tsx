@@ -27,7 +27,7 @@ export const TravelerNav = () => {
           <Link to="/traveler/requests" className={linkClasses("/traveler/requests")}>Requests</Link>
           <Link to="/traveler/earnings" className={linkClasses("/traveler/earnings")}>Earnings</Link>
           <Link to="/traveler/verification" className={linkClasses("/traveler/verification")}>Verification</Link>
-          <Link to="/" className="text-sm font-display font-semibold text-muted-foreground hover:text-foreground transition-colors">
+          <Link to="/?view=site" className="text-sm font-display font-semibold text-muted-foreground hover:text-foreground transition-colors">
             Site
           </Link>
           <button onClick={signOut} className="flex items-center gap-2 text-sm font-display font-semibold text-muted-foreground hover:text-foreground transition-colors">
