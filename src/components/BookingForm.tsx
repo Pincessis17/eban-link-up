@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Send, Lock } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -14,11 +14,14 @@ const inputClasses =
 
 const BookingForm = () => {
   const { user, loading: authLoading } = useAuth();
+  const [searchParams] = useSearchParams();
+  // Pre-fill from an "Available Trips" card so senders don't retype a route
+  // we already told them a traveler is covering.
   const [form, setForm] = useState({
-    originCountry: "",
-    originCity: "",
-    destinationCountry: "",
-    destinationCity: "",
+    originCountry: searchParams.get("originCountry") ?? "",
+    originCity: searchParams.get("originCity") ?? "",
+    destinationCountry: searchParams.get("destinationCountry") ?? "",
+    destinationCity: searchParams.get("destinationCity") ?? "",
     itemType: "Documents",
     itemDescription: "",
     weightKg: "",
@@ -125,6 +128,12 @@ const BookingForm = () => {
           </p>
         </div>
         <form onSubmit={handleSubmit} className="max-w-2xl mx-auto bg-card rounded-2xl p-8 md:p-10 border border-border shadow-[var(--shadow-card)]">
+          {form.originCity && form.destinationCity && (
+            <div className="bg-accent/10 text-accent-foreground rounded-lg p-3 mb-5 font-body text-xs">
+              Route pre-filled from an available trip: {form.originCity} &rarr; {form.destinationCity}. Adjust below if
+              needed.
+            </div>
+          )}
           <div className="grid sm:grid-cols-2 gap-5 mb-5">
             <div>
               <label className="font-display text-sm font-semibold text-foreground mb-1.5 block">Origin country</label>

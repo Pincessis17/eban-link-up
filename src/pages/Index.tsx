@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { Link, Navigate, useSearchParams } from "react-router-dom";
 import BookingForm from "@/components/BookingForm";
+import { AvailableTrips } from "@/components/AvailableTrips";
 import { useAuth } from "@/hooks/useAuth";
 
 const Reveal = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => {
@@ -342,6 +343,7 @@ const Index = () => {
     <div className="min-h-screen">
       <Navbar />
       <Hero />
+      <AvailableTrips basePath="/" anchor="#book" extraParams={{ view: "site" }} />
       <HowItWorks />
       <WhatWeCarry />
       <TrustSafety />
