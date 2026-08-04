@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import ebanSymbol from "@/assets/eban-symbol.png";
 
@@ -9,6 +9,11 @@ const inputClasses =
 const Signup = () => {
   const { signUp } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  // If they arrived here from an "Available Trips" card, carry the route
+  // through to the pre-filled request form after signup instead of losing it.
+  const routeOrigin = searchParams.get("originCity");
+  const routeDestination = searchParams.get("destinationCity");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -31,8 +36,15 @@ const Signup = () => {
       setNeedsConfirmation(true);
       return;
     }
-    if (role === "Traveller") navigate("/traveler");
-    else navigate("/sender/requests");
+    if (role === "Traveller") {
+      navigate("/traveler");
+      return;
+    }
+    if (routeOrigin && routeDestination) {
+      navigate(`/sender/new-request?${searchParams.toString()}`);
+    } else {
+      navigate("/sender/requests");
+    }
   };
 
   if (needsConfirmation) {
@@ -62,7 +74,13 @@ const Signup = () => {
           <img src={ebanSymbol} alt="EBAN" className="w-9 h-9" />
           <span className="font-display text-2xl font-bold text-foreground">EBAN</span>
         </div>
-        <h1 className="font-display text-xl font-bold text-foreground mb-6 text-center">Create an account</h1>
+        <h1 className="font-display text-xl font-bold text-foreground mb-2 text-center">Create an account</h1>
+
+        {routeOrigin && routeDestination && (
+          <p className="font-body text-xs text-center text-gold-dark mb-6">
+            Sending from {routeOrigin} to {routeDestination} &mdash; we'll pick this back up right after you sign up.
+          </p>
+        )}
 
         {error && (
           <div className="bg-destructive/10 text-destructive rounded-lg p-3 mb-4 text-sm font-body text-center">

@@ -5,7 +5,7 @@ import { AvailableTrips } from "@/components/AvailableTrips";
 const SenderNewRequest = () => (
   <div className="min-h-screen bg-background">
     <SenderNav />
-    <AvailableTrips basePath="/sender/new-request" />
+    <AvailableTrips />
     <BookingForm />
   </div>
 );

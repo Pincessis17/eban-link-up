@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Plane, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 interface OpenTrip {
   id: string;
@@ -13,16 +14,8 @@ interface OpenTrip {
   available_kg: number;
 }
 
-interface AvailableTripsProps {
-  /** Path the "Send on this route" button links to; query params carry the route. */
-  basePath: string;
-  /** Optional anchor appended to the link (e.g. "#book"). */
-  anchor?: string;
-  /** Extra query params to merge in (e.g. { view: "site" } to keep the marketing page visible). */
-  extraParams?: Record<string, string>;
-}
-
-export const AvailableTrips = ({ basePath, anchor = "", extraParams = {} }: AvailableTripsProps) => {
+export const AvailableTrips = () => {
+  const { user } = useAuth();
   const [trips, setTrips] = useState<OpenTrip[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -41,15 +34,18 @@ export const AvailableTrips = ({ basePath, anchor = "", extraParams = {} }: Avai
     load();
   }, []);
 
+  // Logged-in senders go straight into the (pre-filled) request form; anyone
+  // without an account yet gets sent to sign up first, then lands on the same
+  // pre-filled form so the route they picked isn't lost.
   const tripLink = (t: OpenTrip) => {
     const params = new URLSearchParams({
       originCountry: t.origin_country,
       originCity: t.origin_city,
       destinationCountry: t.destination_country,
       destinationCity: t.destination_city,
-      ...extraParams,
     });
-    return `${basePath}?${params.toString()}${anchor}`;
+    const target = user ? "/sender/new-request" : "/signup";
+    return `${target}?${params.toString()}`;
   };
 
   if (loading) return null;

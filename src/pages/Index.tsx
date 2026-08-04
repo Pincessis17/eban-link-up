@@ -343,7 +343,7 @@ const Index = () => {
     <div className="min-h-screen">
       <Navbar />
       <Hero />
-      <AvailableTrips basePath="/" anchor="#book" extraParams={{ view: "site" }} />
+      <AvailableTrips />
       <HowItWorks />
       <WhatWeCarry />
       <TrustSafety />
