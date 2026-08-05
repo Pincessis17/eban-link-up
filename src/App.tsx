@@ -20,6 +20,7 @@ import AdminMatch from "./pages/admin/AdminMatch.tsx";
 import AdminIntake from "./pages/admin/AdminIntake.tsx";
 import AdminVerifications from "./pages/admin/AdminVerifications.tsx";
 import AdminPayouts from "./pages/admin/AdminPayouts.tsx";
+import AdminTravelers from "./pages/admin/AdminTravelers.tsx";
 import SenderRequests from "./pages/sender/SenderRequests.tsx";
 import SenderRequestDetail from "./pages/sender/SenderRequestDetail.tsx";
 import SenderNewRequest from "./pages/sender/SenderNewRequest.tsx";
@@ -106,6 +107,14 @@ const App = () => (
               element={
                 <ProtectedRoute requireRole="Admin">
                   <AdminPayouts />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/travelers"
+              element={
+                <ProtectedRoute requireRole="Admin">
+                  <AdminTravelers />
                 </ProtectedRoute>
               }
             />

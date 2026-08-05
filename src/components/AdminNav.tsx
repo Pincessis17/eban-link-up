@@ -24,6 +24,7 @@ export const AdminNav = () => {
         </div>
         <div className="flex items-center gap-5">
           <Link to="/admin/bookings" className={linkClasses("/admin/bookings")}>Requests</Link>
+          <Link to="/admin/travelers" className={linkClasses("/admin/travelers")}>Travelers</Link>
           <Link to="/admin/match" className={linkClasses("/admin/match")}>Match</Link>
           <Link to="/admin/intake" className={linkClasses("/admin/intake")}>Intake / handoff</Link>
           <Link to="/admin/verifications" className={linkClasses("/admin/verifications")}>Verifications</Link>
