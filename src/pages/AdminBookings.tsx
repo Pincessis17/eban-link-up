@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Package, RefreshCw } from "lucide-react";
-import { AdminNav } from "@/components/AdminNav";
+import { AdminNav, ADMIN_SIDEBAR_OFFSET_CLASS } from "@/components/AdminNav";
 
 interface DeliveryRequest {
   id: string;
@@ -60,7 +60,7 @@ const AdminBookings = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className={`min-h-screen bg-background ${ADMIN_SIDEBAR_OFFSET_CLASS}`}>
       <AdminNav />
 
       <div className="container mx-auto px-6 py-10">

@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { AdminNav } from "@/components/AdminNav";
+import { AdminNav, ADMIN_SIDEBAR_OFFSET_CLASS } from "@/components/AdminNav";
 import { supabase } from "@/integrations/supabase/client";
 
 interface TravelerRow {
@@ -53,7 +53,7 @@ const AdminTravelers = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className={`min-h-screen bg-background ${ADMIN_SIDEBAR_OFFSET_CLASS}`}>
       <AdminNav />
       <div className="container mx-auto px-6 py-10">
         <div className="flex items-center justify-between flex-wrap gap-4 mb-8">

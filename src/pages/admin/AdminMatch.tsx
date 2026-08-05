@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { AdminNav } from "@/components/AdminNav";
+import { AdminNav, ADMIN_SIDEBAR_OFFSET_CLASS } from "@/components/AdminNav";
 
 interface PendingRequest {
   id: string;
@@ -95,7 +95,7 @@ const AdminMatch = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className={`min-h-screen bg-background ${ADMIN_SIDEBAR_OFFSET_CLASS}`}>
       <AdminNav />
       <div className="container mx-auto px-6 py-10">
         <h1 className="font-display text-2xl font-bold text-foreground mb-8">Match requests to trips</h1>
