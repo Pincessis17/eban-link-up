@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Package, RefreshCw, ArrowRight, User, Mail, Phone, Calendar, Weight, DollarSign } from "lucide-react";
 import { AdminNav, ADMIN_SIDEBAR_OFFSET_CLASS } from "@/components/AdminNav";
+import { AdminDeleteButton } from "@/components/AdminDeleteButton";
 
 interface DeliveryRequest {
   id: string;
@@ -58,6 +59,14 @@ const AdminBookings = () => {
   useEffect(() => {
     fetchRequests();
   }, []);
+
+  const deleteRequest = async (id: string): Promise<string | null> => {
+    const { data, error: deleteError } = await supabase.from("delivery_requests").delete().eq("id", id).select("id");
+    if (deleteError) return deleteError.message;
+    if (!data || data.length === 0) return "Nothing was deleted. You may not have permission.";
+    setRequests((prev) => prev.filter((r) => r.id !== id));
+    return null;
+  };
 
   return (
     <div className={`min-h-screen bg-background ${ADMIN_SIDEBAR_OFFSET_CLASS}`}>
@@ -154,6 +163,14 @@ const AdminBookings = () => {
                   <div className="text-right text-xs font-body text-muted-foreground border-t lg:border-t-0 pt-3 lg:pt-0 border-border">
                     <p className="font-mono text-[11px] font-bold text-foreground mb-1">REQ #{req.id.slice(0, 8)}</p>
                     <p>{new Date(req.created_at).toLocaleString()}</p>
+                    <div className="flex justify-end mt-3">
+                      <AdminDeleteButton
+                        label="Delete"
+                        title="Delete this delivery request?"
+                        description={`REQ #${req.id.slice(0, 8)} from ${req.profiles?.full_name ?? "this sender"} (${req.origin_city} → ${req.destination_city}) will be permanently removed, along with its matches, payments, payouts, ratings and disputes. This can't be undone.`}
+                        onConfirm={() => deleteRequest(req.id)}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>

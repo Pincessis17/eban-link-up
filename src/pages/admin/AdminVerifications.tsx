@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
 import { AdminNav, ADMIN_SIDEBAR_OFFSET_CLASS } from "@/components/AdminNav";
+import { AdminDeleteButton } from "@/components/AdminDeleteButton";
 
 interface VerificationRow {
   id: string;
@@ -63,6 +64,16 @@ const AdminVerifications = () => {
     load();
   };
 
+  const handleDelete = async (row: VerificationRow): Promise<string | null> => {
+    const { data, error } = await supabase.from("verifications").delete().eq("id", row.id).select("id");
+    if (error) return error.message;
+    if (!data || data.length === 0) return "Nothing was deleted. You may not have permission.";
+    // Best effort: also remove the uploaded document from storage.
+    await supabase.storage.from("verification-documents").remove([row.document_url]);
+    setRows((prev) => prev.filter((r) => r.id !== row.id));
+    return null;
+  };
+
   return (
     <div className={`min-h-screen bg-background ${ADMIN_SIDEBAR_OFFSET_CLASS}`}>
       <AdminNav />
@@ -105,6 +116,11 @@ const AdminVerifications = () => {
                 >
                   <X className="w-4 h-4" />
                 </button>
+                <AdminDeleteButton
+                  title="Delete this verification?"
+                  description={`The ${r.id_document_type ?? "ID"} submission from ${r.traveller_profiles?.name ?? "this traveler"} will be permanently removed. This can't be undone.`}
+                  onConfirm={() => handleDelete(r)}
+                />
               </div>
             </div>
           ))}

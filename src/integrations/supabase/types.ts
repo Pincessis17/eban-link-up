@@ -700,6 +700,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_delete_traveller: { Args: { p_traveller_id: string }; Returns: undefined }
       is_admin: { Args: never; Returns: boolean }
     }
     Enums: {
