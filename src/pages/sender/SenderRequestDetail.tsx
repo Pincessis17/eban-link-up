@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
+import { Plane, ArrowLeft, CheckCircle2, ShieldCheck, Clock, MapPin, Package, AlertCircle, Edit3, DollarSign } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { SenderNav } from "@/components/SenderNav";
@@ -28,11 +29,11 @@ const STATUS_STEPS = ["submitted", "matched", "dropped_off", "handed_to_travelle
 const STATUS_STEP_LABELS: Record<string, string> = {
   submitted: "Submitted",
   matched: "Matched",
-  dropped_off: "Dropped off",
-  handed_to_traveller: "With traveler",
-  in_transit: "In transit",
-  delivered: "Ready for pickup",
-  completed: "Picked up",
+  dropped_off: "Hub Dropoff",
+  handed_to_traveller: "With Traveler",
+  in_transit: "In Flight",
+  delivered: "Ready for Pickup",
+  completed: "Picked Up",
 };
 
 const ITEM_TYPES = ["Documents", "Electronics", "Clothing", "Gifts", "Other"];
@@ -50,9 +51,9 @@ const normalizeStatus = (status: string) => {
   return status;
 };
 
-const inputClasses = "bg-secondary rounded-lg p-3";
+const inputClasses = "bg-secondary/60 rounded-xl p-4 border border-border/60 font-body";
 const fieldClasses =
-  "w-full bg-background border border-border rounded-lg px-4 py-3 font-body text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow";
+  "w-full bg-card border border-border/80 rounded-xl px-4 py-3 font-body text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all";
 
 type EditForm = {
   originCountry: string;
@@ -144,7 +145,7 @@ const SenderRequestDetail = () => {
       return;
     }
 
-    toast({ title: "Request updated" });
+    toast({ title: "Request updated successfully" });
     setEditing(false);
     load();
   };
@@ -161,6 +162,7 @@ const SenderRequestDetail = () => {
       toast({ title: "Error", description: "Couldn't confirm. Try again.", variant: "destructive" });
       return;
     }
+    toast({ title: "Drop-off confirmed!" });
     load();
   };
 
@@ -176,7 +178,7 @@ const SenderRequestDetail = () => {
       toast({ title: "Error", description: "Couldn't confirm. Try again.", variant: "destructive" });
       return;
     }
-    toast({ title: "Thanks for confirming!" });
+    toast({ title: "Delivery pickup confirmed!" });
     load();
   };
 
@@ -184,7 +186,10 @@ const SenderRequestDetail = () => {
     return (
       <div className="min-h-screen bg-background">
         <SenderNav />
-        <div className="text-center py-16 font-body text-muted-foreground">Loading...</div>
+        <div className="text-center py-20 font-body text-muted-foreground">
+          <div className="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+          Loading request details...
+        </div>
       </div>
     );
   }
@@ -193,7 +198,7 @@ const SenderRequestDetail = () => {
     return (
       <div className="min-h-screen bg-background">
         <SenderNav />
-        <div className="text-center py-16 font-body text-muted-foreground">
+        <div className="text-center py-20 font-body text-muted-foreground">
           Request not found.{" "}
           <Link to="/sender/requests" className="text-gold-dark font-semibold hover:underline">
             Back to requests
@@ -212,121 +217,151 @@ const SenderRequestDetail = () => {
   return (
     <div className="min-h-screen bg-background">
       <SenderNav />
-      <div className="container mx-auto px-6 py-10 max-w-xl">
-        <Link to="/sender/requests" className="font-body text-sm text-muted-foreground hover:text-foreground transition-colors mb-4 inline-block">
-          &larr; My requests
+
+      <div className="container mx-auto px-6 py-10 max-w-3xl">
+        <Link to="/sender/requests" className="inline-flex items-center gap-1.5 font-body text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors mb-6">
+          <ArrowLeft className="w-4 h-4" /> Back to My Requests
         </Link>
-        <div className="bg-card rounded-2xl border border-border p-8 shadow-[var(--shadow-card)]">
-          <div className="flex items-start justify-between gap-4 mb-1">
-            <p className="font-body text-xs text-muted-foreground">
-              Request &middot; {new Date(request.created_at).toLocaleDateString()}
-            </p>
+
+        {/* Flight-Style Route Card */}
+        <div className="bg-charcoal text-white rounded-3xl p-8 mb-8 border border-gold/20 shadow-2xl relative overflow-hidden">
+          <div className="flex items-center justify-between pb-6 border-b border-white/10 mb-6">
+            <div>
+              <span className="font-body text-[10px] uppercase tracking-widest text-gold-light">Tracking Reference</span>
+              <p className="font-mono text-sm font-bold text-white uppercase">{request.id.slice(0, 13)}</p>
+            </div>
             {canEdit && !editing && (
               <button
                 onClick={startEditing}
-                className="font-body text-xs font-semibold text-gold-dark hover:text-gold transition-colors whitespace-nowrap"
+                className="inline-flex items-center gap-1.5 bg-gold/10 hover:bg-gold/20 text-gold-light border border-gold/30 px-3.5 py-1.5 rounded-xl font-body text-xs font-semibold transition-all"
               >
-                Edit request
+                <Edit3 className="w-3.5 h-3.5" /> Edit Request
               </button>
             )}
           </div>
-          <h1 className="font-display text-xl font-bold text-foreground mb-6">
-            {request.origin_city}, {request.origin_country} &rarr; {request.destination_city}, {request.destination_country}
-          </h1>
 
-          {isCancelled && (
-            <div className="bg-secondary text-foreground rounded-lg p-4 mb-6 font-body text-sm text-center">
-              This request was cancelled.
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <span className="font-mono text-3xl font-bold text-white">{request.origin_city.slice(0, 3).toUpperCase()}</span>
+              <p className="font-body text-xs text-gray-300">{request.origin_city}</p>
+              <p className="font-body text-[10px] text-gray-400 uppercase">{request.origin_country}</p>
             </div>
-          )}
-          {isDisputed && (
-            <div className="bg-destructive/10 text-destructive rounded-lg p-4 mb-6 font-body text-sm text-center">
-              This request is under review by EBAN. We'll be in touch.
-            </div>
-          )}
 
-          {!isCancelled && !isDisputed && (
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex-1 flex flex-col items-center px-4">
+              <div className="w-full flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-gold" />
+                <div className="h-px bg-gold/40 flex-1 relative flex items-center justify-center">
+                  <Plane className="w-5 h-5 text-gold absolute -top-2.5" />
+                </div>
+                <span className="w-2 h-2 rounded-full bg-gold" />
+              </div>
+              <span className="font-body text-[10px] uppercase tracking-widest text-gold-light mt-2 font-medium">Chain of Custody</span>
+            </div>
+
+            <div className="text-right">
+              <span className="font-mono text-3xl font-bold text-white">{request.destination_city.slice(0, 3).toUpperCase()}</span>
+              <p className="font-body text-xs text-gray-300">{request.destination_city}</p>
+              <p className="font-body text-[10px] text-gray-400 uppercase">{request.destination_country}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Status Tracker Line */}
+        {!isCancelled && !isDisputed && (
+          <div className="bg-card rounded-3xl border border-border/80 p-8 shadow-[var(--shadow-card)] mb-8">
+            <h3 className="font-display text-xl font-medium text-foreground mb-6">Delivery Progress Timeline</h3>
+            <div className="flex items-center justify-between relative overflow-x-auto pb-4">
               {STATUS_STEPS.map((step, idx) => {
                 const done = idx <= currentIdx;
+                const isCurrent = idx === currentIdx;
                 return (
-                  <div key={step} className="flex-1 text-center">
-                    <div className={`w-3 h-3 rounded-full mx-auto mb-2 ${done ? "bg-gold" : "border border-border"}`} />
-                    <p className={`font-body text-[10px] leading-tight ${done ? "text-foreground" : "text-muted-foreground"}`}>
+                  <div key={step} className="flex-1 text-center min-w-[70px]">
+                    <div
+                      className={`w-7 h-7 rounded-full mx-auto mb-2 flex items-center justify-center font-body text-xs font-bold transition-all ${
+                        done
+                          ? "bg-gradient-gold text-accent-foreground shadow-sm"
+                          : "bg-muted text-muted-foreground border border-border"
+                      } ${isCurrent ? "ring-4 ring-gold/20 scale-110" : ""}`}
+                    >
+                      {done ? "✓" : idx + 1}
+                    </div>
+                    <p className={`font-body text-[11px] leading-tight ${done ? "font-semibold text-foreground" : "text-muted-foreground"}`}>
                       {STATUS_STEP_LABELS[step]}
                     </p>
                   </div>
                 );
               })}
             </div>
-          )}
+          </div>
+        )}
 
-          {!isCancelled && !isDisputed && currentIdx >= STATUS_STEPS.indexOf("dropped_off") && !request.sender_dropoff_confirmed_at && (
-            <div className="bg-secondary rounded-lg p-4 mb-6 flex items-center justify-between gap-4 flex-wrap">
-              <p className="font-body text-sm text-foreground">
-                EBAN has received your package and is arranging the handoff to your traveler. Can you confirm you dropped it off with us?
-              </p>
-              <button
-                onClick={confirmDropoff}
-                disabled={confirming}
-                className="bg-gradient-gold text-accent-foreground font-display text-xs font-semibold py-2 px-4 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 whitespace-nowrap"
-              >
-                {confirming ? "Confirming..." : "Confirm drop-off"}
-              </button>
+        {/* Action Banners */}
+        {!isCancelled && !isDisputed && currentIdx >= STATUS_STEPS.indexOf("dropped_off") && !request.sender_dropoff_confirmed_at && (
+          <div className="bg-gold/10 border border-gold/30 rounded-2xl p-6 mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <h4 className="font-display text-lg font-semibold text-gold-dark">Hub Drop-off Verification Required</h4>
+              <p className="font-body text-xs text-muted-foreground mt-1">Please confirm when you have left your package at the EBAN hub.</p>
             </div>
-          )}
+            <button
+              onClick={confirmDropoff}
+              disabled={confirming}
+              className="bg-gradient-gold text-accent-foreground font-body font-bold text-xs uppercase tracking-wider py-3 px-6 rounded-xl hover:opacity-90 transition-all shadow-sm disabled:opacity-50 whitespace-nowrap"
+            >
+              {confirming ? "Confirming..." : "Confirm Drop-off"}
+            </button>
+          </div>
+        )}
 
-          {normalized === "delivered" && (
-            <div className="bg-gradient-gold text-accent-foreground rounded-lg p-4 mb-6 flex items-center justify-between gap-4 flex-wrap">
-              <p className="font-body text-sm font-semibold">
-                Your item has arrived and EBAN has received it from your traveler &mdash; it's ready for you to pick up.
-              </p>
-              <button
-                onClick={confirmPickup}
-                disabled={confirming}
-                className="bg-background text-foreground font-display text-xs font-semibold py-2 px-4 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 whitespace-nowrap"
-              >
-                {confirming ? "Confirming..." : "Confirm pickup"}
-              </button>
+        {normalized === "delivered" && (
+          <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-6 mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <h4 className="font-display text-lg font-semibold text-emerald-700">Package Arrived &amp; Ready for Pickup</h4>
+              <p className="font-body text-xs text-muted-foreground mt-1">Recipient can collect the package from the destination hub.</p>
             </div>
-          )}
+            <button
+              onClick={confirmPickup}
+              disabled={confirming}
+              className="bg-emerald-600 text-white font-body font-bold text-xs uppercase tracking-wider py-3 px-6 rounded-xl hover:bg-emerald-700 transition-all shadow-sm disabled:opacity-50 whitespace-nowrap"
+            >
+              {confirming ? "Confirming..." : "Confirm Final Receipt"}
+            </button>
+          </div>
+        )}
 
-          {normalized === "completed" && (
-            <div className="bg-secondary text-foreground rounded-lg p-4 mb-6 font-body text-sm text-center">
-              You confirmed pickup{request.pickup_confirmed_at ? ` on ${new Date(request.pickup_confirmed_at).toLocaleDateString()}` : ""}. This request is complete &mdash; thank you for using EBAN.
-            </div>
-          )}
-
+        {/* Package Specifications Container */}
+        <div className="bg-card rounded-3xl border border-border/80 p-8 shadow-[var(--shadow-card)]">
           {editing && form ? (
-            <form onSubmit={handleSave} className="space-y-4">
+            <form onSubmit={handleSave} className="space-y-5">
+              <h3 className="font-display text-2xl font-normal text-foreground">Edit Package Details</h3>
+
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="font-display text-xs font-semibold text-foreground mb-1 block">Origin country</label>
+                  <label className="font-body text-xs font-semibold uppercase text-foreground mb-1 block">Origin Country</label>
                   <input required className={fieldClasses} value={form.originCountry} onChange={(e) => setForm({ ...form, originCountry: e.target.value })} />
                 </div>
                 <div>
-                  <label className="font-display text-xs font-semibold text-foreground mb-1 block">Origin city</label>
+                  <label className="font-body text-xs font-semibold uppercase text-foreground mb-1 block">Origin City</label>
                   <input required className={fieldClasses} value={form.originCity} onChange={(e) => setForm({ ...form, originCity: e.target.value })} />
                 </div>
                 <div>
-                  <label className="font-display text-xs font-semibold text-foreground mb-1 block">Destination country</label>
+                  <label className="font-body text-xs font-semibold uppercase text-foreground mb-1 block">Destination Country</label>
                   <input required className={fieldClasses} value={form.destinationCountry} onChange={(e) => setForm({ ...form, destinationCountry: e.target.value })} />
                 </div>
                 <div>
-                  <label className="font-display text-xs font-semibold text-foreground mb-1 block">Destination city</label>
+                  <label className="font-body text-xs font-semibold uppercase text-foreground mb-1 block">Destination City</label>
                   <input required className={fieldClasses} value={form.destinationCity} onChange={(e) => setForm({ ...form, destinationCity: e.target.value })} />
                 </div>
               </div>
 
               <div>
-                <label className="font-display text-xs font-semibold text-foreground mb-1 block">Item type</label>
+                <label className="font-body text-xs font-semibold uppercase text-foreground mb-1 block">Item Type</label>
                 <div className="flex flex-wrap gap-2">
                   {ITEM_TYPES.map((type) => (
                     <button
                       key={type}
                       type="button"
-                      className={`px-3 py-1.5 rounded-lg font-display text-xs font-semibold border transition-colors ${
-                        form.itemType === type ? "bg-gradient-gold text-accent-foreground border-transparent" : "bg-background border-border text-muted-foreground hover:border-gold/50"
+                      className={`px-3.5 py-1.5 rounded-xl font-body text-xs font-semibold border transition-all ${
+                        form.itemType === type ? "bg-gradient-gold text-accent-foreground border-transparent" : "bg-card border-border text-muted-foreground hover:border-gold/50"
                       }`}
                       onClick={() => setForm({ ...form, itemType: type })}
                     >
@@ -337,7 +372,7 @@ const SenderRequestDetail = () => {
               </div>
 
               <div>
-                <label className="font-display text-xs font-semibold text-foreground mb-1 block">Item description</label>
+                <label className="font-body text-xs font-semibold uppercase text-foreground mb-1 block">Item Description</label>
                 <textarea
                   required
                   rows={3}
@@ -349,125 +384,83 @@ const SenderRequestDetail = () => {
 
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="font-display text-xs font-semibold text-foreground mb-1 block">Weight (kg)</label>
+                  <label className="font-body text-xs font-semibold uppercase text-foreground mb-1 block">Weight (kg)</label>
                   <input type="number" step="0.1" min="0" required className={fieldClasses} value={form.weightKg} onChange={(e) => setForm({ ...form, weightKg: e.target.value })} />
                 </div>
                 <div>
-                  <label className="font-display text-xs font-semibold text-foreground mb-1 block">Declared value (USD)</label>
+                  <label className="font-body text-xs font-semibold uppercase text-foreground mb-1 block">Declared Value (USD $)</label>
                   <input type="number" step="1" min="0" required className={fieldClasses} value={form.itemValue} onChange={(e) => setForm({ ...form, itemValue: e.target.value })} />
                 </div>
               </div>
 
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="font-display text-xs font-semibold text-foreground mb-1 block">Preferred date</label>
-                  <input type="date" className={fieldClasses} value={form.preferredDate} onChange={(e) => setForm({ ...form, preferredDate: e.target.value })} />
-                </div>
-                <div>
-                  <label className="font-display text-xs font-semibold text-foreground mb-1 block">Urgency</label>
-                  <div className="flex gap-2">
-                    {URGENCY_LEVELS.map((level) => (
-                      <button
-                        key={level}
-                        type="button"
-                        className={`flex-1 py-2.5 rounded-lg font-display text-xs font-semibold capitalize border transition-colors ${
-                          form.urgencyLevel === level ? "bg-gradient-gold text-accent-foreground border-transparent" : "bg-background border-border text-muted-foreground hover:border-gold/50"
-                        }`}
-                        onClick={() => setForm({ ...form, urgencyLevel: level })}
-                      >
-                        {level}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <label className="font-display text-xs font-semibold text-foreground mb-1 block">Special handling</label>
-                <div className="flex flex-wrap gap-2">
-                  {HANDLING_FLAGS.map((flag) => (
-                    <button
-                      key={flag}
-                      type="button"
-                      className={`px-3 py-1.5 rounded-lg font-display text-xs font-semibold capitalize border transition-colors ${
-                        form.flags.includes(flag) ? "bg-gradient-gold text-accent-foreground border-transparent" : "bg-background border-border text-muted-foreground hover:border-gold/50"
-                      }`}
-                      onClick={() => toggleFlag(flag)}
-                    >
-                      {flag.replace("_", " ")}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex gap-3 pt-2">
+              <div className="flex gap-3 pt-4">
                 <button
                   type="button"
                   onClick={() => setEditing(false)}
                   disabled={saving}
-                  className="flex-1 border border-border text-foreground font-display font-semibold py-3 rounded-lg text-sm hover:bg-secondary transition-colors disabled:opacity-50"
+                  className="flex-1 border border-border text-foreground font-body font-semibold py-3.5 rounded-xl text-xs uppercase tracking-wider hover:bg-secondary transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex-1 bg-gradient-gold text-accent-foreground font-display font-bold py-3 rounded-lg text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
+                  className="flex-1 bg-gradient-gold text-accent-foreground font-body font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider hover:opacity-90 shadow-md transition-all"
                 >
-                  {saving ? "Saving..." : "Save changes"}
+                  {saving ? "Saving Changes..." : "Save Changes"}
                 </button>
               </div>
             </form>
           ) : (
-            <>
-              <div className="grid grid-cols-2 gap-4 mb-6">
+            <div>
+              <h3 className="font-display text-2xl font-normal text-foreground mb-6">Cargo Specifications</h3>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
                 <div className={inputClasses}>
-                  <p className="font-body text-xs text-muted-foreground">Item</p>
-                  <p className="font-display text-sm font-semibold text-foreground capitalize">{request.item_type}</p>
+                  <span className="font-body text-[10px] uppercase font-semibold text-muted-foreground block mb-1">Category</span>
+                  <span className="font-body text-sm font-semibold text-foreground">{request.item_type}</span>
                 </div>
                 <div className={inputClasses}>
-                  <p className="font-body text-xs text-muted-foreground">Weight</p>
-                  <p className="font-display text-sm font-semibold text-foreground">{request.weight_kg}kg</p>
+                  <span className="font-body text-[10px] uppercase font-semibold text-muted-foreground block mb-1">Weight</span>
+                  <span className="font-body text-sm font-semibold text-foreground">{request.weight_kg} kg</span>
                 </div>
                 <div className={inputClasses}>
-                  <p className="font-body text-xs text-muted-foreground">Declared value</p>
-                  <p className="font-display text-sm font-semibold text-foreground">${request.item_value}</p>
+                  <span className="font-body text-[10px] uppercase font-semibold text-muted-foreground block mb-1">Declared Value</span>
+                  <span className="font-body text-sm font-semibold text-foreground">${request.item_value} USD</span>
                 </div>
                 <div className={inputClasses}>
-                  <p className="font-body text-xs text-muted-foreground">Preferred date</p>
-                  <p className="font-display text-sm font-semibold text-foreground">
+                  <span className="font-body text-[10px] uppercase font-semibold text-muted-foreground block mb-1">Target Date</span>
+                  <span className="font-body text-sm font-semibold text-foreground">
                     {request.preferred_date ? new Date(request.preferred_date).toLocaleDateString() : "Flexible"}
-                  </p>
+                  </span>
                 </div>
               </div>
 
               {request.item_description && (
-                <div className="mb-6">
-                  <p className="font-body text-xs text-muted-foreground mb-1">Description</p>
-                  <p className="font-body text-sm text-foreground">{request.item_description}</p>
+                <div className="mb-6 bg-secondary/30 p-4 rounded-xl border border-border/60">
+                  <span className="font-body text-xs font-semibold uppercase text-muted-foreground block mb-1">Item Description</span>
+                  <p className="font-body text-sm text-foreground leading-relaxed">{request.item_description}</p>
                 </div>
               )}
 
               {request.special_handling_flags?.length > 0 && (
-                <div className="mb-6 flex flex-wrap gap-2">
-                  {request.special_handling_flags.map((flag) => (
-                    <span key={flag} className="px-3 py-1 rounded-full text-xs font-display font-semibold bg-secondary text-secondary-foreground capitalize">
-                      {flag.replace("_", " ")}
-                    </span>
-                  ))}
+                <div className="mb-6">
+                  <span className="font-body text-xs font-semibold uppercase text-muted-foreground block mb-2">Special Handling Instructions</span>
+                  <div className="flex flex-wrap gap-2">
+                    {request.special_handling_flags.map((flag) => (
+                      <span key={flag} className="px-3 py-1 rounded-xl text-xs font-body font-semibold bg-earth text-gold-light border border-gold/30 capitalize">
+                        + {flag.replace("_", " ")}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               )}
 
-              {!canEdit && !isCancelled && !isDisputed && (
-                <p className="font-body text-xs text-muted-foreground mb-4">
-                  This request has already been matched, so details are locked in. Contact EBAN if something needs to change.
-                </p>
-              )}
-
-              <div className="bg-accent/10 text-accent-foreground rounded-lg p-3 font-body text-xs">
-                EBAN handles the handoff to your traveler directly &mdash; you won't be contacted by them, and they won't contact you.
+              <div className="bg-gold/10 border border-gold/20 text-gold-dark rounded-xl p-4 font-body text-xs flex items-center gap-3">
+                <ShieldCheck className="w-5 h-5 text-gold shrink-0" />
+                <span>EBAN manages all physical drop-offs, security checks, and traveler handoffs. Direct contact between users is strictly prevented for your privacy.</span>
               </div>
-            </>
+            </div>
           )}
         </div>
       </div>
@@ -476,3 +469,4 @@ const SenderRequestDetail = () => {
 };
 
 export default SenderRequestDetail;
+

@@ -11,6 +11,13 @@ import {
   Lock,
   FileSignature,
   ChevronRight,
+  Sparkles,
+  Globe,
+  ArrowUpRight,
+  Check,
+  X,
+  Clock,
+  Award,
 } from "lucide-react";
 import { Link, Navigate, useSearchParams } from "react-router-dom";
 import BookingForm from "@/components/BookingForm";
@@ -49,67 +56,81 @@ const Reveal = ({ children, className = "" }: { children: React.ReactNode; class
 
 const SectionLabel = ({ children }: { children: React.ReactNode }) => (
   <div className="flex items-center gap-3 mb-4">
-    <span className="w-7 h-px bg-gold" />
-    <span className="font-body text-xs font-medium tracking-[0.2em] uppercase text-gold-dark">{children}</span>
+    <span className="w-8 h-px bg-gold-dark" />
+    <span className="font-body text-xs font-semibold tracking-[0.2em] uppercase text-gold-dark">{children}</span>
   </div>
 );
 
 const Navbar = () => {
   const { user, profile, signOut } = useAuth();
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/85 backdrop-blur-md border-b border-border">
-      <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <img src={ebanSymbol} alt="EBAN symbol" className="w-9 h-9" />
-          <span className="font-display text-2xl font-semibold tracking-[0.15em] text-foreground">EBAN</span>
-        </div>
-        <div className="hidden md:flex items-center gap-8 font-body text-xs font-medium tracking-[0.12em] uppercase text-muted-foreground">
-          <a href="#how-it-works" className="hover:text-foreground transition-colors">How It Works</a>
-          <a href="#what-we-carry" className="hover:text-foreground transition-colors">What We Carry</a>
-          <a href="#trust" className="hover:text-foreground transition-colors">Trust &amp; Safety</a>
-          <a href="#book" className="hover:text-foreground transition-colors">Book a Delivery</a>
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-charcoal/90 backdrop-blur-xl border-b border-gold/15 py-3 shadow-lg" : "bg-transparent py-5"}`}>
+      <div className="container mx-auto px-6 flex items-center justify-between">
+        <Link to="/" className="flex items-center gap-3 group">
+          <div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/30 flex items-center justify-center group-hover:border-gold transition-colors">
+            <img src={ebanSymbol} alt="EBAN symbol" className="w-6 h-6 object-contain" />
+          </div>
+          <div className="flex flex-col">
+            <span className="font-display text-2xl font-semibold tracking-[0.18em] text-white">EBAN</span>
+            <span className="font-body text-[9px] font-medium tracking-[0.2em] uppercase text-gold-light">Global Logistics</span>
+          </div>
+        </Link>
+
+        <div className="hidden md:flex items-center gap-8 font-body text-xs font-medium tracking-[0.15em] uppercase text-gray-300">
+          <a href="#how-it-works" className="hover:text-gold-light transition-colors">Process</a>
+          <a href="#what-we-carry" className="hover:text-gold-light transition-colors">Guidelines</a>
+          <a href="#trust" className="hover:text-gold-light transition-colors">Trust &amp; Verification</a>
+          <a href="#book" className="hover:text-gold-light transition-colors">Dispatch Package</a>
           <a
             href="https://wa.me/23058440472"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-gold-dark hover:text-gold transition-colors"
+            className="text-gold-light hover:text-gold flex items-center gap-1 transition-colors"
           >
-            WhatsApp Us
+            Support <ArrowUpRight className="w-3 h-3" />
           </a>
         </div>
+
         {user ? (
           <div className="flex items-center gap-4">
             {profile?.role === "Traveller" && (
-              <Link to="/traveler" className="font-body text-xs font-semibold tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors">
-                My trips
+              <Link to="/traveler" className="font-body text-xs font-semibold tracking-[0.1em] uppercase text-gold-light hover:text-white transition-colors">
+                My Trips
               </Link>
             )}
             {profile?.role === "Sender" && (
-              <Link to="/sender/requests" className="font-body text-xs font-semibold tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors">
-                My requests
+              <Link to="/sender/requests" className="font-body text-xs font-semibold tracking-[0.1em] uppercase text-gold-light hover:text-white transition-colors">
+                My Requests
               </Link>
             )}
             {profile?.role === "Admin" && (
-              <Link to="/admin/bookings" className="font-body text-xs font-semibold tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors">
-                Admin
+              <Link to="/admin/bookings" className="font-body text-xs font-semibold tracking-[0.1em] uppercase text-gold-light hover:text-white transition-colors">
+                Admin Suite
               </Link>
             )}
-            <span className="hidden sm:inline font-body text-sm text-muted-foreground">
-              {profile?.full_name ?? "Account"}
-            </span>
-            <button onClick={signOut} className="font-body text-xs font-semibold tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors">
-              Sign out
+            <button
+              onClick={signOut}
+              className="border border-gold/30 hover:border-gold text-gold-light font-body text-xs font-semibold tracking-[0.1em] uppercase px-4 py-2 rounded-xl transition-colors"
+            >
+              Sign Out
             </button>
           </div>
         ) : (
           <div className="flex items-center gap-3">
-            <Link to="/login" className="font-body text-xs font-semibold tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors">
-              Log in
+            <Link to="/login" className="font-body text-xs font-semibold tracking-[0.1em] uppercase text-gray-300 hover:text-white transition-colors px-3 py-2">
+              Log In
             </Link>
             <Link
               to="/signup"
-              className="border border-gold text-gold-dark font-body text-xs font-semibold tracking-[0.15em] uppercase px-5 py-2.5 hover:bg-gold hover:text-accent-foreground transition-colors"
+              className="bg-gradient-gold text-charcoal font-body text-xs font-bold tracking-[0.15em] uppercase px-6 py-2.5 rounded-xl hover:opacity-90 transition-all shadow-md glow-gold"
             >
               Get Started
             </Link>
@@ -121,48 +142,132 @@ const Navbar = () => {
 };
 
 const Hero = () => (
-  <section className="relative min-h-screen flex items-center bg-gradient-hero overflow-hidden">
-    <div
-      className="absolute inset-0"
-      style={{
-        background:
-          "radial-gradient(ellipse 60% 70% at 75% 50%, hsl(var(--earth) / 0.5) 0%, transparent 70%), radial-gradient(ellipse 40% 60% at 15% 60%, hsl(var(--gold) / 0.06) 0%, transparent 60%)",
-      }}
-    />
+  <section className="relative min-h-screen flex flex-col justify-center bg-gradient-hero overflow-hidden pt-28 pb-16">
+    {/* Ambient Glow Elements */}
+    <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[700px] bg-gold/10 rounded-full blur-[140px] pointer-events-none" />
+    <div className="absolute bottom-10 right-10 w-96 h-96 bg-accent/10 rounded-full blur-[120px] pointer-events-none" />
+
     <img
       src={ebanSymbol}
       alt=""
       aria-hidden="true"
-      className="absolute -right-20 top-1/2 -translate-y-1/2 w-[560px] h-[560px] object-contain opacity-[0.05] pointer-events-none select-none"
-      style={{ filter: "brightness(10)" }}
+      className="absolute -right-20 top-1/2 -translate-y-1/2 w-[650px] h-[650px] object-contain opacity-[0.04] pointer-events-none select-none"
     />
-    <div className="container mx-auto px-6 relative z-10 pt-24 pb-16">
-      <div className="max-w-2xl animate-fade-up">
-        <div className="inline-flex items-center gap-2 bg-gold/10 border border-gold/25 px-4 py-1.5 mb-8">
-          <span className="w-1.5 h-1.5 rounded-full bg-gold animate-pulse" />
-          <span className="font-body text-[11px] font-medium tracking-[0.2em] uppercase text-gold-light">
-            Peer-to-Peer Delivery Network
-          </span>
+
+    <div className="container mx-auto px-6 relative z-10 my-auto">
+      <div className="grid lg:grid-cols-12 gap-12 items-center">
+        <div className="lg:col-span-7 animate-fade-up">
+          <div className="inline-flex items-center gap-2.5 bg-gold/10 border border-gold/30 backdrop-blur-md px-4 py-2 rounded-full mb-8">
+            <span className="w-2 h-2 rounded-full bg-gold animate-pulse" />
+            <span className="font-body text-[11px] font-semibold tracking-[0.2em] uppercase text-gold-light">
+              P2P Air Cargo Network
+            </span>
+          </div>
+
+          <h1 className="font-display text-5xl md:text-7xl font-light text-white leading-[1.08] mb-6">
+            Send packages with travelers <em className="italic text-gold-light font-normal">already on your route.</em>
+          </h1>
+
+          <p className="font-body text-base md:text-lg font-light text-gray-300 max-w-xl mb-10 leading-relaxed">
+            EBAN connects international senders with verified flight passengers holding spare baggage allowance. Structured, secure, and 100% accountable.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 mb-14">
+            <a
+              href="#book"
+              className="bg-gradient-gold text-charcoal font-body text-xs font-bold tracking-[0.15em] uppercase px-8 py-4 rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-lg glow-gold"
+            >
+              Dispatch a Package <ChevronRight className="w-4 h-4" />
+            </a>
+            <a
+              href="#how-it-works"
+              className="border border-white/20 text-gray-200 font-body text-xs font-semibold tracking-[0.15em] uppercase px-8 py-4 rounded-xl hover:border-gold hover:text-gold-light transition-all text-center backdrop-blur-sm"
+            >
+              Explore Protocol
+            </a>
+          </div>
+
+          {/* Stats Ticker Bar */}
+          <div className="grid grid-cols-3 gap-6 border-t border-white/10 pt-8 max-w-lg">
+            <div>
+              <span className="font-mono text-2xl md:text-3xl font-bold text-gold-light">100%</span>
+              <p className="font-body text-xs text-gray-400 mt-1">Verified Passports</p>
+            </div>
+            <div>
+              <span className="font-mono text-2xl md:text-3xl font-bold text-white">48h</span>
+              <p className="font-body text-xs text-gray-400 mt-1">Avg Global Handoff</p>
+            </div>
+            <div>
+              <span className="font-mono text-2xl md:text-3xl font-bold text-gold-light">$0</span>
+              <p className="font-body text-xs text-gray-400 mt-1">Direct Contact Risk</p>
+            </div>
+          </div>
         </div>
-        <h1 className="font-display text-6xl md:text-7xl font-light text-primary-foreground leading-[1.05] mb-6">
-          Send items with people <em className="italic text-gold-light">already headed</em> there.
-        </h1>
-        <p className="font-body text-base md:text-lg font-light text-primary-foreground/60 max-w-lg mb-10 leading-relaxed">
-          EBAN connects senders with verified travelers on the same route — structured, accountable, and incentivised. You never deal with the other side directly; EBAN handles every handoff.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4">
-          <a
-            href="#book"
-            className="bg-gold text-accent-foreground font-body text-xs font-semibold tracking-[0.15em] uppercase px-8 py-4 hover:bg-gold-dark transition-colors flex items-center justify-center gap-2"
-          >
-            Book a Delivery <ChevronRight className="w-4 h-4" />
-          </a>
-          <a
-            href="#how-it-works"
-            className="border border-primary-foreground/25 text-primary-foreground/70 font-body text-xs font-medium tracking-[0.15em] uppercase px-8 py-4 hover:border-gold hover:text-gold-light transition-colors text-center"
-          >
-            How It Works
-          </a>
+
+        {/* Hero Interactive Flight Card Graphic */}
+        <div className="lg:col-span-5 hidden lg:block">
+          <div className="bg-charcoal/80 backdrop-blur-2xl border border-gold/20 rounded-3xl p-8 shadow-2xl relative">
+            <div className="flex items-center justify-between pb-6 border-b border-white/10">
+              <div className="flex items-center gap-3">
+                <div className="w-3 h-3 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="font-body text-xs font-semibold uppercase tracking-widest text-gray-300">Live Matching Active</span>
+              </div>
+              <span className="font-mono text-xs text-gold-light font-bold">FLIGHT EBN-842</span>
+            </div>
+
+            <div className="py-8 space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="font-mono text-3xl font-bold text-white">ACC</span>
+                  <p className="font-body text-xs text-gray-400">Accra, Ghana</p>
+                </div>
+
+                <div className="flex-1 flex flex-col items-center px-4">
+                  <div className="w-full flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-gold" />
+                    <div className="h-px bg-gold/40 flex-1 relative flex items-center justify-center">
+                      <Plane className="w-5 h-5 text-gold absolute -top-2.5 animate-pulse" />
+                    </div>
+                    <span className="w-2 h-2 rounded-full bg-gold" />
+                  </div>
+                  <span className="font-body text-[10px] uppercase font-semibold text-gold-light tracking-widest mt-2">6.5 Hours Flight</span>
+                </div>
+
+                <div className="text-right">
+                  <span className="font-mono text-3xl font-bold text-white">JFK</span>
+                  <p className="font-body text-xs text-gray-400">New York, USA</p>
+                </div>
+              </div>
+
+              <div className="bg-white/5 rounded-2xl p-4 border border-white/10 space-y-3">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-gray-400">Luggage Allowance</span>
+                  <span className="text-gold-light font-semibold">12 kg Available</span>
+                </div>
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-gray-400">Intake Inspection</span>
+                  <span className="text-emerald-400 font-semibold flex items-center gap-1">
+                    <ShieldCheck className="w-3.5 h-3.5" /> Passed Verification
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-white/10 flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-gold/20 border border-gold/40 flex items-center justify-center text-gold font-bold text-xs">
+                  KA
+                </div>
+                <div>
+                  <p className="font-body text-xs font-semibold text-white">Kwame A.</p>
+                  <p className="font-body text-[10px] text-gray-400">Verified Traveler</p>
+                </div>
+              </div>
+              <a href="#book" className="bg-gold/10 hover:bg-gold/20 text-gold-light border border-gold/30 font-body text-xs font-semibold px-4 py-2 rounded-xl transition-all">
+                Match Route
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -170,94 +275,103 @@ const Hero = () => (
 );
 
 const processSteps = [
-  { icon: FileText, title: "Request" },
-  { icon: Users, title: "Matching" },
-  { icon: PackageCheck, title: "Drop-off & Verification" },
-  { icon: Handshake, title: "Handoff" },
-  { icon: Plane, title: "In Transit" },
-  { icon: CheckCircle2, title: "Delivery" },
+  { icon: FileText, title: "1. Package Request", desc: "Sender specifies route, weight, and special handling instructions." },
+  { icon: Users, title: "2. Route Matching", desc: "EBAN automatically pairs request with a verified traveler on exact flight." },
+  { icon: PackageCheck, title: "3. Hub Drop-off", desc: "Sender leaves package at EBAN hub for physical security inspection." },
+  { icon: Handshake, title: "4. Traveler Handoff", desc: "Inspected package handed to traveler with digital signature timestamp." },
+  { icon: Plane, title: "5. In-Flight Transit", desc: "Traveler carries package in luggage under chain-of-custody track." },
+  { icon: CheckCircle2, title: "6. Verified Delivery", desc: "Recipient signs digital receipt at destination hub for payout release." },
 ];
 
 const HowItWorks = () => (
-  <section id="how-it-works" className="py-24 bg-charcoal">
+  <section id="how-it-works" className="py-24 bg-charcoal text-white relative">
     <div className="container mx-auto px-6">
-      <SectionLabel>The Process</SectionLabel>
-      <h2 className="font-display text-4xl md:text-5xl font-light text-primary-foreground leading-tight max-w-xl">
+      <SectionLabel>End-to-End Protocol</SectionLabel>
+      <h2 className="font-display text-4xl md:text-5xl font-light leading-tight max-w-xl text-white">
         Six steps from <em className="italic text-gold-light">request to delivery</em>
       </h2>
-      <p className="font-body text-sm text-primary-foreground/50 max-w-lg mt-4 leading-relaxed">
-        Every delivery follows the same defined process. Both sides know exactly what to expect — and EBAN is the only party either of them ever deals with.
+      <p className="font-body text-sm text-gray-400 max-w-lg mt-4 leading-relaxed">
+        Every delivery adheres to a strict protocol. Neither party shares personal contacts &mdash; EBAN manages physical intake, security, and payment escrow.
       </p>
-      <Reveal className="relative mt-16">
-        <div className="hidden lg:block absolute top-8 left-[8%] right-[8%] h-px bg-gold/20" />
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-x-4 gap-y-12">
-          {processSteps.map((step, i) => (
-            <div key={step.title} className="group relative z-10 text-center px-2">
-              <div className="w-16 h-16 bg-charcoal border border-gold/30 flex items-center justify-center mb-5 mx-auto font-display text-2xl font-light text-gold-light transition-colors duration-300 group-hover:bg-gold group-hover:border-gold group-hover:text-charcoal">
-                {String(i + 1).padStart(2, "0")}
-              </div>
-              <step.icon className="w-6 h-6 text-gold mb-3 mx-auto" strokeWidth={1.5} />
-              <h3 className="font-display text-base font-normal text-primary-foreground">{step.title}</h3>
+
+      <Reveal className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-16">
+        {processSteps.map((step, i) => (
+          <div
+            key={step.title}
+            className="group bg-white/[0.03] border border-white/10 hover:border-gold/40 p-8 rounded-2xl transition-all duration-300 hover:-translate-y-1"
+          >
+            <div className="w-12 h-12 rounded-xl bg-gold/10 border border-gold/30 flex items-center justify-center mb-6 text-gold group-hover:bg-gold group-hover:text-charcoal transition-colors">
+              <step.icon className="w-6 h-6" strokeWidth={1.5} />
             </div>
-          ))}
-        </div>
+            <h3 className="font-display text-xl font-normal text-white mb-2">{step.title}</h3>
+            <p className="font-body text-xs text-gray-400 leading-relaxed">{step.desc}</p>
+          </div>
+        ))}
       </Reveal>
     </div>
   </section>
 );
 
 const eligibleItems = [
-  "Documents and printed materials",
-  "Clothing, shoes, and accessories",
-  "Personal care and hygiene products",
-  "Non-perishable, sealed food items",
-  "Small electronics and accessories",
-  "Gifts and small household goods within the weight limit",
+  "Official documents, printed certificates, & legal papers",
+  "Clothing, apparel, shoes, and luxury accessories",
+  "Personal care, sealed cosmetics, and hygiene items",
+  "Non-perishable, commercially packaged dried foodstuffs",
+  "Small consumer electronics and gadgets",
+  "Household gifts compliant with airport customs",
 ];
 
 const prohibitedItems = [
-  "Cash, cheques, or other financial instruments",
-  "Weapons, ammunition, or hazardous materials",
-  "Controlled substances or unprescribed medication",
-  "Perishable food requiring refrigeration",
-  "Anything illegal to import at the destination",
-  "Any item the traveler isn't comfortable carrying",
+  "Cash, bank notes, cheques, or bearer bonds",
+  "Weapons, ammunition, explosives, or flammables",
+  "Unprescribed medicine or controlled substances",
+  "Fresh meat, produce, or unsealed perishable food",
+  "Customs-restricted luxury items exceeding limits",
+  "Any unverified package not inspected by EBAN",
 ];
 
 const WhatWeCarry = () => (
   <section id="what-we-carry" className="py-24 bg-background">
     <div className="container mx-auto px-6">
-      <SectionLabel>What We Carry</SectionLabel>
+      <SectionLabel>Safety &amp; Compliance</SectionLabel>
       <h2 className="font-display text-4xl md:text-5xl font-light text-foreground leading-tight max-w-xl">
-        Clear rules, <em className="italic">no surprises</em>
+        Clear item rules, <em className="italic font-normal text-gold-dark">zero customs risk</em>
       </h2>
-      <Reveal className="grid md:grid-cols-2 gap-10 mt-16">
-        <div className="border border-border bg-card p-10 transition-transform duration-300 hover:-translate-y-1">
-          <h3 className="font-display text-xl font-medium text-foreground mb-6">Eligible Items</h3>
-          <ul className="space-y-3">
+      <Reveal className="grid md:grid-cols-2 gap-8 mt-16">
+        <div className="border border-emerald-500/20 bg-emerald-500/[0.02] rounded-3xl p-10 shadow-sm">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600 font-bold">
+              <Check className="w-4 h-4" />
+            </div>
+            <h3 className="font-display text-2xl font-medium text-foreground">Eligible Cargo</h3>
+          </div>
+          <ul className="space-y-4">
             {eligibleItems.map((item) => (
-              <li key={item} className="flex gap-3 items-start border-b border-border pb-3 last:border-0 last:pb-0">
-                <span className="text-earth font-semibold text-sm mt-0.5">&#10003;</span>
+              <li key={item} className="flex gap-3 items-start border-b border-border/50 pb-3 last:border-0 last:pb-0">
+                <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
                 <span className="font-body text-sm text-muted-foreground leading-relaxed">{item}</span>
               </li>
             ))}
           </ul>
         </div>
-        <div className="border border-destructive/20 bg-destructive/[0.03] p-10 transition-transform duration-300 hover:-translate-y-1">
-          <h3 className="font-display text-xl font-medium text-foreground mb-6">Prohibited Items</h3>
-          <ul className="space-y-3">
+
+        <div className="border border-destructive/20 bg-destructive/[0.02] rounded-3xl p-10 shadow-sm">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-8 h-8 rounded-full bg-destructive/10 flex items-center justify-center text-destructive font-bold">
+              <X className="w-4 h-4" />
+            </div>
+            <h3 className="font-display text-2xl font-medium text-foreground">Prohibited Cargo</h3>
+          </div>
+          <ul className="space-y-4">
             {prohibitedItems.map((item) => (
-              <li key={item} className="flex gap-3 items-start border-b border-border pb-3 last:border-0 last:pb-0">
-                <span className="text-destructive font-semibold text-sm mt-0.5">&#10005;</span>
+              <li key={item} className="flex gap-3 items-start border-b border-border/50 pb-3 last:border-0 last:pb-0">
+                <X className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
                 <span className="font-body text-sm text-muted-foreground leading-relaxed">{item}</span>
               </li>
             ))}
           </ul>
         </div>
       </Reveal>
-      <p className="font-body text-xs text-muted-foreground max-w-2xl mt-8 leading-relaxed">
-        Customs rules vary by destination — EBAN staff review every request before it's matched, and a traveler can decline any item without penalty.
-      </p>
     </div>
   </section>
 );
@@ -265,34 +379,34 @@ const WhatWeCarry = () => (
 const trustPillars = [
   {
     icon: ShieldCheck,
-    title: "Verified Identities",
-    desc: "Every traveler completes ID verification with EBAN — passport, national ID, or driver's license — before being matched to a delivery.",
+    title: "100% ID Verified Travelers",
+    desc: "Passports and government photo identification are verified with automated KYC checks before any flight is matched.",
   },
   {
     icon: Lock,
-    title: "No Direct Contact",
-    desc: "Senders and travelers never exchange contact details. EBAN handles matching, drop-off, and handoff at every step.",
+    title: "Protected Zero-Contact Privacy",
+    desc: "Senders and travelers never share phone numbers or home addresses. All handoffs occur at secure EBAN inspection hubs.",
   },
   {
     icon: FileSignature,
-    title: "Signed Handoff",
-    desc: "Every handoff is confirmed with a digital signature, so there's a clear, timestamped record from drop-off to delivery.",
+    title: "Digital Proof of Delivery",
+    desc: "Intake and final handoffs require cryptographic digital signatures with time-stamped visual condition records.",
   },
 ];
 
 const TrustSafety = () => (
-  <section id="trust" className="py-24 bg-charcoal">
+  <section id="trust" className="py-24 bg-charcoal text-white">
     <div className="container mx-auto px-6">
-      <SectionLabel>Trust &amp; Safety</SectionLabel>
-      <h2 className="font-display text-4xl md:text-5xl font-light text-primary-foreground leading-tight max-w-xl">
-        Accountability <em className="italic text-gold-light">at every step</em>
+      <SectionLabel>Guaranteed Security</SectionLabel>
+      <h2 className="font-display text-4xl md:text-5xl font-light leading-tight max-w-xl text-white">
+        Built for accountability <em className="italic text-gold-light">at every mile</em>
       </h2>
-      <Reveal className="grid sm:grid-cols-3 gap-px bg-gold/10 mt-16">
+      <Reveal className="grid sm:grid-cols-3 gap-8 mt-16">
         {trustPillars.map((pillar) => (
-          <div key={pillar.title} className="bg-charcoal p-10 hover:bg-earth transition-colors duration-300">
-            <pillar.icon className="w-6 h-6 text-gold mb-5" strokeWidth={1.5} />
-            <h3 className="font-display text-xl font-normal text-gold-light mb-3">{pillar.title}</h3>
-            <p className="font-body text-sm text-primary-foreground/45 leading-relaxed">{pillar.desc}</p>
+          <div key={pillar.title} className="bg-white/[0.03] border border-white/10 rounded-2xl p-8 hover:border-gold/40 transition-all">
+            <pillar.icon className="w-8 h-8 text-gold mb-6" strokeWidth={1.5} />
+            <h3 className="font-display text-xl font-normal text-white mb-3">{pillar.title}</h3>
+            <p className="font-body text-xs text-gray-400 leading-relaxed">{pillar.desc}</p>
           </div>
         ))}
       </Reveal>
@@ -301,21 +415,28 @@ const TrustSafety = () => (
 );
 
 const Footer = () => (
-  <footer className="bg-charcoal text-primary-foreground py-12 border-t border-gold/10">
+  <footer className="bg-charcoal text-white py-16 border-t border-gold/15">
     <div className="container mx-auto px-6">
-      <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-8 pb-12 border-b border-white/10">
         <div className="flex items-center gap-3">
-          <img src={ebanSymbol} alt="EBAN" className="w-8 h-8" />
-          <span className="font-display text-xl font-semibold tracking-[0.15em]">EBAN</span>
+          <div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/30 flex items-center justify-center">
+            <img src={ebanSymbol} alt="EBAN" className="w-6 h-6 object-contain" />
+          </div>
+          <div>
+            <span className="font-display text-2xl font-semibold tracking-[0.18em]">EBAN</span>
+            <p className="font-body text-[10px] uppercase tracking-widest text-gold-light">International Peer Logistics</p>
+          </div>
         </div>
-        <div className="flex gap-8 font-body text-xs tracking-[0.1em] uppercase text-primary-foreground/50">
-          <a href="#how-it-works" className="hover:text-primary-foreground transition-colors">How It Works</a>
-          <a href="#what-we-carry" className="hover:text-primary-foreground transition-colors">What We Carry</a>
-          <a href="#book" className="hover:text-primary-foreground transition-colors">Book</a>
+        <div className="flex gap-8 font-body text-xs tracking-[0.1em] uppercase text-gray-400">
+          <a href="#how-it-works" className="hover:text-white transition-colors">Process</a>
+          <a href="#what-we-carry" className="hover:text-white transition-colors">Guidelines</a>
+          <a href="#trust" className="hover:text-white transition-colors">Security</a>
+          <a href="#book" className="hover:text-white transition-colors">Book Delivery</a>
         </div>
       </div>
-      <div className="border-t border-primary-foreground/10 mt-8 pt-6 text-center">
-        <p className="font-body text-xs text-primary-foreground/30">© {new Date().getFullYear()} EBAN. Trusted peer-to-peer delivery, powered by everyday travelers.</p>
+      <div className="mt-8 pt-4 flex flex-col sm:flex-row items-center justify-between text-xs font-body text-gray-500 gap-4">
+        <p>&copy; {new Date().getFullYear()} EBAN Logistics Network. All rights reserved.</p>
+        <p className="text-gray-400">Encrypted Handoff &amp; Verification Protocol</p>
       </div>
     </div>
   </footer>
@@ -327,8 +448,11 @@ const Index = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center font-body text-muted-foreground">
-        Loading...
+      <div className="min-h-screen flex items-center justify-center font-body text-muted-foreground bg-charcoal text-white">
+        <div className="flex items-center gap-3">
+          <div className="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin" />
+          <span>Connecting to EBAN Network...</span>
+        </div>
       </div>
     );
   }
@@ -340,7 +464,7 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background text-foreground">
       <Navbar />
       <Hero />
       <AvailableTrips />
@@ -354,3 +478,4 @@ const Index = () => {
 };
 
 export default Index;
+

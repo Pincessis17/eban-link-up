@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { Wallet } from "lucide-react";
+import { Wallet, DollarSign, Clock, ArrowUpRight, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTravellerProfile } from "@/hooks/useTravellerProfile";
 import { TravelerNav } from "@/components/TravelerNav";
@@ -13,10 +13,10 @@ interface Payout {
 }
 
 const statusColors: Record<string, string> = {
-  pending: "bg-accent/20 text-accent-foreground",
-  processing: "bg-blue-100 text-blue-800",
-  paid: "bg-green-100 text-green-800",
-  failed: "bg-red-100 text-red-800",
+  pending: "bg-gold/15 text-gold-dark border-gold/30",
+  processing: "bg-blue-500/15 text-blue-700 border-blue-500/30",
+  paid: "bg-emerald-500/15 text-emerald-700 border-emerald-500/30",
+  failed: "bg-destructive/15 text-destructive border-destructive/30",
 };
 
 const TravelerEarnings = () => {
@@ -43,41 +43,77 @@ const TravelerEarnings = () => {
     load();
   }, [load]);
 
-  const total = payouts.filter((p) => p.status === "paid").reduce((sum, p) => sum + Number(p.amount), 0);
+  const totalPaid = payouts.filter((p) => p.status === "paid").reduce((sum, p) => sum + Number(p.amount), 0);
+  const pendingEscrow = payouts.filter((p) => p.status === "pending" || p.status === "processing").reduce((sum, p) => sum + Number(p.amount), 0);
 
   return (
     <div className="min-h-screen bg-background">
       <TravelerNav />
-      <div className="container mx-auto px-6 py-10 max-w-xl">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-lg bg-gradient-gold flex items-center justify-center">
-            <Wallet className="w-5 h-5 text-accent-foreground" />
+
+      <div className="container mx-auto px-6 py-10 max-w-3xl">
+        <div className="flex items-center gap-4 mb-8">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-gold flex items-center justify-center shadow-md">
+            <Wallet className="w-6 h-6 text-accent-foreground" />
           </div>
           <div>
-            <h1 className="font-display text-xl font-bold text-foreground">Earnings</h1>
-            <p className="font-body text-sm text-muted-foreground">${total} paid out so far</p>
+            <h1 className="font-display text-3xl font-light text-foreground">Traveler Earnings &amp; Payouts</h1>
+            <p className="font-body text-xs text-muted-foreground mt-0.5">Track your baggage space compensation and withdrawal history.</p>
           </div>
         </div>
 
-        {loading && <div className="font-body text-sm text-muted-foreground">Loading...</div>}
-        {!loading && payouts.length === 0 && (
-          <div className="text-center py-16 bg-card rounded-2xl border border-border font-body text-sm text-muted-foreground">
-            No payouts yet &mdash; they'll show up here once a delivery is completed.
+        {/* Metric Summary Cards */}
+        <div className="grid sm:grid-cols-2 gap-4 mb-10">
+          <div className="bg-charcoal text-white rounded-3xl p-6 border border-gold/20 shadow-xl relative overflow-hidden">
+            <span className="font-body text-[10px] uppercase tracking-widest text-gold-light">Total Disbursed Payouts</span>
+            <div className="flex items-baseline gap-1 mt-2">
+              <span className="font-display text-4xl font-bold text-white">${totalPaid}</span>
+              <span className="font-body text-xs text-gray-400">USD</span>
+            </div>
+            <p className="font-body text-xs text-emerald-400 mt-2 flex items-center gap-1">
+              <CheckCircle2 className="w-3.5 h-3.5" /> Transfer completed directly to bank
+            </p>
+          </div>
+
+          <div className="bg-card rounded-3xl p-6 border border-border/80 shadow-[var(--shadow-card)]">
+            <span className="font-body text-[10px] uppercase tracking-widest text-muted-foreground">Pending Escrow</span>
+            <div className="flex items-baseline gap-1 mt-2">
+              <span className="font-display text-4xl font-bold text-gold-dark">${pendingEscrow}</span>
+              <span className="font-body text-xs text-muted-foreground">USD</span>
+            </div>
+            <p className="font-body text-xs text-muted-foreground mt-2 flex items-center gap-1">
+              <Clock className="w-3.5 h-3.5 text-gold-dark" /> Released upon verified handoff receipt
+            </p>
+          </div>
+        </div>
+
+        <h3 className="font-display text-2xl font-light text-foreground mb-4">Payout Transaction History</h3>
+
+        {loading && (
+          <div className="text-center py-16 font-body text-muted-foreground">
+            <div className="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+            Loading payout history...
           </div>
         )}
 
-        <div className="grid gap-2">
+        {!loading && payouts.length === 0 && (
+          <div className="text-center py-16 bg-card rounded-3xl border border-border/80 p-8 font-body text-sm text-muted-foreground max-w-md mx-auto">
+            No payouts processed yet. Completed package handoffs will automatically trigger payouts here.
+          </div>
+        )}
+
+        <div className="grid gap-3">
           {payouts.map((p) => (
-            <div key={p.id} className="flex items-center justify-between p-4 rounded-xl border border-border bg-card">
+            <div key={p.id} className="flex items-center justify-between p-5 rounded-2xl border border-border/80 bg-card shadow-sm hover:border-gold/30 transition-colors">
               <div>
-                <p className="font-display text-sm font-semibold text-foreground">
-                  {p.delivery_requests?.origin_city} &rarr; {p.delivery_requests?.destination_city}
+                <p className="font-body text-sm font-semibold text-foreground">
+                  {p.delivery_requests?.origin_city ?? "Route"} &rarr; {p.delivery_requests?.destination_city ?? "Destination"}
                 </p>
-                <p className="font-body text-xs text-muted-foreground">{new Date(p.created_at).toLocaleDateString()}</p>
+                <p className="font-body text-xs text-muted-foreground mt-0.5">{new Date(p.created_at).toLocaleDateString()}</p>
               </div>
-              <div className="flex items-center gap-3">
-                <span className="font-display text-sm font-semibold text-foreground">${p.amount}</span>
-                <span className={`px-3 py-1 rounded-full text-xs font-display font-semibold capitalize ${statusColors[p.status] ?? statusColors.pending}`}>
+
+              <div className="flex items-center gap-4">
+                <span className="font-mono text-lg font-bold text-foreground">${p.amount} USD</span>
+                <span className={`px-3 py-1 rounded-full text-xs font-body font-semibold uppercase tracking-wider border ${statusColors[p.status] ?? statusColors.pending}`}>
                   {p.status}
                 </span>
               </div>
@@ -90,3 +126,4 @@ const TravelerEarnings = () => {
 };
 
 export default TravelerEarnings;
+

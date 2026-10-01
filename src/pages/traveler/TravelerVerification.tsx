@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { ShieldCheck, Upload } from "lucide-react";
+import { ShieldCheck, Upload, FileText, CheckCircle2, Clock, XCircle, File } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useTravellerProfile } from "@/hooks/useTravellerProfile";
@@ -16,9 +16,9 @@ interface VerificationRow {
 }
 
 const statusColors: Record<string, string> = {
-  pending: "bg-accent/20 text-accent-foreground",
-  approved: "bg-green-100 text-green-800",
-  rejected: "bg-red-100 text-red-800",
+  pending: "bg-gold/15 text-gold-dark border-gold/30",
+  approved: "bg-emerald-500/15 text-emerald-700 border-emerald-500/30",
+  rejected: "bg-destructive/15 text-destructive border-destructive/30",
 };
 
 const TravelerVerification = () => {
@@ -82,62 +82,82 @@ const TravelerVerification = () => {
   return (
     <div className="min-h-screen bg-background">
       <TravelerNav />
-      <div className="container mx-auto px-6 py-10 max-w-xl">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-lg bg-gradient-gold flex items-center justify-center">
-            <ShieldCheck className="w-5 h-5 text-accent-foreground" />
+
+      <div className="container mx-auto px-6 py-10 max-w-2xl">
+        <div className="flex items-center gap-4 mb-8">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-gold flex items-center justify-center shadow-md">
+            <ShieldCheck className="w-6 h-6 text-accent-foreground" />
           </div>
           <div>
-            <h1 className="font-display text-xl font-bold text-foreground">ID verification</h1>
-            <p className="font-body text-sm text-muted-foreground">
-              Current status: <span className="font-semibold capitalize">{travellerProfile?.verification_status ?? "pending"}</span>
+            <h1 className="font-display text-3xl font-light text-foreground">Identity Verification</h1>
+            <p className="font-body text-xs text-muted-foreground mt-0.5">
+              Verification Status: <span className="font-semibold text-gold-dark uppercase tracking-wider">{travellerProfile?.verification_status ?? "pending"}</span>
             </p>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-card rounded-2xl p-6 border border-border shadow-[var(--shadow-card)] mb-8">
-          <label className="font-display text-sm font-semibold text-foreground mb-1.5 block">Document type</label>
-          <select
-            className="w-full bg-background border border-border rounded-lg px-4 py-3 font-body text-foreground mb-4 focus:outline-none focus:ring-2 focus:ring-ring"
-            value={docType}
-            onChange={(e) => setDocType(e.target.value)}
-          >
-            {DOCUMENT_TYPES.map((t) => (
-              <option key={t} value={t}>{t}</option>
-            ))}
-          </select>
+        <form onSubmit={handleSubmit} className="bg-card rounded-3xl p-8 border border-border/80 shadow-[var(--shadow-card)] mb-10">
+          <div className="space-y-6">
+            <div>
+              <label className="font-body text-xs font-semibold uppercase tracking-wider text-foreground mb-2 block">Document Type</label>
+              <select
+                className="w-full bg-card border border-border/80 rounded-xl px-4 py-3 font-body text-sm text-foreground focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all"
+                value={docType}
+                onChange={(e) => setDocType(e.target.value)}
+              >
+                {DOCUMENT_TYPES.map((t) => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+            </div>
 
-          <label className="font-display text-sm font-semibold text-foreground mb-1.5 block">Upload photo or scan</label>
-          <input
-            type="file"
-            accept="image/*,.pdf"
-            required
-            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-            className="w-full bg-background border border-border rounded-lg px-4 py-3 font-body text-sm text-foreground mb-4"
-          />
+            <div>
+              <label className="font-body text-xs font-semibold uppercase tracking-wider text-foreground mb-2 block">Passport / ID Upload</label>
+              <div className="border-2 border-dashed border-border/80 rounded-2xl p-8 text-center hover:border-gold/50 transition-colors bg-secondary/30 relative">
+                <input
+                  type="file"
+                  accept="image/*,.pdf"
+                  required
+                  onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
+                <div className="flex flex-col items-center">
+                  <Upload className="w-10 h-10 text-gold-dark/60 mb-3" />
+                  <p className="font-body text-sm font-semibold text-foreground">
+                    {file ? file.name : "Click or drag & drop photo/scan here"}
+                  </p>
+                  <p className="font-body text-xs text-muted-foreground mt-1">Supports PNG, JPG, or PDF (Max 10MB)</p>
+                </div>
+              </div>
+            </div>
 
-          <button
-            type="submit"
-            disabled={uploading || !file}
-            className="w-full bg-gradient-gold text-accent-foreground font-display font-bold py-3 rounded-lg text-sm hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
-          >
-            <Upload className="w-4 h-4" /> {uploading ? "Uploading..." : "Submit for review"}
-          </button>
+            <button
+              type="submit"
+              disabled={uploading || !file}
+              className="w-full bg-gradient-gold text-accent-foreground font-body font-bold text-xs uppercase tracking-widest py-4 rounded-xl hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-md glow-gold"
+            >
+              <Upload className="w-4 h-4" /> {uploading ? "Submitting Document..." : "Submit for Verification Review"}
+            </button>
+          </div>
         </form>
 
-        <p className="font-display text-sm font-semibold text-foreground mb-3">Submission history</p>
-        {loading && <div className="font-body text-sm text-muted-foreground">Loading...</div>}
+        <h3 className="font-display text-2xl font-light text-foreground mb-4">Submission History</h3>
+        {loading && <div className="font-body text-sm text-muted-foreground">Loading submissions...</div>}
         {!loading && rows.length === 0 && (
-          <p className="font-body text-sm text-muted-foreground">No documents submitted yet.</p>
+          <p className="font-body text-sm text-muted-foreground bg-card p-6 rounded-2xl border border-border">No documents submitted yet.</p>
         )}
-        <div className="grid gap-2">
+
+        <div className="grid gap-3">
           {rows.map((r) => (
-            <div key={r.id} className="flex items-center justify-between p-4 rounded-xl border border-border bg-card">
-              <div>
-                <p className="font-display text-sm font-semibold text-foreground">{r.id_document_type ?? "Document"}</p>
-                <p className="font-body text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString()}</p>
+            <div key={r.id} className="flex items-center justify-between p-5 rounded-2xl border border-border/80 bg-card shadow-sm">
+              <div className="flex items-center gap-3">
+                <File className="w-5 h-5 text-gold-dark" />
+                <div>
+                  <p className="font-body text-sm font-semibold text-foreground">{r.id_document_type ?? "Document"}</p>
+                  <p className="font-body text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString()}</p>
+                </div>
               </div>
-              <span className={`px-3 py-1 rounded-full text-xs font-display font-semibold capitalize ${statusColors[r.status] ?? statusColors.pending}`}>
+              <span className={`px-3.5 py-1 rounded-full text-xs font-body font-semibold uppercase tracking-wider border ${statusColors[r.status] ?? statusColors.pending}`}>
                 {r.status}
               </span>
             </div>
@@ -149,3 +169,4 @@ const TravelerVerification = () => {
 };
 
 export default TravelerVerification;
+

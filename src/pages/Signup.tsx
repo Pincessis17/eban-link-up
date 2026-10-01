@@ -2,16 +2,13 @@ import { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import ebanSymbol from "@/assets/eban-symbol.png";
-
-const inputClasses =
-  "w-full bg-background border border-border rounded-lg px-4 py-3 font-body text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow";
+import { ArrowRight, CheckCircle2, User, Plane, Send } from "lucide-react";
 
 const Signup = () => {
   const { signUp } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  // If they arrived here from an "Available Trips" card, carry the route
-  // through to the pre-filled request form after signup instead of losing it.
+
   const routeOrigin = searchParams.get("originCity");
   const routeDestination = searchParams.get("destinationCity");
   const [fullName, setFullName] = useState("");
@@ -49,18 +46,20 @@ const Signup = () => {
 
   if (needsConfirmation) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center px-6 py-12">
-        <div className="w-full max-w-md bg-card rounded-2xl p-8 border border-border shadow-[var(--shadow-card)] text-center">
-          <div className="flex items-center gap-3 mb-8 justify-center">
-            <img src={ebanSymbol} alt="EBAN" className="w-9 h-9" />
-            <span className="font-display text-2xl font-bold text-foreground">EBAN</span>
+      <div className="min-h-screen bg-gradient-hero flex items-center justify-center px-6 py-12 text-white">
+        <div className="w-full max-w-md bg-charcoal/90 backdrop-blur-2xl rounded-3xl p-10 border border-gold/20 shadow-2xl text-center">
+          <div className="w-16 h-16 rounded-full bg-gradient-gold flex items-center justify-center mx-auto mb-6 glow-gold">
+            <CheckCircle2 className="w-8 h-8 text-charcoal" />
           </div>
-          <h1 className="font-display text-xl font-bold text-foreground mb-3">Check your email</h1>
-          <p className="font-body text-sm text-muted-foreground mb-6">
-            We sent a confirmation link to <span className="font-semibold text-foreground">{email}</span>. Click it, then come back and log in.
+          <h1 className="font-display text-3xl font-light text-white mb-3">Verification Sent</h1>
+          <p className="font-body text-xs text-gray-300 mb-8 max-w-xs mx-auto leading-relaxed">
+            We sent an activation link to <strong className="text-gold-light">{email}</strong>. Please confirm your email to sign in.
           </p>
-          <Link to="/login" className="inline-block bg-gradient-gold text-accent-foreground font-display font-semibold px-6 py-3 rounded-lg text-sm hover:opacity-90 transition-opacity">
-            Go to log in
+          <Link
+            to="/login"
+            className="inline-flex items-center gap-2 bg-gradient-gold text-charcoal font-body font-bold text-xs uppercase tracking-widest px-8 py-4 rounded-xl hover:opacity-90 shadow-lg glow-gold transition-all"
+          >
+            Go to Login Portal <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       </div>
@@ -68,86 +67,113 @@ const Signup = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-6 py-12">
-      <div className="w-full max-w-md bg-card rounded-2xl p-8 border border-border shadow-[var(--shadow-card)]">
-        <div className="flex items-center gap-3 mb-8 justify-center">
-          <img src={ebanSymbol} alt="EBAN" className="w-9 h-9" />
-          <span className="font-display text-2xl font-bold text-foreground">EBAN</span>
-        </div>
-        <h1 className="font-display text-xl font-bold text-foreground mb-2 text-center">Create an account</h1>
+    <div className="min-h-screen bg-gradient-hero flex items-center justify-center px-6 py-12 relative overflow-hidden">
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-gold/10 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="w-full max-w-md bg-charcoal/90 backdrop-blur-2xl rounded-3xl p-8 md:p-10 border border-gold/20 shadow-2xl relative z-10 text-white">
+        <Link to="/" className="flex items-center gap-3 mb-8 justify-center group">
+          <div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/30 flex items-center justify-center group-hover:border-gold transition-colors">
+            <img src={ebanSymbol} alt="EBAN" className="w-6 h-6 object-contain" />
+          </div>
+          <div>
+            <span className="font-display text-2xl font-bold tracking-[0.18em] text-white block leading-tight">EBAN</span>
+            <span className="font-body text-[9px] uppercase tracking-widest text-gold-light">Join the Network</span>
+          </div>
+        </Link>
+
+        <h1 className="font-display text-3xl font-light text-white mb-2 text-center">Create an Account</h1>
 
         {routeOrigin && routeDestination && (
-          <p className="font-body text-xs text-center text-gold-dark mb-6">
-            Sending from {routeOrigin} to {routeDestination} &mdash; we'll pick this back up right after you sign up.
+          <p className="font-body text-xs text-center text-gold-light mb-6">
+            Pre-filling request for: <strong>{routeOrigin}</strong> &rarr; <strong>{routeDestination}</strong>
           </p>
         )}
 
         {error && (
-          <div className="bg-destructive/10 text-destructive rounded-lg p-3 mb-4 text-sm font-body text-center">
+          <div className="bg-destructive/20 border border-destructive/40 text-rose-300 rounded-xl p-3.5 mb-6 text-xs font-body text-center">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="font-display text-sm font-semibold text-foreground mb-1.5 block">I am a</label>
-            <div className="flex gap-3">
+            <label className="font-body text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2 block">I am joining as a</label>
+            <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
                 onClick={() => setRole("Sender")}
-                className={`flex-1 py-3 rounded-lg font-display text-sm font-semibold border transition-colors ${
+                className={`py-3.5 rounded-xl font-body text-xs font-bold uppercase tracking-wider transition-all border flex items-center justify-center gap-2 ${
                   role === "Sender"
-                    ? "bg-gradient-gold text-accent-foreground border-transparent"
-                    : "bg-background border-border text-muted-foreground hover:border-gold/50"
+                    ? "bg-gradient-gold text-charcoal border-transparent shadow-md"
+                    : "bg-white/5 border-white/10 text-gray-400 hover:border-gold/40"
                 }`}
               >
-                Sender
+                <Send className="w-3.5 h-3.5" /> Sender
               </button>
               <button
                 type="button"
                 onClick={() => setRole("Traveller")}
-                className={`flex-1 py-3 rounded-lg font-display text-sm font-semibold border transition-colors ${
+                className={`py-3.5 rounded-xl font-body text-xs font-bold uppercase tracking-wider transition-all border flex items-center justify-center gap-2 ${
                   role === "Traveller"
-                    ? "bg-gradient-gold text-accent-foreground border-transparent"
-                    : "bg-background border-border text-muted-foreground hover:border-gold/50"
+                    ? "bg-gradient-gold text-charcoal border-transparent shadow-md"
+                    : "bg-white/5 border-white/10 text-gray-400 hover:border-gold/40"
                 }`}
               >
-                Traveller
+                <Plane className="w-3.5 h-3.5" /> Traveler
               </button>
             </div>
           </div>
+
           <div>
-            <label className="font-display text-sm font-semibold text-foreground mb-1.5 block">Full name</label>
-            <input type="text" required className={inputClasses} value={fullName} onChange={(e) => setFullName(e.target.value)} />
+            <label className="font-body text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2 block">Full Legal Name</label>
+            <input
+              type="text"
+              required
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 font-body text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all"
+              placeholder="e.g. Kwame Mensah"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+            />
           </div>
+
           <div>
-            <label className="font-display text-sm font-semibold text-foreground mb-1.5 block">Email</label>
-            <input type="email" required className={inputClasses} value={email} onChange={(e) => setEmail(e.target.value)} />
+            <label className="font-body text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2 block">Email Address</label>
+            <input
+              type="email"
+              required
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 font-body text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all"
+              placeholder="name@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
           </div>
+
           <div>
-            <label className="font-display text-sm font-semibold text-foreground mb-1.5 block">Password</label>
+            <label className="font-body text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2 block">Password</label>
             <input
               type="password"
               required
               minLength={6}
-              className={inputClasses}
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 font-body text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all"
+              placeholder="Minimum 6 characters"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
+
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-gold text-accent-foreground font-display font-bold py-3 rounded-lg text-base hover:opacity-90 transition-opacity disabled:opacity-50"
+            className="w-full bg-gradient-gold text-charcoal font-body font-bold text-xs uppercase tracking-widest py-4 rounded-xl hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg glow-gold mt-2"
           >
-            {loading ? "Creating account..." : "Sign up"}
+            {loading ? "Creating Account..." : "Complete Registration"} <ArrowRight className="w-4 h-4" />
           </button>
         </form>
 
-        <p className="font-body text-sm text-muted-foreground text-center mt-6">
-          Already have an account?{" "}
-          <Link to="/login" className="text-gold-dark font-semibold hover:underline">
-            Log in
+        <p className="font-body text-xs text-gray-400 text-center mt-8">
+          Already registered?{" "}
+          <Link to="/login" className="text-gold-light font-semibold hover:underline">
+            Log In
           </Link>
         </p>
       </div>
@@ -156,3 +182,4 @@ const Signup = () => {
 };
 
 export default Signup;
+

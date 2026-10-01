@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Package } from "lucide-react";
+import { Package, ArrowRight, Plus, Sparkles, Filter, ChevronRight, Clock, ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { SenderNav } from "@/components/SenderNav";
@@ -19,36 +19,37 @@ interface DeliveryRequestRow {
 
 const STATUS_LABEL: Record<string, string> = {
   draft: "Draft",
-  submitted: "Submitted",
-  matched: "Matched with a traveler",
-  accepted_by_traveller: "Matched with a traveler",
-  paid: "Matched with a traveler",
-  dropped_off: "Dropped off with EBAN",
-  handed_to_traveller: "With traveler",
-  in_transit: "In transit",
+  submitted: "Submitted - Matching",
+  matched: "Matched with Traveler",
+  accepted_by_traveller: "Matched with Traveler",
+  paid: "Payment Confirmed",
+  dropped_off: "At EBAN Hub",
+  handed_to_traveller: "In Transit with Traveler",
+  in_transit: "In Flight",
   delivered: "Delivered",
   completed: "Delivered",
-  disputed: "Under review",
+  disputed: "Under Review",
   cancelled: "Cancelled",
 };
 
-const STATUS_STYLE: Record<string, string> = {
-  submitted: "bg-secondary text-secondary-foreground",
-  matched: "bg-accent/20 text-accent-foreground",
-  accepted_by_traveller: "bg-accent/20 text-accent-foreground",
-  paid: "bg-accent/20 text-accent-foreground",
-  dropped_off: "bg-accent/20 text-accent-foreground",
-  handed_to_traveller: "bg-accent/20 text-accent-foreground",
-  in_transit: "bg-accent/20 text-accent-foreground",
-  delivered: "bg-green-100 text-green-800",
-  completed: "bg-green-100 text-green-800",
-  disputed: "bg-destructive/10 text-destructive",
-  cancelled: "bg-secondary text-secondary-foreground",
+const STATUS_BADGE: Record<string, string> = {
+  submitted: "bg-gold/15 text-gold-dark border-gold/30",
+  matched: "bg-blue-500/10 text-blue-600 border-blue-500/30",
+  accepted_by_traveller: "bg-blue-500/10 text-blue-600 border-blue-500/30",
+  paid: "bg-emerald-500/10 text-emerald-600 border-emerald-500/30",
+  dropped_off: "bg-amber-500/10 text-amber-600 border-amber-500/30",
+  handed_to_traveller: "bg-indigo-500/10 text-indigo-600 border-indigo-500/30",
+  in_transit: "bg-purple-500/10 text-purple-600 border-purple-500/30",
+  delivered: "bg-emerald-500/15 text-emerald-700 border-emerald-500/30",
+  completed: "bg-emerald-500/15 text-emerald-700 border-emerald-500/30",
+  disputed: "bg-destructive/10 text-destructive border-destructive/30",
+  cancelled: "bg-muted text-muted-foreground border-border",
 };
 
 const SenderRequests = () => {
   const { user, loading: authLoading } = useAuth();
   const [requests, setRequests] = useState<DeliveryRequestRow[]>([]);
+  const [filter, setFilter] = useState<"all" | "active" | "delivered">("all");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -72,46 +73,112 @@ const SenderRequests = () => {
     load();
   }, [user, authLoading]);
 
+  const filteredRequests = requests.filter((r) => {
+    if (filter === "active") return !["delivered", "completed", "cancelled"].includes(r.status);
+    if (filter === "delivered") return ["delivered", "completed"].includes(r.status);
+    return true;
+  });
+
   return (
     <div className="min-h-screen bg-background">
       <SenderNav />
-      <div className="container mx-auto px-6 py-10 max-w-2xl">
-        <h1 className="font-display text-2xl font-bold text-foreground mb-6">My requests</h1>
 
-        {loading && <div className="text-center py-10 font-body text-muted-foreground">Loading...</div>}
+      <div className="container mx-auto px-6 py-10 max-w-4xl">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+          <div>
+            <h1 className="font-display text-3xl md:text-4xl font-light text-foreground">Package Requests</h1>
+            <p className="font-body text-xs text-muted-foreground mt-1">Track live traveler matching, hub drop-off, and digital receipts.</p>
+          </div>
 
-        {!loading && requests.length === 0 && (
-          <div className="text-center py-16 bg-card rounded-2xl border border-border">
-            <Package className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-            <p className="font-display font-semibold text-foreground mb-1">No requests yet</p>
+          <Link
+            to="/sender/new-request"
+            className="inline-flex items-center gap-2 bg-gradient-gold text-accent-foreground font-body font-bold text-xs uppercase tracking-wider px-6 py-3 rounded-xl hover:opacity-90 shadow-md transition-all"
+          >
+            <Plus className="w-4 h-4" /> New Package Request
+          </Link>
+        </div>
+
+        {/* Filter Tabs */}
+        <div className="flex items-center gap-2 mb-6 border-b border-border/80 pb-3">
+          <button
+            onClick={() => setFilter("all")}
+            className={`px-4 py-2 rounded-xl text-xs font-body font-semibold uppercase tracking-wider transition-all ${
+              filter === "all" ? "bg-earth text-gold-light shadow-sm" : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            All Requests ({requests.length})
+          </button>
+          <button
+            onClick={() => setFilter("active")}
+            className={`px-4 py-2 rounded-xl text-xs font-body font-semibold uppercase tracking-wider transition-all ${
+              filter === "active" ? "bg-earth text-gold-light shadow-sm" : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Active ({requests.filter((r) => !["delivered", "completed", "cancelled"].includes(r.status)).length})
+          </button>
+          <button
+            onClick={() => setFilter("delivered")}
+            className={`px-4 py-2 rounded-xl text-xs font-body font-semibold uppercase tracking-wider transition-all ${
+              filter === "delivered" ? "bg-earth text-gold-light shadow-sm" : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Delivered ({requests.filter((r) => ["delivered", "completed"].includes(r.status)).length})
+          </button>
+        </div>
+
+        {loading && (
+          <div className="text-center py-16 font-body text-muted-foreground">
+            <div className="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+            Loading your package requests...
+          </div>
+        )}
+
+        {!loading && filteredRequests.length === 0 && (
+          <div className="text-center py-20 bg-card rounded-3xl border border-border/80 p-10 shadow-[var(--shadow-card)] max-w-lg mx-auto">
+            <Package className="w-12 h-12 text-gold-dark/60 mx-auto mb-4" />
+            <h3 className="font-display text-2xl font-semibold text-foreground mb-2">No package requests found</h3>
             <p className="font-body text-sm text-muted-foreground mb-6">
-              Book a delivery and track its progress here.
+              Create a new request to get matched with a traveler headed to your destination.
             </p>
-            <Link to="/sender/new-request" className="inline-block bg-gradient-gold text-accent-foreground font-display font-semibold px-6 py-3 rounded-lg text-sm hover:opacity-90 transition-opacity">
-              Send a package
+            <Link
+              to="/sender/new-request"
+              className="inline-flex items-center gap-2 bg-gradient-gold text-accent-foreground font-body font-bold text-xs uppercase tracking-wider px-8 py-3.5 rounded-xl hover:opacity-90 transition-all shadow-md"
+            >
+              Dispatch a Package <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
         )}
 
-        <div className="grid gap-3">
-          {requests.map((r) => (
+        <div className="grid gap-4">
+          {filteredRequests.map((r) => (
             <Link
               key={r.id}
               to={`/sender/requests/${r.id}`}
-              className="block bg-card rounded-xl border border-border p-5 hover:shadow-md transition-shadow"
+              className="group bg-card rounded-2xl border border-border/80 p-6 hover:border-gold/50 shadow-[var(--shadow-card)] hover:shadow-gold-glow transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-4"
             >
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <p className="font-display text-sm font-bold text-foreground">
-                    {r.origin_city} &rarr; {r.destination_city}
-                  </p>
-                  <p className="font-body text-xs text-muted-foreground mt-1">
-                    {r.item_type} &middot; {r.weight_kg}kg &middot; {new Date(r.created_at).toLocaleDateString()}
-                  </p>
+              <div className="flex-1 space-y-2">
+                <div className="flex items-center gap-2 text-foreground font-display text-xl font-bold">
+                  <span>{r.origin_city}</span>
+                  <ArrowRight className="w-4 h-4 text-gold-dark group-hover:translate-x-1 transition-transform" />
+                  <span>{r.destination_city}</span>
                 </div>
-                <span className={`px-3 py-1 rounded-full text-xs font-display font-semibold whitespace-nowrap ${STATUS_STYLE[r.status] ?? "bg-secondary text-secondary-foreground"}`}>
+
+                <div className="flex flex-wrap items-center gap-3 font-body text-xs text-muted-foreground">
+                  <span className="bg-secondary px-2.5 py-1 rounded-md text-foreground font-medium">{r.item_type}</span>
+                  <span>Weight: <strong>{r.weight_kg} kg</strong></span>
+                  <span>&middot;</span>
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5 text-muted-foreground" />
+                    {new Date(r.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between md:justify-end gap-3 pt-3 md:pt-0 border-t md:border-t-0 border-border">
+                <span className={`px-3.5 py-1.5 rounded-full text-xs font-body font-semibold uppercase tracking-wider border ${STATUS_BADGE[r.status] ?? "bg-secondary text-foreground border-border"}`}>
                   {STATUS_LABEL[r.status] ?? r.status}
                 </span>
+                <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-gold-dark transition-colors" />
               </div>
             </Link>
           ))}
@@ -122,3 +189,4 @@ const SenderRequests = () => {
 };
 
 export default SenderRequests;
+
