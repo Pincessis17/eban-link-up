@@ -74,7 +74,7 @@ const TravelerVerification = () => {
       return;
     }
 
-    toast({ title: "Document submitted", description: "EBAN staff will review it shortly." });
+    toast({ title: "Document submitted", description: "Our team will review your ID within 24 hours." });
     setFile(null);
     load();
   };
