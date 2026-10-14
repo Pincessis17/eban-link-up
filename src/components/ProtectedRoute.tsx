@@ -22,7 +22,7 @@ export function ProtectedRoute({ children, requireRole }: ProtectedRouteProps) {
     return <Navigate to="/login" replace />;
   }
 
-  if (requireRole && profile?.role !== requireRole) {
+  if (requireRole && profile?.role !== requireRole && profile?.role !== "Admin") {
     return <Navigate to="/" replace />;
   }
 

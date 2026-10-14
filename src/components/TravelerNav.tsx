@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { LogOut, Plane, ShieldCheck, DollarSign, Plus, Globe, Search } from "lucide-react";
 import ebanSymbol from "@/assets/eban-symbol.png";
 import { useAuth } from "@/hooks/useAuth";
+import { AdminViewSwitcher } from "@/components/AdminViewSwitcher";
 
 export const TravelerNav = () => {
   const { signOut } = useAuth();
@@ -15,6 +16,8 @@ export const TravelerNav = () => {
     }`;
 
   return (
+    <>
+    <AdminViewSwitcher />
     <nav className="bg-card/90 backdrop-blur-xl border-b border-border/80 px-6 py-3.5 sticky top-0 z-40 shadow-sm">
       <div className="container mx-auto flex items-center justify-between">
         <div className="flex items-center gap-6">
@@ -66,6 +69,7 @@ export const TravelerNav = () => {
         </div>
       </div>
     </nav>
+    </>
   );
 };
 

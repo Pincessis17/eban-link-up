@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { LogOut, Package, Users, GitMerge, ShieldCheck, DollarSign, Globe } from "lucide-react";
+import { LogOut, Package, Users, GitMerge, ShieldCheck, DollarSign, Globe, Eye, Plane } from "lucide-react";
 import ebanSymbol from "@/assets/eban-symbol.png";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -52,6 +52,13 @@ export const AdminNav = () => {
         </nav>
 
         <div className="flex flex-col gap-1.5 pt-4 border-t border-white/10">
+          <div className="px-3 text-[10px] font-body uppercase tracking-widest text-gray-500 font-semibold mb-1">Preview as</div>
+          <Link to="/sender/requests" className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-body font-semibold text-gray-400 hover:text-white hover:bg-white/5 transition-colors">
+            <Eye className="w-4 h-4 text-gold-light" /><span>Sender view</span>
+          </Link>
+          <Link to="/traveler" className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-body font-semibold text-gray-400 hover:text-white hover:bg-white/5 transition-colors">
+            <Plane className="w-4 h-4 text-gold-light" /><span>Traveler view</span>
+          </Link>
           <Link
             to="/?view=site"
             className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-body font-semibold text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
@@ -93,6 +100,12 @@ export const AdminNav = () => {
               {item.label}
             </Link>
           ))}
+          <Link to="/sender/requests" className="shrink-0 px-3 py-1.5 rounded-lg text-xs font-body font-semibold text-gray-400 hover:text-white">
+            Sender view
+          </Link>
+          <Link to="/traveler" className="shrink-0 px-3 py-1.5 rounded-lg text-xs font-body font-semibold text-gray-400 hover:text-white">
+            Traveler view
+          </Link>
           <Link to="/?view=site" className="shrink-0 px-3 py-1.5 rounded-lg text-xs font-body font-semibold text-gray-400 hover:text-white">
             Site
           </Link>
