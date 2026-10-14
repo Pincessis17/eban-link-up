@@ -250,6 +250,33 @@ export type Database = {
           },
         ]
       }
+      feedback: {
+        Row: {
+          comment: string
+          created_at: string
+          id: string
+          rating: number
+          status: string
+          user_id: string
+        }
+        Insert: {
+          comment: string
+          created_at?: string
+          id?: string
+          rating: number
+          status?: string
+          user_id: string
+        }
+        Update: {
+          comment?: string
+          created_at?: string
+          id?: string
+          rating?: number
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           author_id: string
@@ -769,6 +796,17 @@ export type Database = {
     Functions: {
       admin_delete_traveller: { Args: { p_traveller_id: string }; Returns: undefined }
       is_admin: { Args: never; Returns: boolean }
+      public_feedback: {
+        Args: never
+        Returns: {
+          id: string
+          display_name: string
+          role: string | null
+          rating: number
+          comment: string
+          created_at: string
+        }[]
+      }
       browse_open_trips: {
         Args: never
         Returns: {

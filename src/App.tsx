@@ -8,6 +8,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import AdminBookings from "./pages/AdminBookings.tsx";
+import AdminFeedback from "./pages/admin/AdminFeedback";
 import Login from "./pages/Login.tsx";
 import Signup from "./pages/Signup.tsx";
 import TravelerHome from "./pages/traveler/TravelerHome.tsx";
@@ -38,6 +39,14 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
+            <Route
+              path="/admin/feedback"
+              element={
+                <ProtectedRoute requireRole="Admin">
+                  <AdminFeedback />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/signup" element={<Signup />} />
             <Route
               path="/admin/bookings"

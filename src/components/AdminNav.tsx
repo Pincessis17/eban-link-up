@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { LogOut, Package, Users, GitMerge, ShieldCheck, DollarSign, Globe, Eye, Plane } from "lucide-react";
+import { LogOut, Package, Users, GitMerge, ShieldCheck, DollarSign, Globe, Eye, Plane, MessageSquare } from "lucide-react";
 import ebanSymbol from "@/assets/eban-symbol.png";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -9,6 +9,7 @@ const NAV_ITEMS = [
   { to: "/admin/match", label: "Smart Matcher", icon: GitMerge },
   { to: "/admin/verifications", label: "ID Verifications", icon: ShieldCheck },
   { to: "/admin/payouts", label: "Payout Console", icon: DollarSign },
+  { to: "/admin/feedback", label: "Feedback", icon: MessageSquare },
 ];
 
 export const ADMIN_SIDEBAR_OFFSET_CLASS = "md:pl-64";
