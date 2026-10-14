@@ -127,7 +127,7 @@ export const FeedbackWall = () => {
               <div className="rounded-2xl border border-dashed border-border p-10 text-center">
                 <p className="font-display text-xl text-foreground">No reviews yet</p>
                 <p className="font-body text-sm text-muted-foreground mt-2">
-                  We're just getting started. Once members finish their first delivery, their feedback will show up here.
+                  Be the first to share your experience with Eban and help others make informed decisions.
                 </p>
               </div>
             ) : (
