@@ -1,9 +1,14 @@
 import { useEffect, useState, useCallback } from "react";
-import { useParams, Link } from "react-router-dom";
-import { Plane, ArrowLeft, CheckCircle2, ShieldCheck, Clock, MapPin, Package, AlertCircle, Edit3, DollarSign } from "lucide-react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { Plane, ArrowLeft, ShieldCheck, Edit3, Star, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { SenderNav } from "@/components/SenderNav";
+import { DeleteButton } from "@/components/AdminDeleteButton";
+import { RequestMessages } from "@/components/RequestMessages";
+import { RateCounterparty } from "@/components/RateCounterparty";
+import { ReportIssueButton } from "@/components/ReportIssueButton";
+import { REQUEST_STEPS, stepIndex, SENDER_DELETABLE, IN_FLIGHT, errMsg, money } from "@/lib/marketplace";
 
 interface DeliveryRequest {
   id: string;
@@ -20,36 +25,25 @@ interface DeliveryRequest {
   status: string;
   special_handling_flags: string[];
   created_at: string;
-  sender_dropoff_confirmed_at: string | null;
+  matched_traveller_id: string | null;
+  offered_price: number | null;
+  agreed_price: number | null;
   delivered_at: string | null;
   pickup_confirmed_at: string | null;
 }
 
-const STATUS_STEPS = ["submitted", "matched", "dropped_off", "handed_to_traveller", "in_transit", "delivered", "completed"];
-const STATUS_STEP_LABELS: Record<string, string> = {
-  submitted: "Submitted",
-  matched: "Matched",
-  dropped_off: "Hub Dropoff",
-  handed_to_traveller: "With Traveler",
-  in_transit: "In Flight",
-  delivered: "Ready for Pickup",
-  completed: "Picked Up",
-};
+interface Counterparty {
+  counterparty_role: string;
+  first_name: string;
+  rating: number | null;
+  total_deliveries: number | null;
+  verified: boolean | null;
+  my_rating: number | null;
+}
 
 const ITEM_TYPES = ["Documents", "Electronics", "Clothing", "Gifts", "Other"];
 const URGENCY_LEVELS = ["standard", "priority", "urgent"] as const;
 const HANDLING_FLAGS = ["fragile", "perishable", "high_value"] as const;
-
-const normalizeStatus = (status: string) => {
-  if (["draft", "submitted"].includes(status)) return "submitted";
-  if (["matched", "accepted_by_traveller", "paid"].includes(status)) return "matched";
-  if (status === "dropped_off") return "dropped_off";
-  if (status === "handed_to_traveller") return "handed_to_traveller";
-  if (status === "in_transit") return "in_transit";
-  if (status === "delivered") return "delivered";
-  if (status === "completed") return "completed";
-  return status;
-};
 
 const inputClasses = "bg-secondary/60 rounded-xl p-4 border border-border/60 font-body";
 const fieldClasses =
@@ -66,6 +60,7 @@ type EditForm = {
   itemValue: string;
   urgencyLevel: (typeof URGENCY_LEVELS)[number];
   preferredDate: string;
+  offeredPrice: string;
   flags: string[];
 };
 
@@ -80,6 +75,7 @@ const toEditForm = (r: DeliveryRequest): EditForm => ({
   itemValue: String(r.item_value ?? ""),
   urgencyLevel: (r.urgency_level as (typeof URGENCY_LEVELS)[number]) ?? "standard",
   preferredDate: r.preferred_date ? r.preferred_date.slice(0, 10) : "",
+  offeredPrice: r.offered_price != null ? String(r.offered_price) : "",
   flags: r.special_handling_flags ?? [],
 });
 
@@ -90,13 +86,21 @@ const SenderRequestDetail = () => {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<EditForm | null>(null);
-  const [confirming, setConfirming] = useState(false);
+  const [acting, setActing] = useState(false);
+  const [counterparty, setCounterparty] = useState<Counterparty | null>(null);
+  const navigate = useNavigate();
 
   const load = useCallback(async () => {
     if (!id) return;
     setLoading(true);
     const { data } = await supabase.from("delivery_requests").select("*").eq("id", id).maybeSingle();
     setRequest(data as DeliveryRequest);
+    if (data?.matched_traveller_id) {
+      const { data: cp } = await supabase.rpc("get_request_counterparty", { p_request_id: id });
+      setCounterparty(cp?.[0] ?? null);
+    } else {
+      setCounterparty(null);
+    }
     setLoading(false);
   }, [id]);
 
@@ -134,6 +138,7 @@ const SenderRequestDetail = () => {
         item_value: parseFloat(form.itemValue) || 0,
         urgency_level: form.urgencyLevel,
         preferred_date: form.preferredDate || null,
+        offered_price: form.offeredPrice ? parseFloat(form.offeredPrice) : null,
         special_handling_flags: form.flags,
       })
       .eq("id", request.id);
@@ -150,36 +155,32 @@ const SenderRequestDetail = () => {
     load();
   };
 
-  const confirmDropoff = async () => {
-    if (!request) return;
-    setConfirming(true);
-    const { error } = await supabase
-      .from("delivery_requests")
-      .update({ sender_dropoff_confirmed_at: new Date().toISOString() })
-      .eq("id", request.id);
-    setConfirming(false);
+  const run = async (call: () => PromiseLike<{ error: unknown }>, okTitle: string) => {
+    setActing(true);
+    const { error } = await call();
+    setActing(false);
     if (error) {
-      toast({ title: "Error", description: "Couldn't confirm. Try again.", variant: "destructive" });
+      toast({ title: "Couldn't do that", description: errMsg(error), variant: "destructive" });
       return;
     }
-    toast({ title: "Drop-off confirmed!" });
+    toast({ title: okTitle });
     load();
   };
 
-  const confirmPickup = async () => {
-    if (!request) return;
-    setConfirming(true);
-    const { error } = await supabase
-      .from("delivery_requests")
-      .update({ status: "completed", pickup_confirmed_at: new Date().toISOString() })
-      .eq("id", request.id);
-    setConfirming(false);
-    if (error) {
-      toast({ title: "Error", description: "Couldn't confirm. Try again.", variant: "destructive" });
-      return;
-    }
-    toast({ title: "Delivery pickup confirmed!" });
-    load();
+  const fundEscrow = () =>
+    run(() => supabase.rpc("fund_escrow", { p_request_id: request!.id }), "Payment is now held in escrow");
+  const confirmReceipt = () =>
+    run(() => supabase.rpc("confirm_receipt", { p_request_id: request!.id }), "Receipt confirmed. Payment released to the traveler.");
+  const cancelRequest = () =>
+    run(() => supabase.rpc("cancel_request", { p_request_id: request!.id }), "Request cancelled");
+
+  const deleteRequest = async (): Promise<string | null> => {
+    if (!request) return null;
+    const { data, error } = await supabase.from("delivery_requests").delete().eq("id", request.id).select("id");
+    if (error) return errMsg(error);
+    if (!data || data.length === 0) return "Nothing was deleted. You may not have permission.";
+    navigate("/sender/requests");
+    return null;
   };
 
   if (loading) {
@@ -211,8 +212,9 @@ const SenderRequestDetail = () => {
   const isCancelled = request.status === "cancelled";
   const isDisputed = request.status === "disputed";
   const canEdit = request.status === "submitted";
-  const normalized = normalizeStatus(request.status);
-  const currentIdx = STATUS_STEPS.indexOf(normalized);
+  const currentIdx = stepIndex(request.status);
+  const price = request.agreed_price ?? request.offered_price;
+  const hasTraveler = !!request.matched_traveller_id && !isCancelled && request.status !== "submitted";
 
   return (
     <div className="min-h-screen bg-background">
@@ -230,14 +232,33 @@ const SenderRequestDetail = () => {
               <span className="font-body text-[10px] uppercase tracking-widest text-gold-light">Tracking Reference</span>
               <p className="font-mono text-sm font-bold text-white uppercase">{request.id.slice(0, 13)}</p>
             </div>
-            {canEdit && !editing && (
-              <button
-                onClick={startEditing}
-                className="inline-flex items-center gap-1.5 bg-gold/10 hover:bg-gold/20 text-gold-light border border-gold/30 px-3.5 py-1.5 rounded-xl font-body text-xs font-semibold transition-all"
-              >
-                <Edit3 className="w-3.5 h-3.5" /> Edit Request
-              </button>
-            )}
+            <div className="flex items-center gap-2">
+              {canEdit && !editing && (
+                <button
+                  onClick={startEditing}
+                  className="inline-flex items-center gap-1.5 bg-gold/10 hover:bg-gold/20 text-gold-light border border-gold/30 px-3.5 py-1.5 rounded-xl font-body text-xs font-semibold transition-all"
+                >
+                  <Edit3 className="w-3.5 h-3.5" /> Edit Request
+                </button>
+              )}
+              {["matched", "accepted_by_traveller"].includes(request.status) && (
+                <button
+                  onClick={cancelRequest}
+                  disabled={acting}
+                  className="inline-flex items-center gap-1.5 border border-white/20 text-white/80 hover:bg-white/10 px-3.5 py-1.5 rounded-xl font-body text-xs font-semibold transition-all disabled:opacity-50"
+                >
+                  Cancel request
+                </button>
+              )}
+              {SENDER_DELETABLE.includes(request.status) && (
+                <DeleteButton
+                  label="Delete"
+                  title="Delete this request?"
+                  description="This request will be permanently removed. Space reserved on a traveler's trip goes back to them. This can't be undone."
+                  onConfirm={deleteRequest}
+                />
+              )}
+            </div>
           </div>
 
           <div className="flex items-center justify-between gap-4">
@@ -255,7 +276,7 @@ const SenderRequestDetail = () => {
                 </div>
                 <span className="w-2 h-2 rounded-full bg-gold" />
               </div>
-              <span className="font-body text-[10px] uppercase tracking-widest text-gold-light mt-2 font-medium">Chain of Custody</span>
+              <span className="font-body text-[10px] uppercase tracking-widest text-gold-light mt-2 font-medium">P2P Delivery Route</span>
             </div>
 
             <div className="text-right">
@@ -269,13 +290,13 @@ const SenderRequestDetail = () => {
         {/* Status Tracker Line */}
         {!isCancelled && !isDisputed && (
           <div className="bg-card rounded-3xl border border-border/80 p-8 shadow-[var(--shadow-card)] mb-8">
-            <h3 className="font-display text-xl font-medium text-foreground mb-6">Delivery Progress Timeline</h3>
+            <h3 className="font-display text-xl font-medium text-foreground mb-6">Delivery progress</h3>
             <div className="flex items-center justify-between relative overflow-x-auto pb-4">
-              {STATUS_STEPS.map((step, idx) => {
+              {REQUEST_STEPS.map((step, idx) => {
                 const done = idx <= currentIdx;
                 const isCurrent = idx === currentIdx;
                 return (
-                  <div key={step} className="flex-1 text-center min-w-[70px]">
+                  <div key={step.key} className="flex-1 text-center min-w-[70px]">
                     <div
                       className={`w-7 h-7 rounded-full mx-auto mb-2 flex items-center justify-center font-body text-xs font-bold transition-all ${
                         done
@@ -286,7 +307,7 @@ const SenderRequestDetail = () => {
                       {done ? "✓" : idx + 1}
                     </div>
                     <p className={`font-body text-[11px] leading-tight ${done ? "font-semibold text-foreground" : "text-muted-foreground"}`}>
-                      {STATUS_STEP_LABELS[step]}
+                      {step.label}
                     </p>
                   </div>
                 );
@@ -295,36 +316,96 @@ const SenderRequestDetail = () => {
           </div>
         )}
 
-        {/* Action Banners */}
-        {!isCancelled && !isDisputed && currentIdx >= STATUS_STEPS.indexOf("dropped_off") && !request.sender_dropoff_confirmed_at && (
+        {/* Status banners */}
+        {request.status === "submitted" && (
           <div className="bg-gold/10 border border-gold/30 rounded-2xl p-6 mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <h4 className="font-display text-lg font-semibold text-gold-dark">Hub Drop-off Verification Required</h4>
-              <p className="font-body text-xs text-muted-foreground mt-1">Please confirm when you have left your package at the EBAN hub.</p>
+              <h4 className="font-display text-lg font-semibold text-foreground">Your request is on the open board</h4>
+              <p className="font-body text-xs text-muted-foreground mt-1">Travelers on your route can claim it. You can also pick a traveler yourself.</p>
+            </div>
+            <Link to="/sender/trips" className="bg-earth text-gold-light font-body font-bold text-xs uppercase tracking-wider py-3 px-6 rounded-xl hover:opacity-90 whitespace-nowrap">
+              Browse trips
+            </Link>
+          </div>
+        )}
+
+        {request.status === "matched" && (
+          <div className="bg-blue-500/10 border border-blue-500/30 rounded-2xl p-6 mb-8">
+            <h4 className="font-display text-lg font-semibold text-foreground">Waiting for {counterparty?.first_name ?? "the traveler"} to accept</h4>
+            <p className="font-body text-xs text-muted-foreground mt-1">You'll be asked to pay into escrow as soon as they confirm.</p>
+          </div>
+        )}
+
+        {request.status === "accepted_by_traveller" && (
+          <div className="bg-blue-500/10 border border-blue-500/30 rounded-2xl p-6 mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <h4 className="font-display text-lg font-semibold text-foreground">
+                {counterparty?.first_name ?? "The traveler"} accepted. Pay to lock it in.
+              </h4>
+              <p className="font-body text-xs text-muted-foreground mt-1">
+                {money(price)} is held in escrow and only released to the traveler after you confirm you received the item.
+              </p>
+              <p className="font-body text-[11px] text-muted-foreground mt-1 flex items-center gap-1"><Lock className="w-3 h-3" /> Test mode: no card is charged yet.</p>
             </div>
             <button
-              onClick={confirmDropoff}
-              disabled={confirming}
-              className="bg-gradient-gold text-accent-foreground font-body font-bold text-xs uppercase tracking-wider py-3 px-6 rounded-xl hover:opacity-90 transition-all shadow-sm disabled:opacity-50 whitespace-nowrap"
+              onClick={fundEscrow}
+              disabled={acting}
+              className="bg-gradient-gold text-accent-foreground font-body font-bold text-xs uppercase tracking-wider py-3 px-6 rounded-xl hover:opacity-90 shadow-sm disabled:opacity-50 whitespace-nowrap"
             >
-              {confirming ? "Confirming..." : "Confirm Drop-off"}
+              {acting ? "Processing..." : `Pay ${money(price)} into escrow`}
             </button>
           </div>
         )}
 
-        {normalized === "delivered" && (
+        {["paid", "dropped_off", "handed_to_traveller", "in_transit"].includes(request.status) && (
+          <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-6 mb-8">
+            <h4 className="font-display text-lg font-semibold text-emerald-700">{money(price)} is held in escrow</h4>
+            <p className="font-body text-xs text-muted-foreground mt-1">
+              It stays safe until you confirm receipt. Agree the handover with the traveler in Messages below.
+            </p>
+          </div>
+        )}
+
+        {request.status === "delivered" && (
           <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-6 mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <h4 className="font-display text-lg font-semibold text-emerald-700">Package Arrived &amp; Ready for Pickup</h4>
-              <p className="font-body text-xs text-muted-foreground mt-1">Recipient can collect the package from the destination hub.</p>
+              <h4 className="font-display text-lg font-semibold text-emerald-700">The traveler says it's delivered</h4>
+              <p className="font-body text-xs text-muted-foreground mt-1">
+                Check the item. Confirming releases {money(price)} to the traveler. If something is wrong, report an issue instead.
+              </p>
             </div>
             <button
-              onClick={confirmPickup}
-              disabled={confirming}
+              onClick={confirmReceipt}
+              disabled={acting}
               className="bg-emerald-600 text-white font-body font-bold text-xs uppercase tracking-wider py-3 px-6 rounded-xl hover:bg-emerald-700 transition-all shadow-sm disabled:opacity-50 whitespace-nowrap"
             >
-              {confirming ? "Confirming..." : "Confirm Final Receipt"}
+              {acting ? "Confirming..." : "Confirm receipt & release payment"}
             </button>
+          </div>
+        )}
+
+        {isDisputed && (
+          <div className="bg-destructive/10 border border-destructive/30 rounded-2xl p-6 mb-8">
+            <h4 className="font-display text-lg font-semibold text-destructive">Dispute open</h4>
+            <p className="font-body text-xs text-muted-foreground mt-1">Payment stays in escrow while EBAN reviews what happened.</p>
+          </div>
+        )}
+
+        {hasTraveler && counterparty && counterparty.counterparty_role === "traveller" && (
+          <div className="bg-card rounded-2xl border border-border/80 p-5 mb-8 flex items-center justify-between gap-4 shadow-[var(--shadow-card)]">
+            <div>
+              <p className="font-body text-[10px] uppercase font-semibold text-muted-foreground">Your traveler</p>
+              <p className="font-display text-lg font-semibold text-foreground">{counterparty.first_name}</p>
+            </div>
+            <div className="text-right font-body text-xs text-muted-foreground">
+              <p className="flex items-center justify-end gap-1">
+                <Star className="w-3.5 h-3.5 text-gold" /> {Number(counterparty.rating ?? 0).toFixed(1)} &middot; {counterparty.total_deliveries ?? 0} deliveries
+              </p>
+              <p className="flex items-center justify-end gap-1 mt-1">
+                <ShieldCheck className={`w-3.5 h-3.5 ${counterparty.verified ? "text-emerald-600" : "text-amber-500"}`} />
+                {counterparty.verified ? "ID verified" : "ID not verified"}
+              </p>
+            </div>
           </div>
         )}
 
@@ -393,6 +474,11 @@ const SenderRequestDetail = () => {
                 </div>
               </div>
 
+              <div>
+                <label className="font-body text-xs font-semibold uppercase text-foreground mb-1 block">Price you'll pay (USD $)</label>
+                <input type="number" step="0.5" min="0" className={fieldClasses} placeholder="Leave empty to accept the traveler's price per kg" value={form.offeredPrice} onChange={(e) => setForm({ ...form, offeredPrice: e.target.value })} />
+              </div>
+
               <div className="flex gap-3 pt-4">
                 <button
                   type="button"
@@ -413,7 +499,7 @@ const SenderRequestDetail = () => {
             </form>
           ) : (
             <div>
-              <h3 className="font-display text-2xl font-normal text-foreground mb-6">Cargo Specifications</h3>
+              <h3 className="font-display text-2xl font-normal text-foreground mb-6">Item details</h3>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
                 <div className={inputClasses}>
@@ -429,7 +515,7 @@ const SenderRequestDetail = () => {
                   <span className="font-body text-sm font-semibold text-foreground">${request.item_value} USD</span>
                 </div>
                 <div className={inputClasses}>
-                  <span className="font-body text-[10px] uppercase font-semibold text-muted-foreground block mb-1">Target Date</span>
+                  <span className="font-body text-[10px] uppercase font-semibold text-muted-foreground block mb-1">Needed by</span>
                   <span className="font-body text-sm font-semibold text-foreground">
                     {request.preferred_date ? new Date(request.preferred_date).toLocaleDateString() : "Flexible"}
                   </span>
@@ -458,11 +544,36 @@ const SenderRequestDetail = () => {
 
               <div className="bg-gold/10 border border-gold/20 text-gold-dark rounded-xl p-4 font-body text-xs flex items-center gap-3">
                 <ShieldCheck className="w-5 h-5 text-gold shrink-0" />
-                <span>EBAN manages all physical drop-offs, security checks, and traveler handoffs. Direct contact between users is strictly prevented for your privacy.</span>
+                <span>EBAN is a marketplace: you and the traveler are responsible for the item and its handover. Your payment is protected by escrow, and only released when you confirm receipt.</span>
               </div>
+              {price != null && (
+                <p className="font-body text-xs text-muted-foreground mt-4">
+                  Price: <strong className="text-foreground">{money(price)}</strong>
+                  {request.agreed_price == null && " (your offer; the traveler confirms when they claim it)"}
+                </p>
+              )}
             </div>
           )}
         </div>
+
+        {hasTraveler && (
+          <div className="mt-8 space-y-6">
+            <RequestMessages requestId={request.id} otherName={counterparty?.first_name} />
+            {request.status === "completed" && (
+              <RateCounterparty
+                requestId={request.id}
+                existingRating={counterparty?.my_rating ?? null}
+                who={counterparty?.first_name ?? "the traveler"}
+                onDone={load}
+              />
+            )}
+            {IN_FLIGHT.includes(request.status) && (
+              <div className="text-center">
+                <ReportIssueButton requestId={request.id} onDone={load} />
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

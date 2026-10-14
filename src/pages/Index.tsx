@@ -88,7 +88,7 @@ const Navbar = () => {
           <a href="#how-it-works" className="hover:text-gold-light transition-colors">Process</a>
           <a href="#what-we-carry" className="hover:text-gold-light transition-colors">Guidelines</a>
           <a href="#trust" className="hover:text-gold-light transition-colors">Trust &amp; Verification</a>
-          <a href="#book" className="hover:text-gold-light transition-colors">Dispatch Package</a>
+          <a href="#book" className="hover:text-gold-light transition-colors">Post a Request</a>
           <a
             href="https://wa.me/23058440472"
             target="_blank"
@@ -169,7 +169,7 @@ const Hero = () => (
           </h1>
 
           <p className="font-body text-base md:text-lg font-light text-gray-300 max-w-xl mb-10 leading-relaxed">
-            EBAN connects international senders with verified flight passengers holding spare baggage allowance. Structured, secure, and 100% accountable.
+            EBAN is a marketplace that connects senders with ID-verified travelers who have spare baggage allowance. You agree the details with the traveler, and your payment is held in escrow until you confirm delivery.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 mb-14">
@@ -177,13 +177,13 @@ const Hero = () => (
               href="#book"
               className="bg-gradient-gold text-charcoal font-body text-xs font-bold tracking-[0.15em] uppercase px-8 py-4 rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-lg glow-gold"
             >
-              Dispatch a Package <ChevronRight className="w-4 h-4" />
+              Post a Request <ChevronRight className="w-4 h-4" />
             </a>
             <a
               href="#how-it-works"
               className="border border-white/20 text-gray-200 font-body text-xs font-semibold tracking-[0.15em] uppercase px-8 py-4 rounded-xl hover:border-gold hover:text-gold-light transition-all text-center backdrop-blur-sm"
             >
-              Explore Protocol
+              How it works
             </a>
           </div>
 
@@ -191,15 +191,15 @@ const Hero = () => (
           <div className="grid grid-cols-3 gap-6 border-t border-white/10 pt-8 max-w-lg">
             <div>
               <span className="font-mono text-2xl md:text-3xl font-bold text-gold-light">100%</span>
-              <p className="font-body text-xs text-gray-400 mt-1">Verified Passports</p>
+              <p className="font-body text-xs text-gray-400 mt-1">ID-verified to be booked</p>
             </div>
             <div>
-              <span className="font-mono text-2xl md:text-3xl font-bold text-white">48h</span>
-              <p className="font-body text-xs text-gray-400 mt-1">Avg Global Handoff</p>
+              <span className="font-mono text-2xl md:text-3xl font-bold text-white">Escrow</span>
+              <p className="font-body text-xs text-gray-400 mt-1">Paid out on your OK</p>
             </div>
             <div>
-              <span className="font-mono text-2xl md:text-3xl font-bold text-gold-light">$0</span>
-              <p className="font-body text-xs text-gray-400 mt-1">Direct Contact Risk</p>
+              <span className="font-mono text-2xl md:text-3xl font-bold text-gold-light">P2P</span>
+              <p className="font-body text-xs text-gray-400 mt-1">You agree the handover</p>
             </div>
           </div>
         </div>
@@ -210,7 +210,7 @@ const Hero = () => (
             <div className="flex items-center justify-between pb-6 border-b border-white/10">
               <div className="flex items-center gap-3">
                 <div className="w-3 h-3 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="font-body text-xs font-semibold uppercase tracking-widest text-gray-300">Live Matching Active</span>
+                <span className="font-body text-xs font-semibold uppercase tracking-widest text-gray-300">Live Trip Board</span>
               </div>
               <span className="font-mono text-xs text-gold-light font-bold">FLIGHT EBN-842</span>
             </div>
@@ -245,9 +245,9 @@ const Hero = () => (
                   <span className="text-gold-light font-semibold">12 kg Available</span>
                 </div>
                 <div className="flex justify-between items-center text-xs">
-                  <span className="text-gray-400">Intake Inspection</span>
+                  <span className="text-gray-400">Traveler Verified</span>
                   <span className="text-emerald-400 font-semibold flex items-center gap-1">
-                    <ShieldCheck className="w-3.5 h-3.5" /> Passed Verification
+                    <ShieldCheck className="w-3.5 h-3.5" /> ID & Passport Confirmed
                   </span>
                 </div>
               </div>
@@ -264,7 +264,7 @@ const Hero = () => (
                 </div>
               </div>
               <a href="#book" className="bg-gold/10 hover:bg-gold/20 text-gold-light border border-gold/30 font-body text-xs font-semibold px-4 py-2 rounded-xl transition-all">
-                Match Route
+                Browse Trips
               </a>
             </div>
           </div>
@@ -275,23 +275,23 @@ const Hero = () => (
 );
 
 const processSteps = [
-  { icon: FileText, title: "1. Package Request", desc: "Sender specifies route, weight, and special handling instructions." },
-  { icon: Users, title: "2. Route Matching", desc: "EBAN automatically pairs request with a verified traveler on exact flight." },
-  { icon: PackageCheck, title: "3. Hub Drop-off", desc: "Sender leaves package at EBAN hub for physical security inspection." },
-  { icon: Handshake, title: "4. Traveler Handoff", desc: "Inspected package handed to traveler with digital signature timestamp." },
-  { icon: Plane, title: "5. In-Flight Transit", desc: "Traveler carries package in luggage under chain-of-custody track." },
-  { icon: CheckCircle2, title: "6. Verified Delivery", desc: "Recipient signs digital receipt at destination hub for payout release." },
+  { icon: FileText, title: "1. Post Your Request", desc: "Senders post their package details — route, weight, item type, and any special instructions." },
+  { icon: Users, title: "2. Browse Traveler Listings", desc: "Verified travelers share their upcoming flights and available luggage space on the marketplace." },
+  { icon: Handshake, title: "3. Agree & Pay into Escrow", desc: "Sender books a traveler (or a traveler claims the request). Once accepted, the sender pays into escrow and they agree the handover in Messages." },
+  { icon: PackageCheck, title: "4. Direct Handoff", desc: "Sender and traveler meet at a place they agree. The traveler checks the item before taking it." },
+  { icon: Plane, title: "5. In-Flight Carry", desc: "Traveler carries the item in their checked or carry-on luggage as agreed." },
+  { icon: CheckCircle2, title: "6. Confirm & Rate", desc: "The sender confirms receipt, the traveler's earning is released from escrow, and both sides leave a rating." },
 ];
 
 const HowItWorks = () => (
   <section id="how-it-works" className="py-24 bg-charcoal text-white relative">
     <div className="container mx-auto px-6">
-      <SectionLabel>End-to-End Protocol</SectionLabel>
+      <SectionLabel>How the Marketplace Works</SectionLabel>
       <h2 className="font-display text-4xl md:text-5xl font-light leading-tight max-w-xl text-white">
         Six steps from <em className="italic text-gold-light">request to delivery</em>
       </h2>
       <p className="font-body text-sm text-gray-400 max-w-lg mt-4 leading-relaxed">
-        Every delivery adheres to a strict protocol. Neither party shares personal contacts &mdash; EBAN manages physical intake, security, and payment escrow.
+        EBAN connects you directly with verified travelers on your route. No middlemen, no drop-off centres &mdash; just a structured peer-to-peer marketplace with secure escrow.
       </p>
 
       <Reveal className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-16">
@@ -327,7 +327,7 @@ const prohibitedItems = [
   "Unprescribed medicine or controlled substances",
   "Fresh meat, produce, or unsealed perishable food",
   "Customs-restricted luxury items exceeding limits",
-  "Any unverified package not inspected by EBAN",
+  "Any item prohibited by airline or customs regulations",
 ];
 
 const WhatWeCarry = () => (
@@ -335,7 +335,7 @@ const WhatWeCarry = () => (
     <div className="container mx-auto px-6">
       <SectionLabel>Safety &amp; Compliance</SectionLabel>
       <h2 className="font-display text-4xl md:text-5xl font-light text-foreground leading-tight max-w-xl">
-        Clear item rules, <em className="italic font-normal text-gold-dark">zero customs risk</em>
+        Clear item rules, <em className="italic font-normal text-gold-dark">your responsibility</em>
       </h2>
       <Reveal className="grid md:grid-cols-2 gap-8 mt-16">
         <div className="border border-emerald-500/20 bg-emerald-500/[0.02] rounded-3xl p-10 shadow-sm">
@@ -380,26 +380,26 @@ const trustPillars = [
   {
     icon: ShieldCheck,
     title: "100% ID Verified Travelers",
-    desc: "Passports and government photo identification are verified with automated KYC checks before any flight is matched.",
+    desc: "Travelers upload a passport or government photo ID, and our team reviews it. Only approved travelers can be booked or claim requests.",
   },
   {
     icon: Lock,
-    title: "Protected Zero-Contact Privacy",
-    desc: "Senders and travelers never share phone numbers or home addresses. All handoffs occur at secure EBAN inspection hubs.",
+    title: "Secure Escrow Payments",
+    desc: "Your payment is held in escrow and only released to the traveler when you confirm you received the item. If something goes wrong, report an issue and the payment stays frozen while we review it.",
   },
   {
     icon: FileSignature,
-    title: "Digital Proof of Delivery",
-    desc: "Intake and final handoffs require cryptographic digital signatures with time-stamped visual condition records.",
+    title: "Signed Handover & Ratings",
+    desc: "The traveler signs when they take the item, and both sides rate each other after delivery, so reputation builds with every trip.",
   },
 ];
 
 const TrustSafety = () => (
   <section id="trust" className="py-24 bg-charcoal text-white">
     <div className="container mx-auto px-6">
-      <SectionLabel>Guaranteed Security</SectionLabel>
+      <SectionLabel>Trust &amp; Safety</SectionLabel>
       <h2 className="font-display text-4xl md:text-5xl font-light leading-tight max-w-xl text-white">
-        Built for accountability <em className="italic text-gold-light">at every mile</em>
+        Trust built in <em className="italic text-gold-light">at every step</em>
       </h2>
       <Reveal className="grid sm:grid-cols-3 gap-8 mt-16">
         {trustPillars.map((pillar) => (
@@ -431,12 +431,12 @@ const Footer = () => (
           <a href="#how-it-works" className="hover:text-white transition-colors">Process</a>
           <a href="#what-we-carry" className="hover:text-white transition-colors">Guidelines</a>
           <a href="#trust" className="hover:text-white transition-colors">Security</a>
-          <a href="#book" className="hover:text-white transition-colors">Book Delivery</a>
+          <a href="#book" className="hover:text-white transition-colors">Post a Request</a>
         </div>
       </div>
       <div className="mt-8 pt-4 flex flex-col sm:flex-row items-center justify-between text-xs font-body text-gray-500 gap-4">
         <p>&copy; {new Date().getFullYear()} EBAN Logistics Network. All rights reserved.</p>
-        <p className="text-gray-400">Encrypted Handoff &amp; Verification Protocol</p>
+        <p className="text-gray-400">EBAN is a marketplace. Senders and travelers are responsible for what they send and carry.</p>
       </div>
     </div>
   </footer>

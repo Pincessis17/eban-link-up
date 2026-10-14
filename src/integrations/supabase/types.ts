@@ -33,6 +33,12 @@ export type Database = {
           special_handling_flags: string[]
           status: string
           urgency_level: string
+          trip_id: string | null
+          offered_price: number | null
+          agreed_price: number | null
+          sender_dropoff_confirmed_at: string | null
+          delivered_at: string | null
+          pickup_confirmed_at: string | null
           weight_kg: number
         }
         Insert: {
@@ -55,6 +61,12 @@ export type Database = {
           special_handling_flags?: string[]
           status?: string
           urgency_level: string
+          trip_id?: string | null
+          offered_price?: number | null
+          agreed_price?: number | null
+          sender_dropoff_confirmed_at?: string | null
+          delivered_at?: string | null
+          pickup_confirmed_at?: string | null
           weight_kg: number
         }
         Update: {
@@ -77,6 +89,12 @@ export type Database = {
           special_handling_flags?: string[]
           status?: string
           urgency_level?: string
+          trip_id?: string | null
+          offered_price?: number | null
+          agreed_price?: number | null
+          sender_dropoff_confirmed_at?: string | null
+          delivered_at?: string | null
+          pickup_confirmed_at?: string | null
           weight_kg?: number
         }
         Relationships: [
@@ -92,6 +110,13 @@ export type Database = {
             columns: ["route_id"]
             isOneToOne: false
             referencedRelation: "routes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delivery_requests_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
             referencedColumns: ["id"]
           },
           {
@@ -221,6 +246,45 @@ export type Database = {
             columns: ["traveller_id"]
             isOneToOne: false
             referencedRelation: "traveller_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          author_id: string
+          body: string
+          created_at: string
+          id: string
+          request_id: string
+        }
+        Insert: {
+          author_id: string
+          body: string
+          created_at?: string
+          id?: string
+          request_id: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          created_at?: string
+          id?: string
+          request_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "delivery_requests"
             referencedColumns: ["id"]
           },
         ]
@@ -606,6 +670,7 @@ export type Database = {
           id: string
           origin_city: string
           origin_country: string
+          price_per_kg: number | null
           restricted_item_preferences: string | null
           status: string
           traveller_id: string
@@ -621,6 +686,7 @@ export type Database = {
           id?: string
           origin_city: string
           origin_country: string
+          price_per_kg?: number | null
           restricted_item_preferences?: string | null
           status?: string
           traveller_id: string
@@ -636,6 +702,7 @@ export type Database = {
           id?: string
           origin_city?: string
           origin_country?: string
+          price_per_kg?: number | null
           restricted_item_preferences?: string | null
           status?: string
           traveller_id?: string
@@ -702,6 +769,74 @@ export type Database = {
     Functions: {
       admin_delete_traveller: { Args: { p_traveller_id: string }; Returns: undefined }
       is_admin: { Args: never; Returns: boolean }
+      browse_open_trips: {
+        Args: never
+        Returns: {
+          id: string
+          origin_country: string
+          origin_city: string
+          destination_country: string
+          destination_city: string
+          departure_date: string
+          arrival_date: string
+          available_kg: number
+          price_per_kg: number | null
+          restricted_item_preferences: string | null
+          traveller_first_name: string
+          traveller_rating: number
+          traveller_deliveries: number
+          traveller_verified: boolean
+          is_mine: boolean
+        }[]
+      }
+      browse_open_requests: {
+        Args: never
+        Returns: {
+          id: string
+          origin_country: string
+          origin_city: string
+          destination_country: string
+          destination_city: string
+          item_type: string
+          item_description: string
+          weight_kg: number
+          item_value: number
+          urgency_level: string
+          preferred_date: string | null
+          special_handling_flags: string[]
+          offered_price: number | null
+          created_at: string
+        }[]
+      }
+      get_request_counterparty: {
+        Args: { p_request_id: string }
+        Returns: {
+          counterparty_role: string
+          first_name: string
+          rating: number | null
+          total_deliveries: number | null
+          verified: boolean | null
+          my_rating: number | null
+        }[]
+      }
+      book_trip: {
+        Args: {
+          p_trip_id: string
+          p_item_type: string
+          p_item_description: string
+          p_weight_kg: number
+          p_item_value: number
+          p_flags?: string[]
+        }
+        Returns: string
+      }
+      claim_request: { Args: { p_request_id: string; p_trip_id: string }; Returns: undefined }
+      decline_match: { Args: { p_match_id: string }; Returns: undefined }
+      cancel_request: { Args: { p_request_id: string }; Returns: undefined }
+      fund_escrow: { Args: { p_request_id: string }; Returns: undefined }
+      confirm_receipt: { Args: { p_request_id: string }; Returns: undefined }
+      raise_dispute: { Args: { p_request_id: string; p_reason: string }; Returns: undefined }
+      rate_request: { Args: { p_request_id: string; p_rating: number; p_comment?: string }; Returns: undefined }
     }
     Enums: {
       [_ in never]: never

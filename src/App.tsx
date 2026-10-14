@@ -17,13 +17,14 @@ import TravelerRequestDetail from "./pages/traveler/TravelerRequestDetail.tsx";
 import TravelerVerification from "./pages/traveler/TravelerVerification.tsx";
 import TravelerEarnings from "./pages/traveler/TravelerEarnings.tsx";
 import AdminMatch from "./pages/admin/AdminMatch.tsx";
-import AdminIntake from "./pages/admin/AdminIntake.tsx";
 import AdminVerifications from "./pages/admin/AdminVerifications.tsx";
 import AdminPayouts from "./pages/admin/AdminPayouts.tsx";
 import AdminTravelers from "./pages/admin/AdminTravelers.tsx";
 import SenderRequests from "./pages/sender/SenderRequests.tsx";
 import SenderRequestDetail from "./pages/sender/SenderRequestDetail.tsx";
 import SenderNewRequest from "./pages/sender/SenderNewRequest.tsx";
+import SenderBrowseTrips from "./pages/sender/SenderBrowseTrips.tsx";
+import TravelerBrowseRequests from "./pages/traveler/TravelerBrowseRequests.tsx";
 
 const queryClient = new QueryClient();
 
@@ -63,6 +64,14 @@ const App = () => (
               }
             />
             <Route
+              path="/traveler/browse"
+              element={
+                <ProtectedRoute requireRole="Traveller">
+                  <TravelerBrowseRequests />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/traveler/requests"
               element={
                 <ProtectedRoute requireRole="Traveller">
@@ -83,14 +92,6 @@ const App = () => (
               element={
                 <ProtectedRoute requireRole="Admin">
                   <AdminMatch />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/intake"
-              element={
-                <ProtectedRoute requireRole="Admin">
-                  <AdminIntake />
                 </ProtectedRoute>
               }
             />
@@ -131,6 +132,14 @@ const App = () => (
               element={
                 <ProtectedRoute requireRole="Traveller">
                   <TravelerEarnings />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/sender/trips"
+              element={
+                <ProtectedRoute requireRole="Sender">
+                  <SenderBrowseTrips />
                 </ProtectedRoute>
               }
             />

@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { LogOut, Package, Plus, Globe } from "lucide-react";
+import { LogOut, Package, Plus, Globe, Plane } from "lucide-react";
 import ebanSymbol from "@/assets/eban-symbol.png";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -30,6 +30,9 @@ export const SenderNav = () => {
         </div>
 
         <div className="flex items-center gap-3">
+          <Link to="/sender/trips" className={linkClasses("/sender/trips")}>
+            <Plane className="w-3.5 h-3.5" /> Browse Trips
+          </Link>
           <Link to="/sender/requests" className={linkClasses("/sender/requests")}>
             <Package className="w-3.5 h-3.5" /> My Requests
           </Link>
@@ -37,7 +40,7 @@ export const SenderNav = () => {
             to="/sender/new-request"
             className="flex items-center gap-1.5 bg-gradient-gold text-accent-foreground px-4 py-2 rounded-xl text-xs font-body font-bold tracking-wider uppercase hover:opacity-90 shadow-sm transition-all"
           >
-            <Plus className="w-3.5 h-3.5" /> New Request
+            <Plus className="w-3.5 h-3.5" /> Post Request
           </Link>
           <div className="h-5 w-px bg-border mx-1" />
           <Link to="/?view=site" className="text-muted-foreground hover:text-foreground p-2 rounded-lg transition-colors flex items-center gap-1 text-xs font-body">

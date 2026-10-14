@@ -4,6 +4,8 @@ import { Package, ArrowRight, Plus, Sparkles, Filter, ChevronRight, Clock, Shiel
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { SenderNav } from "@/components/SenderNav";
+import { DeleteButton } from "@/components/AdminDeleteButton";
+import { SENDER_STATUS_LABEL as STATUS_LABEL, STATUS_BADGE, SENDER_DELETABLE, errMsg } from "@/lib/marketplace";
 
 interface DeliveryRequestRow {
   id: string;
@@ -16,35 +18,6 @@ interface DeliveryRequestRow {
   status: string;
   created_at: string;
 }
-
-const STATUS_LABEL: Record<string, string> = {
-  draft: "Draft",
-  submitted: "Submitted - Matching",
-  matched: "Matched with Traveler",
-  accepted_by_traveller: "Matched with Traveler",
-  paid: "Payment Confirmed",
-  dropped_off: "At EBAN Hub",
-  handed_to_traveller: "In Transit with Traveler",
-  in_transit: "In Flight",
-  delivered: "Delivered",
-  completed: "Delivered",
-  disputed: "Under Review",
-  cancelled: "Cancelled",
-};
-
-const STATUS_BADGE: Record<string, string> = {
-  submitted: "bg-gold/15 text-gold-dark border-gold/30",
-  matched: "bg-blue-500/10 text-blue-600 border-blue-500/30",
-  accepted_by_traveller: "bg-blue-500/10 text-blue-600 border-blue-500/30",
-  paid: "bg-emerald-500/10 text-emerald-600 border-emerald-500/30",
-  dropped_off: "bg-amber-500/10 text-amber-600 border-amber-500/30",
-  handed_to_traveller: "bg-indigo-500/10 text-indigo-600 border-indigo-500/30",
-  in_transit: "bg-purple-500/10 text-purple-600 border-purple-500/30",
-  delivered: "bg-emerald-500/15 text-emerald-700 border-emerald-500/30",
-  completed: "bg-emerald-500/15 text-emerald-700 border-emerald-500/30",
-  disputed: "bg-destructive/10 text-destructive border-destructive/30",
-  cancelled: "bg-muted text-muted-foreground border-border",
-};
 
 const SenderRequests = () => {
   const { user, loading: authLoading } = useAuth();
@@ -73,6 +46,14 @@ const SenderRequests = () => {
     load();
   }, [user, authLoading]);
 
+  const deleteRequest = async (id: string): Promise<string | null> => {
+    const { data, error } = await supabase.from("delivery_requests").delete().eq("id", id).select("id");
+    if (error) return errMsg(error);
+    if (!data || data.length === 0) return "Nothing was deleted. You may not have permission.";
+    setRequests((prev) => prev.filter((r) => r.id !== id));
+    return null;
+  };
+
   const filteredRequests = requests.filter((r) => {
     if (filter === "active") return !["delivered", "completed", "cancelled"].includes(r.status);
     if (filter === "delivered") return ["delivered", "completed"].includes(r.status);
@@ -87,7 +68,7 @@ const SenderRequests = () => {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="font-display text-3xl md:text-4xl font-light text-foreground">Package Requests</h1>
-            <p className="font-body text-xs text-muted-foreground mt-1">Track live traveler matching, hub drop-off, and digital receipts.</p>
+            <p className="font-body text-xs text-muted-foreground mt-1">Track your active requests and coordinate with your matched traveler.</p>
           </div>
 
           <Link
@@ -138,23 +119,26 @@ const SenderRequests = () => {
             <Package className="w-12 h-12 text-gold-dark/60 mx-auto mb-4" />
             <h3 className="font-display text-2xl font-semibold text-foreground mb-2">No package requests found</h3>
             <p className="font-body text-sm text-muted-foreground mb-6">
-              Create a new request to get matched with a traveler headed to your destination.
+              Browse trips to book a traveler, or post a request and let travelers claim it.
             </p>
             <Link
-              to="/sender/new-request"
+              to="/sender/trips"
               className="inline-flex items-center gap-2 bg-gradient-gold text-accent-foreground font-body font-bold text-xs uppercase tracking-wider px-8 py-3.5 rounded-xl hover:opacity-90 transition-all shadow-md"
             >
-              Dispatch a Package <ChevronRight className="w-4 h-4" />
+              Browse Trips <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
         )}
 
         <div className="grid gap-4">
           {filteredRequests.map((r) => (
-            <Link
+            <div
               key={r.id}
+              className="group bg-card rounded-2xl border border-border/80 hover:border-gold/50 shadow-[var(--shadow-card)] hover:shadow-gold-glow transition-all duration-300 flex items-center gap-3 pr-4"
+            >
+            <Link
               to={`/sender/requests/${r.id}`}
-              className="group bg-card rounded-2xl border border-border/80 p-6 hover:border-gold/50 shadow-[var(--shadow-card)] hover:shadow-gold-glow transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-4"
+              className="flex-1 p-6 flex flex-col md:flex-row md:items-center justify-between gap-4"
             >
               <div className="flex-1 space-y-2">
                 <div className="flex items-center gap-2 text-foreground font-display text-xl font-bold">
@@ -181,6 +165,14 @@ const SenderRequests = () => {
                 <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-gold-dark transition-colors" />
               </div>
             </Link>
+            {SENDER_DELETABLE.includes(r.status) && (
+              <DeleteButton
+                title="Delete this request?"
+                description={`${r.origin_city} to ${r.destination_city} (${r.item_type}, ${r.weight_kg} kg) will be permanently removed. Space reserved on a traveler's trip goes back to them. This can't be undone.`}
+                onConfirm={() => deleteRequest(r.id)}
+              />
+            )}
+            </div>
           ))}
         </div>
       </div>

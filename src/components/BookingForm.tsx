@@ -28,6 +28,7 @@ const BookingForm = () => {
     itemValue: "150",
     urgencyLevel: "standard" as (typeof URGENCY_LEVELS)[number],
     preferredDate: "",
+    offeredPrice: "",
     flags: [] as string[],
   });
   const [submitted, setSubmitted] = useState(false);
@@ -39,12 +40,6 @@ const BookingForm = () => {
       flags: f.flags.includes(flag) ? f.flags.filter((x) => x !== flag) : [...f.flags, flag],
     }));
   };
-
-  // Estimated delivery fee calculation
-  const baseRate = 25; // USD base
-  const kgRate = (parseFloat(form.weightKg) || 1) * 12;
-  const urgencyMultiplier = form.urgencyLevel === "urgent" ? 1.5 : form.urgencyLevel === "priority" ? 1.25 : 1.0;
-  const estimatedFee = Math.round((baseRate + kgRate) * urgencyMultiplier);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,6 +58,7 @@ const BookingForm = () => {
       item_value: parseFloat(form.itemValue) || 0,
       urgency_level: form.urgencyLevel,
       preferred_date: form.preferredDate || null,
+      offered_price: form.offeredPrice ? parseFloat(form.offeredPrice) : null,
       special_handling_flags: form.flags,
       status: "submitted",
     });
@@ -85,15 +81,15 @@ const BookingForm = () => {
             <div className="w-20 h-20 rounded-full bg-gradient-gold flex items-center justify-center mx-auto mb-6 glow-gold">
               <CheckCircle2 className="w-10 h-10 text-accent-foreground" />
             </div>
-            <h2 className="font-display text-4xl font-light text-foreground mb-3">Delivery Request Submitted!</h2>
+            <h2 className="font-display text-4xl font-light text-foreground mb-3">Your request is on the board</h2>
             <p className="font-body text-muted-foreground text-base mb-8 max-w-md mx-auto">
-              Your request is officially on the EBAN dispatch desk. We will automatically match you with verified travelers on your route.
+              Travelers on your route can now see and claim it. You can also pick a traveler yourself from the trip board. You pay into escrow once someone accepts.
             </p>
             <Link
               to="/sender/requests"
               className="inline-flex items-center gap-2 bg-gradient-gold text-accent-foreground font-body font-bold uppercase tracking-wider px-8 py-4 rounded-xl text-xs hover:opacity-90 shadow-md transition-all"
             >
-              Track Request Status <ChevronRight className="w-4 h-4" />
+              View my requests <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
         </div>
@@ -109,9 +105,9 @@ const BookingForm = () => {
             <div className="w-16 h-16 rounded-2xl bg-gold/10 border border-gold/30 flex items-center justify-center mx-auto mb-6">
               <Lock className="w-7 h-7 text-gold-dark" />
             </div>
-            <h2 className="font-display text-3xl md:text-4xl font-light text-foreground mb-3">Sign in to book a package delivery</h2>
+            <h2 className="font-display text-3xl md:text-4xl font-light text-foreground mb-3">Sign in to post a request</h2>
             <p className="font-body text-muted-foreground text-base mb-8 max-w-md mx-auto">
-              Create your free EBAN account to book deliveries, track travelers in real-time, and get digital receipts.
+              Create your free EBAN account to browse trips, post requests and pay safely through escrow.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
@@ -140,14 +136,14 @@ const BookingForm = () => {
           <div className="inline-flex items-center gap-2 bg-gold/10 border border-gold/25 px-3 py-1 rounded-full mb-3">
             <Sparkles className="w-3.5 h-3.5 text-gold-dark" />
             <span className="font-body text-xs font-semibold tracking-[0.2em] uppercase text-gold-dark">
-              Instant Dispatch Portal
+              Open Request Board
             </span>
           </div>
           <h2 className="font-display text-4xl md:text-5xl font-light text-foreground">
-            Schedule a <em className="italic text-gold-dark font-normal">Package Delivery</em>
+            Post a <em className="italic text-gold-dark font-normal">Request</em>
           </h2>
           <p className="font-body text-muted-foreground mt-3 max-w-xl mx-auto text-base">
-            Tell us your route and item specs. EBAN manages traveler verification, pickup intake, and digital sign-off.
+            Describe what you need carried. Travelers on your route can claim it, and your payment is held in escrow until you confirm delivery.
           </p>
         </div>
 
@@ -175,7 +171,7 @@ const BookingForm = () => {
             {form.originCity && form.destinationCity && (
               <div className="bg-gold/10 border border-gold/25 text-gold-dark rounded-xl p-3.5 mb-6 font-body text-xs flex items-center gap-2">
                 <MapPin className="w-4 h-4 shrink-0 text-gold" />
-                <span>Pre-filled from open traveler trip: <strong>{form.originCity}</strong> &rarr; <strong>{form.destinationCity}</strong>.</span>
+                <span>Route pre-filled from a traveler trip: <strong>{form.originCity}</strong> &rarr; <strong>{form.destinationCity}</strong>.</span>
               </div>
             )}
 
@@ -267,7 +263,7 @@ const BookingForm = () => {
                     required
                     className={`${inputClasses} resize-none`}
                     rows={3}
-                    placeholder="Describe your item clearly for customs and intake verification..."
+                    placeholder="Describe your item clearly so the traveler knows exactly what they would carry..."
                     value={form.itemDescription}
                     onChange={(e) => setForm({ ...form, itemDescription: e.target.value })}
                   />
@@ -369,14 +365,22 @@ const BookingForm = () => {
                     <span className="font-body text-xs text-muted-foreground uppercase tracking-wider">Declared Value</span>
                     <span className="font-body text-sm font-semibold text-foreground">${form.itemValue} USD</span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="font-body text-xs text-muted-foreground uppercase tracking-wider">Estimated Delivery Reward</span>
-                    <span className="font-display text-2xl font-bold text-gold-dark">${estimatedFee} USD</span>
+                  <div>
+                    <label className="font-body text-xs text-muted-foreground uppercase tracking-wider mb-2 block">Your offer (USD, optional)</label>
+                    <input
+                      type="number"
+                      step="0.5"
+                      min="0"
+                      className={inputClasses}
+                      placeholder="Leave empty to accept the traveler's price per kg"
+                      value={form.offeredPrice}
+                      onChange={(e) => setForm({ ...form, offeredPrice: e.target.value })}
+                    />
                   </div>
                 </div>
 
                 <div className="p-4 bg-gold/10 border border-gold/20 rounded-xl font-body text-xs text-gold-dark">
-                  * Final pricing is confirmed upon EBAN hub intake inspection. You pay only after a verified traveler accepts your package route.
+                  * You pay only after a verified traveler claims your request. The money is held in escrow and released when you confirm you received the item. You are responsible for what you send and for following customs rules.
                 </div>
 
                 <div className="pt-4 flex justify-between">
@@ -392,7 +396,7 @@ const BookingForm = () => {
                     disabled={loading}
                     className="bg-gradient-gold text-accent-foreground font-body font-bold text-xs uppercase tracking-widest px-10 py-4 rounded-xl hover:opacity-90 transition-opacity flex items-center gap-2 shadow-lg glow-gold disabled:opacity-50"
                   >
-                    {loading ? "Submitting..." : "Submit Dispatch Request"} <Send className="w-4 h-4" />
+                    {loading ? "Posting..." : "Post request"} <Send className="w-4 h-4" />
                   </button>
                 </div>
               </div>

@@ -4,6 +4,8 @@ import { Plane, Plus, Calendar, Weight, ShieldCheck, ArrowRight, Sparkles, Alert
 import { supabase } from "@/integrations/supabase/client";
 import { useTravellerProfile } from "@/hooks/useTravellerProfile";
 import { TravelerNav } from "@/components/TravelerNav";
+import { DeleteButton } from "@/components/AdminDeleteButton";
+import { errMsg, money } from "@/lib/marketplace";
 
 interface Trip {
   id: string;
@@ -14,6 +16,7 @@ interface Trip {
   departure_date: string;
   capacity_kg: number;
   available_kg: number;
+  price_per_kg: number | null;
   status: string;
 }
 
@@ -43,6 +46,14 @@ const TravelerHome = () => {
     load();
   }, [travellerProfile, profileLoading]);
 
+  const deleteTrip = async (tripId: string): Promise<string | null> => {
+    const { data, error } = await supabase.from("trips").delete().eq("id", tripId).select("id");
+    if (error) return errMsg(error);
+    if (!data || data.length === 0) return "Nothing was deleted. You may not have permission.";
+    setTrips((prev) => prev.filter((t) => t.id !== tripId));
+    return null;
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <TravelerNav />
@@ -58,7 +69,7 @@ const TravelerHome = () => {
               <div>
                 <h4 className="font-display text-base font-semibold text-foreground">ID Verification Pending</h4>
                 <p className="font-body text-xs text-muted-foreground">
-                  Status: <span className="font-semibold text-gold-dark capitalize">{travellerProfile?.verification_status ?? "pending"}</span>. Upload your passport photo to unlock instant matching.
+                  Status: <span className="font-semibold text-gold-dark capitalize">{travellerProfile?.verification_status ?? "pending"}</span>. Upload your passport photo so senders can book you and you can claim requests.
                 </p>
               </div>
             </div>
@@ -97,7 +108,7 @@ const TravelerHome = () => {
             <Plane className="w-12 h-12 text-gold-dark/60 mx-auto mb-4" />
             <h3 className="font-display text-2xl font-semibold text-foreground mb-2">No active flight trips listed</h3>
             <p className="font-body text-sm text-muted-foreground mb-6">
-              Share your upcoming flight details to get matched with package requests on your exact route.
+              Share your upcoming flight and your price per kg. Senders can book you, and you can claim open requests on your route.
             </p>
             <Link
               to="/traveler/new-trip"
@@ -148,10 +159,22 @@ const TravelerHome = () => {
                       </span>
                       <span className="font-semibold text-foreground">{trip.available_kg} kg available / {trip.capacity_kg} kg total</span>
                     </div>
+                    <p className="font-body text-xs text-muted-foreground mt-2">
+                      Your price: <strong className="text-foreground">{trip.price_per_kg != null ? `${money(trip.price_per_kg)} / kg` : "not set"}</strong>
+                    </p>
                     <div className="w-full h-2 bg-border/60 rounded-full overflow-hidden">
                       <div className="h-full bg-gradient-gold rounded-full transition-all duration-500" style={{ width: `${100 - fillPct}%` }} />
                     </div>
                   </div>
+                </div>
+
+                <div className="flex md:flex-col items-center md:items-end">
+                  <DeleteButton
+                    label="Delete trip"
+                    title="Delete this trip?"
+                    description={`${trip.origin_city} to ${trip.destination_city} will be removed. Bookings that haven't been paid yet go back to the open board. A trip with a paid delivery in progress can't be deleted.`}
+                    onConfirm={() => deleteTrip(trip.id)}
+                  />
                 </div>
               </div>
             );

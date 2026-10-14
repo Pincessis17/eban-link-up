@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { LogOut, Plane, ShieldCheck, DollarSign, Plus, Globe } from "lucide-react";
+import { LogOut, Plane, ShieldCheck, DollarSign, Plus, Globe, Search } from "lucide-react";
 import ebanSymbol from "@/assets/eban-symbol.png";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -33,8 +33,11 @@ export const TravelerNav = () => {
           <Link to="/traveler" className={linkClasses("/traveler")}>
             <Plane className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Trips</span>
           </Link>
+          <Link to="/traveler/browse" className={linkClasses("/traveler/browse")}>
+            <Search className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Browse</span>
+          </Link>
           <Link to="/traveler/requests" className={linkClasses("/traveler/requests")}>
-            <span className="hidden sm:inline">Requests</span>
+            <span className="hidden sm:inline">Bookings</span>
           </Link>
           <Link to="/traveler/earnings" className={linkClasses("/traveler/earnings")}>
             <DollarSign className="w-3.5 h-3.5 text-emerald-600" /> <span className="hidden sm:inline">Earnings</span>

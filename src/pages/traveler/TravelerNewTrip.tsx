@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Send } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTravellerProfile } from "@/hooks/useTravellerProfile";
@@ -12,14 +12,16 @@ const inputClasses =
 const TravelerNewTrip = () => {
   const { travellerProfile } = useTravellerProfile();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [form, setForm] = useState({
-    originCountry: "",
-    originCity: "",
-    destinationCountry: "",
-    destinationCity: "",
+    originCountry: searchParams.get("originCountry") ?? "",
+    originCity: searchParams.get("originCity") ?? "",
+    destinationCountry: searchParams.get("destinationCountry") ?? "",
+    destinationCity: searchParams.get("destinationCity") ?? "",
     departureDate: "",
     arrivalDate: "",
     capacityKg: "",
+    pricePerKg: "",
     restrictions: "",
   });
   const [loading, setLoading] = useState(false);
@@ -41,6 +43,7 @@ const TravelerNewTrip = () => {
       arrival_date: form.arrivalDate || form.departureDate,
       capacity_kg: capacity,
       available_kg: capacity,
+      price_per_kg: parseFloat(form.pricePerKg) || null,
       restricted_item_preferences: form.restrictions || null,
       status: "open",
     });
@@ -52,7 +55,7 @@ const TravelerNewTrip = () => {
       return;
     }
 
-    toast({ title: "Trip posted", description: "We'll match you with requests along this route." });
+    toast({ title: "Trip posted", description: "Senders can now book space on it. You can also claim open requests." });
     navigate("/traveler");
   };
 
@@ -92,10 +95,19 @@ const TravelerNewTrip = () => {
               <input type="date" className={inputClasses} value={form.arrivalDate} onChange={(e) => setForm({ ...form, arrivalDate: e.target.value })} />
             </div>
           </div>
-          <div className="mb-5">
-            <label className="font-display text-sm font-semibold text-foreground mb-1.5 block">Available capacity (kg)</label>
-            <input type="number" step="0.5" min="0" required className={inputClasses} placeholder="5" value={form.capacityKg} onChange={(e) => setForm({ ...form, capacityKg: e.target.value })} />
+          <div className="grid sm:grid-cols-2 gap-5 mb-5">
+            <div>
+              <label className="font-display text-sm font-semibold text-foreground mb-1.5 block">Available capacity (kg)</label>
+              <input type="number" step="0.5" min="0" required className={inputClasses} placeholder="5" value={form.capacityKg} onChange={(e) => setForm({ ...form, capacityKg: e.target.value })} />
+            </div>
+            <div>
+              <label className="font-display text-sm font-semibold text-foreground mb-1.5 block">Your price per kg (USD)</label>
+              <input type="number" step="0.5" min="0.5" required className={inputClasses} placeholder="8" value={form.pricePerKg} onChange={(e) => setForm({ ...form, pricePerKg: e.target.value })} />
+            </div>
           </div>
+          <p className="font-body text-xs text-muted-foreground mb-5 -mt-2">
+            You set the price. Senders see it before booking, and the money is held in escrow until they confirm delivery.
+          </p>
           <div className="mb-8">
             <label className="font-display text-sm font-semibold text-foreground mb-1.5 block">Anything you'd rather not carry? (optional)</label>
             <textarea className={`${inputClasses} resize-none`} rows={2} placeholder="e.g. no perishables" value={form.restrictions} onChange={(e) => setForm({ ...form, restrictions: e.target.value })} />

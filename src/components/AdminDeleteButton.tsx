@@ -78,3 +78,6 @@ export const AdminDeleteButton = ({ title, description, onConfirm, label }: Admi
     </AlertDialog>
   );
 };
+
+/** Same confirm-then-delete button, for use outside the admin area (senders, travelers). */
+export const DeleteButton = AdminDeleteButton;

@@ -41,8 +41,7 @@ export const AvailableTrips = () => {
       destinationCountry: t.destination_country,
       destinationCity: t.destination_city,
     });
-    const target = user ? "/sender/new-request" : "/signup";
-    return `${target}?${params.toString()}`;
+    return user ? "/sender/trips" : `/signup?${params.toString()}`;
   };
 
   if (loading) return null;
@@ -64,7 +63,7 @@ export const AvailableTrips = () => {
             Travelers <em className="italic text-gold-dark font-normal">already scheduled</em> on route
           </h2>
           <p className="font-body text-muted-foreground mt-4 max-w-xl mx-auto text-base">
-            Send packages with verified travelers holding open baggage allowance today. EBAN guarantees end-to-end handoff security.
+            Travelers who have posted spare baggage space on their flights. Sign in to see prices and book, with payment held in escrow.
           </p>
         </div>
 
@@ -73,7 +72,7 @@ export const AvailableTrips = () => {
             <Plane className="w-12 h-12 text-gold/60 mx-auto mb-4 animate-bounce" />
             <h3 className="font-display text-xl font-semibold text-foreground mb-2">No active departures listed right now</h3>
             <p className="font-body text-sm text-muted-foreground leading-relaxed">
-              Submit your package request below. Our automated dispatch system will notify you as soon as a traveler posts your route.
+              Post a request below and travelers heading your way can claim it.
             </p>
           </div>
         ) : (
@@ -95,8 +94,8 @@ export const AvailableTrips = () => {
                       <Calendar className="w-3.5 h-3.5 text-gold" />
                       {new Date(t.departure_date).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
                     </div>
-                    <span className="flex items-center gap-1 text-[10px] uppercase font-semibold text-emerald-400 bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded-full">
-                      <ShieldCheck className="w-3 h-3" /> Verified
+                    <span className="flex items-center gap-1 text-[10px] uppercase font-semibold text-gold-light bg-white/5 border border-gold/30 px-2 py-0.5 rounded-full">
+                      <ShieldCheck className="w-3 h-3" /> Open
                     </span>
                   </div>
 
@@ -152,7 +151,7 @@ export const AvailableTrips = () => {
                       to={tripLink(t)}
                       className="w-full inline-flex items-center justify-center gap-2 bg-gradient-gold text-accent-foreground font-body text-xs font-bold uppercase tracking-wider py-3 px-4 rounded-xl hover:opacity-95 shadow-md hover:shadow-gold-glow transition-all"
                     >
-                      Book Delivery Space <ArrowRight className="w-3.5 h-3.5" />
+                      {user ? "See price & book" : "Sign up to book"} <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
                   </div>
                 </div>

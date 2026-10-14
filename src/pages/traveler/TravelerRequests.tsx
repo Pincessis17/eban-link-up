@@ -28,6 +28,18 @@ const matchStatusLabel: Record<string, string> = {
   rejected: "Declined",
 };
 
+const requestStatusLabel: Record<string, string> = {
+  accepted_by_traveller: "Waiting for sender to pay",
+  paid: "Funded: collect the item",
+  dropped_off: "Funded: collect the item",
+  handed_to_traveller: "You have the item",
+  in_transit: "In transit",
+  delivered: "Awaiting sender confirmation",
+  completed: "Completed and paid out",
+  disputed: "Dispute open",
+  cancelled: "Cancelled",
+};
+
 const TravelerRequests = () => {
   const { travellerProfile, loading: profileLoading } = useTravellerProfile();
   const [matches, setMatches] = useState<MatchRow[]>([]);
@@ -60,7 +72,7 @@ const TravelerRequests = () => {
     <div className="min-h-screen bg-background">
       <TravelerNav />
       <div className="container mx-auto px-6 py-10 max-w-2xl">
-        <h1 className="font-display text-2xl font-bold text-foreground mb-6">Requests</h1>
+        <h1 className="font-display text-2xl font-bold text-foreground mb-6">My bookings</h1>
 
         {loading && <div className="text-center py-10 font-body text-muted-foreground">Loading...</div>}
 
@@ -69,7 +81,7 @@ const TravelerRequests = () => {
             <Package className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
             <p className="font-display font-semibold text-foreground mb-1">No requests yet</p>
             <p className="font-body text-sm text-muted-foreground">
-              Once a request matches one of your trips, it'll show up here.
+              When a sender books one of your trips, or you claim a request, it shows up here. Browse open requests to find one.
             </p>
           </div>
         )}
@@ -95,7 +107,9 @@ const TravelerRequests = () => {
                     m.status === "pending" ? "bg-accent/20 text-accent-foreground" : m.status === "accepted" ? "bg-green-100 text-green-800" : "bg-secondary text-secondary-foreground"
                   }`}
                 >
-                  {matchStatusLabel[m.status] ?? m.status}
+                  {m.status === "accepted" && m.delivery_requests
+                    ? requestStatusLabel[m.delivery_requests.status] ?? matchStatusLabel.accepted
+                    : matchStatusLabel[m.status] ?? m.status}
                 </span>
               </div>
             </Link>

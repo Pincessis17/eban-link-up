@@ -5,6 +5,10 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
 import { TravelerNav } from "@/components/TravelerNav";
 import { SignaturePad } from "@/components/SignaturePad";
+import { RequestMessages } from "@/components/RequestMessages";
+import { RateCounterparty } from "@/components/RateCounterparty";
+import { ReportIssueButton } from "@/components/ReportIssueButton";
+import { IN_FLIGHT, errMsg, money } from "@/lib/marketplace";
 
 interface DeliveryRequest {
   id: string;
@@ -18,6 +22,13 @@ interface DeliveryRequest {
   preferred_date: string | null;
   status: string;
   special_handling_flags: string[];
+  agreed_price: number | null;
+  offered_price: number | null;
+}
+
+interface Counterparty {
+  first_name: string;
+  my_rating: number | null;
 }
 
 interface MatchDetail {
@@ -33,15 +44,18 @@ interface HandoffPreference {
   location: string | null;
 }
 
-const STATUS_STEPS = ["accepted_by_traveller", "handed_to_traveller", "in_transit", "delivered"];
+const STATUS_STEPS = ["accepted_by_traveller", "paid", "handed_to_traveller", "in_transit", "delivered"];
 const STATUS_LABELS: Record<string, string> = {
   accepted_by_traveller: "Accepted",
-  paid: "Accepted",
-  dropped_off: "Accepted",
+  paid: "Funded",
   handed_to_traveller: "Received",
   in_transit: "In transit",
   delivered: "Delivered",
-  completed: "Delivered",
+};
+const stepKey = (status: string) => {
+  if (status === "dropped_off") return "paid";
+  if (status === "completed") return "delivered";
+  return status;
 };
 
 const inputClasses =
@@ -59,6 +73,7 @@ const TravelerRequestDetail = () => {
   const [customTime, setCustomTime] = useState("");
   const [customLocation, setCustomLocation] = useState("");
   const [showSignature, setShowSignature] = useState(false);
+  const [counterparty, setCounterparty] = useState<Counterparty | null>(null);
 
   const load = useCallback(async () => {
     if (!id) return;
@@ -77,6 +92,10 @@ const TravelerRequestDetail = () => {
         .eq("request_id", (matchData.delivery_requests as unknown as DeliveryRequest).id)
         .maybeSingle();
       setHandoff(handoffData);
+      const { data: cp } = await supabase.rpc("get_request_counterparty", {
+        p_request_id: (matchData.delivery_requests as unknown as DeliveryRequest).id,
+      });
+      setCounterparty(cp?.[0] ?? null);
     }
     setLoading(false);
   }, [id]);
@@ -103,10 +122,10 @@ const TravelerRequestDetail = () => {
   const handleDecline = async () => {
     if (!match) return;
     setBusy(true);
-    const { error } = await supabase.from("matches").update({ status: "rejected" }).eq("id", match.id);
+    const { error } = await supabase.rpc("decline_match", { p_match_id: match.id });
     setBusy(false);
     if (error) {
-      toast({ title: "Error", description: "Couldn't decline the request. Try again.", variant: "destructive" });
+      toast({ title: "Error", description: errMsg(error, "Couldn't decline the request. Try again."), variant: "destructive" });
       return;
     }
     navigate("/traveler/requests");
@@ -203,8 +222,12 @@ const TravelerRequestDetail = () => {
               <p className="font-body text-xs text-muted-foreground">Declared value</p>
               <p className="font-display text-sm font-semibold text-foreground">${request.item_value}</p>
             </div>
-            <div className="bg-secondary rounded-lg p-3">
-              <p className="font-body text-xs text-muted-foreground">Preferred date</p>
+            <div className="bg-secondary rounded-lg p-3 col-span-2">
+              <p className="font-body text-xs text-muted-foreground">You earn</p>
+              <p className="font-display text-sm font-semibold text-foreground">{money(request.agreed_price ?? request.offered_price)}</p>
+            </div>
+            <div className="bg-secondary rounded-lg p-3 col-span-2">
+              <p className="font-body text-xs text-muted-foreground">Needed by</p>
               <p className="font-display text-sm font-semibold text-foreground">
                 {request.preferred_date ? new Date(request.preferred_date).toLocaleDateString() : "Flexible"}
               </p>
@@ -212,7 +235,7 @@ const TravelerRequestDetail = () => {
           </div>
 
           <div className="bg-accent/10 text-accent-foreground rounded-lg p-3 mb-6 font-body text-xs">
-            Sender details are kept private by EBAN. You'll never contact them directly &mdash; EBAN handles pickup and handoff.
+            EBAN is a marketplace: you and the sender are responsible for the item and its handover. Check what you are carrying before you take it. Use Messages to agree the handover.
           </div>
 
           {match.status === "pending" && (
@@ -242,7 +265,7 @@ const TravelerRequestDetail = () => {
                   }`}
                 >
                   <p className="font-display text-sm font-semibold text-foreground">Airport handoff (standard)</p>
-                  <p className="font-body text-xs text-muted-foreground mt-1">EBAN meets you at the airport before your flight.</p>
+                  <p className="font-body text-xs text-muted-foreground mt-1">Sender brings the package to the airport before your flight.</p>
                 </button>
                 <button
                   type="button"
@@ -251,8 +274,8 @@ const TravelerRequestDetail = () => {
                     handoffType === "custom" ? "border-gold bg-accent/10" : "border-border"
                   }`}
                 >
-                  <p className="font-display text-sm font-semibold text-foreground">Pick up earlier</p>
-                  <p className="font-body text-xs text-muted-foreground mt-1">Choose a time to receive it from the EBAN hub instead.</p>
+                  <p className="font-display text-sm font-semibold text-foreground">Custom location</p>
+                  <p className="font-body text-xs text-muted-foreground mt-1">Agree on a convenient time and place with the sender.</p>
                 </button>
               </div>
               {handoffType === "custom" && (
@@ -263,7 +286,7 @@ const TravelerRequestDetail = () => {
                   </div>
                   <div>
                     <label className="font-display text-xs font-semibold text-foreground mb-1 block">Location</label>
-                    <input type="text" required className={inputClasses} placeholder="EBAN hub" value={customLocation} onChange={(e) => setCustomLocation(e.target.value)} />
+                    <input type="text" required className={inputClasses} placeholder="e.g. Arrival hall, Terminal 2" value={customLocation} onChange={(e) => setCustomLocation(e.target.value)} />
                   </div>
                 </div>
               )}
@@ -277,9 +300,7 @@ const TravelerRequestDetail = () => {
             <div>
               <div className="flex items-center justify-between mb-6">
                 {STATUS_STEPS.map((step) => {
-                  const currentIdx = STATUS_STEPS.indexOf(
-                    ["accepted_by_traveller", "paid", "dropped_off"].includes(request.status) ? "accepted_by_traveller" : request.status
-                  );
+                  const currentIdx = STATUS_STEPS.indexOf(stepKey(request.status));
                   const stepIdx = STATUS_STEPS.indexOf(step);
                   const done = stepIdx <= currentIdx;
                   return (
@@ -295,12 +316,17 @@ const TravelerRequestDetail = () => {
                 {handoff.type === "airport" ? "Airport handoff (standard)" : `${handoff.location} · ${handoff.scheduled_time ? new Date(handoff.scheduled_time).toLocaleString() : ""}`}
               </div>
 
-              {["accepted_by_traveller", "paid", "dropped_off"].includes(request.status) && !showSignature && (
+              {request.status === "accepted_by_traveller" && (
+                <p className="font-body text-sm text-muted-foreground text-center py-4">
+                  Waiting for the sender to pay into escrow. Don't take the item until the payment shows as funded.
+                </p>
+              )}
+              {["paid", "dropped_off"].includes(request.status) && !showSignature && (
                 <button onClick={() => setShowSignature(true)} disabled={busy} className="w-full border border-border text-foreground font-display font-bold py-3 rounded-lg text-sm hover:bg-secondary transition-colors disabled:opacity-50">
-                  I've received the package
+                  I've received the item (sign to confirm)
                 </button>
               )}
-              {["accepted_by_traveller", "paid", "dropped_off"].includes(request.status) && showSignature && (
+              {["paid", "dropped_off"].includes(request.status) && showSignature && (
                 <SignaturePad onCapture={handleSignatureCapture} onCancel={() => setShowSignature(false)} />
               )}
               {request.status === "handed_to_traveller" && (
@@ -309,16 +335,54 @@ const TravelerRequestDetail = () => {
                 </button>
               )}
               {request.status === "in_transit" && (
+                <div className="space-y-3">
+                  <p className="font-body text-sm text-muted-foreground text-center">
+                    Once you land, hand the item to the sender's recipient at the place you agreed in Messages, then mark it delivered.
+                  </p>
+                  <button
+                    onClick={() => advanceStatus("delivered", { delivered_at: new Date().toISOString() })}
+                    disabled={busy}
+                    className="w-full bg-gradient-gold text-accent-foreground font-display font-bold py-3 rounded-lg text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
+                  >
+                    Mark as delivered
+                  </button>
+                </div>
+              )}
+              {request.status === "delivered" && (
                 <p className="font-body text-sm text-muted-foreground text-center py-4">
-                  Once you land, hand the item to EBAN staff. They'll confirm receipt and let the sender know it's ready for pickup.
+                  Delivered. Waiting for the sender to confirm receipt, then {money(request.agreed_price ?? request.offered_price)} is released to you.
                 </p>
               )}
-              {["delivered", "completed"].includes(request.status) && (
-                <p className="font-body text-sm text-green-700 text-center py-4">EBAN has received the item from you &mdash; thank you!</p>
+              {request.status === "completed" && (
+                <p className="font-body text-sm text-green-700 text-center py-4">
+                  Confirmed by the sender. {money(request.agreed_price ?? request.offered_price)} is on its way to you. Thank you for carrying!
+                </p>
+              )}
+              {request.status === "disputed" && (
+                <p className="font-body text-sm text-destructive text-center py-4">A dispute is open. The payment stays in escrow while EBAN reviews it.</p>
               )}
             </div>
           )}
         </div>
+
+        {match.status === "accepted" && (
+          <div className="mt-6 space-y-6">
+            <RequestMessages requestId={request.id} otherName={counterparty?.first_name} />
+            {request.status === "completed" && (
+              <RateCounterparty
+                requestId={request.id}
+                existingRating={counterparty?.my_rating ?? null}
+                who={counterparty?.first_name ?? "the sender"}
+                onDone={load}
+              />
+            )}
+            {IN_FLIGHT.includes(request.status) && (
+              <div className="text-center">
+                <ReportIssueButton requestId={request.id} onDone={load} />
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
