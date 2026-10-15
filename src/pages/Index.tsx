@@ -144,6 +144,16 @@ const Navbar = () => {
 
 const Hero = () => (
   <section className="relative min-h-screen flex flex-col justify-center bg-gradient-hero overflow-hidden pt-28 pb-16">
+    {/* Background photo (optional): public/images/hero-bg.jpg. Falls back to the gradient if missing. */}
+    <img
+      src="/images/hero-bg.jpg"
+      alt=""
+      aria-hidden="true"
+      onError={(e) => (e.currentTarget.style.display = "none")}
+      className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
+    />
+    <div className="absolute inset-0 bg-gradient-to-r from-charcoal/90 via-charcoal/65 to-charcoal/35 pointer-events-none" />
+    <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-charcoal/80 to-transparent pointer-events-none" />
     {/* Ambient Glow Elements */}
     <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[700px] bg-gold/10 rounded-full blur-[140px] pointer-events-none" />
     <div className="absolute bottom-10 right-10 w-96 h-96 bg-accent/10 rounded-full blur-[120px] pointer-events-none" />
