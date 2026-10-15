@@ -97,37 +97,8 @@ const BookingForm = () => {
     );
   }
 
-  if (!authLoading && !user) {
-    return (
-      <section id="book" className="py-24 bg-background relative overflow-hidden">
-        <div className="container mx-auto px-6 relative z-10">
-          <div className="max-w-2xl mx-auto text-center bg-card/90 backdrop-blur-xl rounded-3xl p-12 border border-border/80 shadow-[var(--shadow-elevated)]">
-            <div className="w-16 h-16 rounded-2xl bg-gold/10 border border-gold/30 flex items-center justify-center mx-auto mb-6">
-              <Lock className="w-7 h-7 text-gold-dark" />
-            </div>
-            <h2 className="font-display text-3xl md:text-4xl font-light text-foreground mb-3">Sign in to post a request</h2>
-            <p className="font-body text-muted-foreground text-base mb-8 max-w-md mx-auto">
-              Create your free EBAN account to browse trips, post requests and pay safely through escrow.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                to="/signup"
-                className="bg-gradient-gold text-accent-foreground font-body font-bold text-xs uppercase tracking-wider px-8 py-4 rounded-xl hover:opacity-90 shadow-md transition-all"
-              >
-                Create Account
-              </Link>
-              <Link
-                to="/login"
-                className="border border-border text-foreground font-body font-semibold text-xs uppercase tracking-wider px-8 py-4 rounded-xl hover:bg-secondary transition-colors"
-              >
-                Log In
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-    );
-  }
+  // Signed-out visitors get the sign-up prompt inside the routes section instead.
+  if (!authLoading && !user) return null;
 
   return (
     <section id="book" className="py-24 bg-background relative overflow-hidden">
