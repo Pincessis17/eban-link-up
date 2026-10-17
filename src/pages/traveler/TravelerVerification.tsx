@@ -6,6 +6,10 @@ import { useTravellerProfile } from "@/hooks/useTravellerProfile";
 import { toast } from "@/hooks/use-toast";
 import { TravelerNav } from "@/components/TravelerNav";
 
+// TESTING MODE: when true, uploading an ID verifies the traveler immediately, with no admin review.
+// Set to false before launch so every ID goes through Admin > ID Verifications.
+const AUTO_APPROVE_ON_UPLOAD = true;
+
 const DOCUMENT_TYPES = ["Passport", "National ID", "Driver's License", "Student ID"];
 
 interface VerificationRow {
@@ -23,7 +27,7 @@ const statusColors: Record<string, string> = {
 
 const TravelerVerification = () => {
   const { user } = useAuth();
-  const { travellerProfile } = useTravellerProfile();
+  const { travellerProfile, refresh } = useTravellerProfile();
   const [rows, setRows] = useState<VerificationRow[]>([]);
   const [docType, setDocType] = useState(DOCUMENT_TYPES[0]);
   const [file, setFile] = useState<File | null>(null);
@@ -71,7 +75,7 @@ const TravelerVerification = () => {
       traveller_id: travellerProfile.id,
       document_url: path,
       id_document_type: docType,
-      status: "pending",
+      status: AUTO_APPROVE_ON_UPLOAD ? "approved" : "pending",
     });
 
     setUploading(false);
@@ -81,8 +85,21 @@ const TravelerVerification = () => {
       return;
     }
 
-    toast({ title: "Document submitted", description: "Our team will review your ID within 24 hours." });
+    if (AUTO_APPROVE_ON_UPLOAD) {
+      const { error: approveError } = await supabase
+        .from("traveller_profiles")
+        .update({ verification_status: "approved" })
+        .eq("id", travellerProfile.id);
+      if (approveError) {
+        toast({ title: "Error", description: approveError.message, variant: "destructive" });
+        return;
+      }
+      toast({ title: "Verified!", description: "Your ID was received. You can now be booked and claim requests." });
+    } else {
+      toast({ title: "Document submitted", description: "Our team will review your ID within 24 hours." });
+    }
     setFile(null);
+    await refresh();
     load();
   };
 
