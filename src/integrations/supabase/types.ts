@@ -796,6 +796,9 @@ export type Database = {
     Functions: {
       admin_delete_traveller: { Args: { p_traveller_id: string }; Returns: undefined }
       is_admin: { Args: never; Returns: boolean }
+      report_payment_sent: { Args: { p_request_id: string }; Returns: undefined }
+      admin_confirm_payment: { Args: { p_request_id: string }; Returns: undefined }
+      admin_reject_payment: { Args: { p_request_id: string }; Returns: undefined }
       public_feedback: {
         Args: never
         Returns: {

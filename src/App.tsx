@@ -9,6 +9,7 @@ import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import AdminBookings from "./pages/AdminBookings.tsx";
 import AdminFeedback from "./pages/admin/AdminFeedback";
+import AdminPayments from "./pages/admin/AdminPayments";
 import Login from "./pages/Login.tsx";
 import Signup from "./pages/Signup.tsx";
 import TravelerHome from "./pages/traveler/TravelerHome.tsx";
@@ -39,6 +40,14 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
+            <Route
+              path="/admin/payments"
+              element={
+                <ProtectedRoute requireRole="Admin">
+                  <AdminPayments />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/admin/feedback"
               element={

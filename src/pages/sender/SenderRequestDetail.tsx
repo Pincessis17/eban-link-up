@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { Plane, ArrowLeft, ShieldCheck, Edit3, Star, Lock } from "lucide-react";
+import { Plane, ArrowLeft, ShieldCheck, Edit3, Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { SenderNav } from "@/components/SenderNav";
@@ -8,6 +8,8 @@ import { DeleteButton } from "@/components/AdminDeleteButton";
 import { RequestMessages } from "@/components/RequestMessages";
 import { RateCounterparty } from "@/components/RateCounterparty";
 import { ReportIssueButton } from "@/components/ReportIssueButton";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { PAYMENT_METHODS, paymentReference } from "@/lib/paymentConfig";
 import { REQUEST_STEPS, stepIndex, SENDER_DELETABLE, IN_FLIGHT, errMsg, money } from "@/lib/marketplace";
 
 interface DeliveryRequest {
@@ -88,6 +90,8 @@ const SenderRequestDetail = () => {
   const [form, setForm] = useState<EditForm | null>(null);
   const [acting, setActing] = useState(false);
   const [counterparty, setCounterparty] = useState<Counterparty | null>(null);
+  const [payment, setPayment] = useState<{ status: string } | null>(null);
+  const [payOpen, setPayOpen] = useState(false);
   const navigate = useNavigate();
 
   const load = useCallback(async () => {
@@ -95,6 +99,8 @@ const SenderRequestDetail = () => {
     setLoading(true);
     const { data } = await supabase.from("delivery_requests").select("*").eq("id", id).maybeSingle();
     setRequest(data as DeliveryRequest);
+    const { data: pay } = await supabase.from("payments").select("status").eq("request_id", id).maybeSingle();
+    setPayment(pay);
     if (data?.matched_traveller_id) {
       const { data: cp } = await supabase.rpc("get_request_counterparty", { p_request_id: id });
       setCounterparty(cp?.[0] ?? null);
@@ -167,8 +173,10 @@ const SenderRequestDetail = () => {
     load();
   };
 
-  const fundEscrow = () =>
-    run(() => supabase.rpc("fund_escrow", { p_request_id: request!.id }), "Payment is now held in escrow");
+  const reportPayment = async () => {
+    await run(() => supabase.rpc("report_payment_sent", { p_request_id: request!.id }), "Thanks! EBAN will confirm your payment shortly.");
+    setPayOpen(false);
+  };
   const confirmReceipt = () =>
     run(() => supabase.rpc("confirm_receipt", { p_request_id: request!.id }), "Receipt confirmed. Payment released to the traveler.");
   const cancelRequest = () =>
@@ -336,30 +344,37 @@ const SenderRequestDetail = () => {
           </div>
         )}
 
-        {request.status === "accepted_by_traveller" && (
+        {request.status === "accepted_by_traveller" && payment?.status === "pending" && (
+          <div className="bg-gold/10 border border-gold/30 rounded-2xl p-6 mb-8">
+            <h4 className="font-display text-lg font-semibold text-foreground">Payment reported. Waiting for EBAN to confirm it arrived.</h4>
+            <p className="font-body text-xs text-muted-foreground mt-1">
+              Reference <span className="font-mono font-semibold text-foreground">{paymentReference(request.id)}</span> · {money(price)}. Once confirmed, the traveler can collect your item.
+            </p>
+          </div>
+        )}
+
+        {request.status === "accepted_by_traveller" && !payment && (
           <div className="bg-blue-500/10 border border-blue-500/30 rounded-2xl p-6 mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
               <h4 className="font-display text-lg font-semibold text-foreground">
                 {counterparty?.first_name ?? "The traveler"} accepted. Pay to lock it in.
               </h4>
               <p className="font-body text-xs text-muted-foreground mt-1">
-                {money(price)} is held in escrow and only released to the traveler after you confirm you received the item.
+                EBAN holds {money(price)} and only releases it to the traveler after you confirm you received the item.
               </p>
-              <p className="font-body text-[11px] text-muted-foreground mt-1 flex items-center gap-1"><Lock className="w-3 h-3" /> Test mode: no card is charged yet.</p>
             </div>
             <button
-              onClick={fundEscrow}
-              disabled={acting}
-              className="bg-gradient-gold text-accent-foreground font-body font-bold text-xs uppercase tracking-wider py-3 px-6 rounded-xl hover:opacity-90 shadow-sm disabled:opacity-50 whitespace-nowrap"
+              onClick={() => setPayOpen(true)}
+              className="bg-gradient-gold text-accent-foreground font-body font-bold text-xs uppercase tracking-wider py-3 px-6 rounded-xl hover:opacity-90 shadow-sm whitespace-nowrap"
             >
-              {acting ? "Processing..." : `Pay ${money(price)} into escrow`}
+              {`Pay ${money(price)}`}
             </button>
           </div>
         )}
 
         {["paid", "dropped_off", "handed_to_traveller", "in_transit"].includes(request.status) && (
           <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-6 mb-8">
-            <h4 className="font-display text-lg font-semibold text-emerald-700">{money(price)} is held in escrow</h4>
+            <h4 className="font-display text-lg font-semibold text-emerald-700">{money(price)} is held by EBAN</h4>
             <p className="font-body text-xs text-muted-foreground mt-1">
               It stays safe until you confirm receipt. Agree the handover with the traveler in Messages below.
             </p>
@@ -575,6 +590,46 @@ const SenderRequestDetail = () => {
           </div>
         )}
       </div>
+      <Dialog open={payOpen} onOpenChange={setPayOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="font-display">Pay {money(price)}</DialogTitle>
+            <DialogDescription>Send the money to EBAN, then tell us you've sent it. EBAN holds it until you confirm delivery.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 font-body text-sm">
+            <div className="rounded-xl border border-border bg-secondary/40 p-4">
+              <p className="text-xs uppercase tracking-wider text-muted-foreground">Use this reference</p>
+              <p className="font-mono text-lg font-bold text-foreground">{request ? paymentReference(request.id) : ""}</p>
+            </div>
+            {PAYMENT_METHODS.filter((m) => m.details.length > 0).length === 0 ? (
+              <p className="rounded-xl border border-destructive/30 bg-destructive/10 text-destructive p-4 text-xs">
+                EBAN's payment details haven't been added yet. Please message the EBAN team before sending anything.
+              </p>
+            ) : (
+              PAYMENT_METHODS.filter((m) => m.details.length > 0).map((m) => (
+                <div key={m.label} className="rounded-xl border border-border p-4">
+                  <p className="font-semibold text-foreground">{m.label}</p>
+                  {m.details.map((d) => (
+                    <p key={d} className="text-muted-foreground">{d}</p>
+                  ))}
+                </div>
+              ))
+            )}
+            <ol className="list-decimal pl-5 text-xs text-muted-foreground space-y-1">
+              <li>Send exactly {money(price)} and put the reference in the note.</li>
+              <li>Tap the button below once you've sent it.</li>
+              <li>EBAN confirms it arrived, usually within a few hours.</li>
+            </ol>
+            <button
+              onClick={reportPayment}
+              disabled={acting || PAYMENT_METHODS.every((m) => m.details.length === 0)}
+              className="w-full bg-gradient-gold text-accent-foreground font-bold text-xs uppercase tracking-wider py-3 rounded-xl disabled:opacity-50"
+            >
+              {acting ? "Saving..." : "I've sent the payment"}
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

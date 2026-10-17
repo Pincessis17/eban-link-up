@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { to: "/admin/travelers", label: "Traveler Directory", icon: Users },
   { to: "/admin/match", label: "Smart Matcher", icon: GitMerge },
   { to: "/admin/verifications", label: "ID Verifications", icon: ShieldCheck },
+  { to: "/admin/payments", label: "Payments In", icon: DollarSign },
   { to: "/admin/payouts", label: "Payout Console", icon: DollarSign },
   { to: "/admin/feedback", label: "Feedback", icon: MessageSquare },
 ];
