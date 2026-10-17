@@ -31,7 +31,10 @@ const TravelerVerification = () => {
   const [uploading, setUploading] = useState(false);
 
   const load = useCallback(async () => {
-    if (!travellerProfile) return;
+    if (!travellerProfile) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     const { data } = await supabase
       .from("verifications")
@@ -48,7 +51,11 @@ const TravelerVerification = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user || !travellerProfile || !file) return;
+    if (!user || !file) return;
+    if (!travellerProfile) {
+      toast({ title: "Profile not ready", description: "Please refresh the page and try again.", variant: "destructive" });
+      return;
+    }
     setUploading(true);
 
     const path = `${user.id}/${Date.now()}-${file.name}`;
@@ -91,7 +98,7 @@ const TravelerVerification = () => {
           <div>
             <h1 className="font-display text-3xl font-light text-foreground">Identity Verification</h1>
             <p className="font-body text-xs text-muted-foreground mt-0.5">
-              Verification Status: <span className="font-semibold text-gold-dark uppercase tracking-wider">{travellerProfile?.verification_status ?? "pending"}</span>
+              Verification Status: <span className="font-semibold text-gold-dark uppercase tracking-wider">{travellerProfile?.verification_status === "pending" && !loading && rows.length === 0 ? "not submitted" : travellerProfile?.verification_status ?? "loading"}</span>
             </p>
           </div>
         </div>

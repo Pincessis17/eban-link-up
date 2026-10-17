@@ -14,7 +14,7 @@ export interface TravellerProfile {
 }
 
 export function useTravellerProfile() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [travellerProfile, setTravellerProfile] = useState<TravellerProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -26,9 +26,20 @@ export function useTravellerProfile() {
     }
     setLoading(true);
     const { data } = await supabase.from("traveller_profiles").select("*").eq("user_id", user.id).maybeSingle();
-    setTravellerProfile(data);
+    let row = data;
+    // Self-heal: a traveler account whose profile row is missing (for example it was
+    // deleted by an admin) gets a fresh one, so verification and trips keep working.
+    if (!row && profile?.role === "Traveller") {
+      const { data: created } = await supabase
+        .from("traveller_profiles")
+        .insert({ user_id: user.id, name: profile.full_name ?? (user.user_metadata?.full_name as string | undefined) ?? null })
+        .select("*")
+        .maybeSingle();
+      row = created;
+    }
+    setTravellerProfile(row);
     setLoading(false);
-  }, [user]);
+  }, [user, profile?.role, profile?.full_name]);
 
   useEffect(() => {
     refresh();
