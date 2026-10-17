@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useTravellerProfile } from "@/hooks/useTravellerProfile";
 import { toast } from "@/hooks/use-toast";
 import { TravelerNav } from "@/components/TravelerNav";
+import { PRICE_SUGGESTIONS } from "@/lib/pricingGuide";
 
 const inputClasses =
   "w-full bg-background border border-border rounded-lg px-4 py-3 font-body text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow";
@@ -105,9 +106,30 @@ const TravelerNewTrip = () => {
               <input type="number" step="0.5" min="0.5" required className={inputClasses} placeholder="8" value={form.pricePerKg} onChange={(e) => setForm({ ...form, pricePerKg: e.target.value })} />
             </div>
           </div>
-          <p className="font-body text-xs text-muted-foreground mb-5 -mt-2">
+          <p className="font-body text-xs text-muted-foreground mb-4 -mt-2">
             You set the price. Senders see it before booking, and the money is held in escrow until they confirm delivery.
           </p>
+          <div className="rounded-2xl border border-gold/30 bg-gold/5 p-4 mb-5">
+            <p className="font-display text-sm font-semibold text-foreground">Suggested prices per kg</p>
+            <p className="font-body text-xs text-muted-foreground mt-0.5 mb-3">
+              Just a guide to get you started. You can charge whatever you like, higher or lower. Tap one to use it.
+            </p>
+            <div className="grid sm:grid-cols-2 gap-2">
+              {PRICE_SUGGESTIONS.map((s) => (
+                <button
+                  key={s.label}
+                  type="button"
+                  onClick={() => setForm({ ...form, pricePerKg: String(s.perKg) })}
+                  className={`flex items-center justify-between rounded-xl border px-3.5 py-2.5 text-left font-body text-xs transition-colors ${
+                    form.pricePerKg === String(s.perKg) ? "border-gold bg-gold/15" : "border-border bg-card hover:border-gold/50"
+                  }`}
+                >
+                  <span className="text-muted-foreground">{s.label}</span>
+                  <span className="font-semibold text-foreground">${s.perKg}/kg</span>
+                </button>
+              ))}
+            </div>
+          </div>
           <div className="mb-8">
             <label className="font-display text-sm font-semibold text-foreground mb-1.5 block">Anything you'd rather not carry? (optional)</label>
             <textarea className={`${inputClasses} resize-none`} rows={2} placeholder="e.g. no perishables" value={form.restrictions} onChange={(e) => setForm({ ...form, restrictions: e.target.value })} />
