@@ -75,7 +75,7 @@ const BookingForm = () => {
 
   if (submitted) {
     return (
-      <section id="book" className="py-24 bg-background">
+      <section id="book" className="py-24 bg-background border-t border-gold/10">
         <div className="container mx-auto px-6">
           <div className="max-w-2xl mx-auto text-center bg-card rounded-3xl p-12 border border-gold/30 shadow-gold-glow">
             <div className="w-20 h-20 rounded-full bg-gradient-gold flex items-center justify-center mx-auto mb-6 glow-gold">
@@ -101,7 +101,7 @@ const BookingForm = () => {
   if (!authLoading && !user) return null;
 
   return (
-    <section id="book" className="py-24 bg-background relative overflow-hidden">
+    <section id="book" className="py-24 bg-background relative overflow-hidden border-t border-gold/10">
       <div className="container mx-auto px-6">
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 bg-gold/10 border border-gold/25 px-3 py-1 rounded-full mb-3">

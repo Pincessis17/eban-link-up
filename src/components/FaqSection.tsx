@@ -65,7 +65,7 @@ export const FaqSection = () => {
   const [tab, setTab] = useState(tabs[0]);
 
   return (
-    <section id="faq" className="py-24 bg-background">
+    <section id="faq" className="py-24 bg-background border-t border-gold/10">
       <div className="container mx-auto px-6">
         <div className="grid lg:grid-cols-[minmax(0,380px)_1fr] gap-14">
           <div className="flex flex-col">

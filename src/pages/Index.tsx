@@ -315,17 +315,17 @@ const HowItWorks = () => {
     { id: "traveller", label: "For travelers" },
   ];
   return (
-    <section id="how-it-works" className="py-24 bg-charcoal text-white relative">
+    <section id="how-it-works" className="py-24 bg-background relative border-t border-gold/10">
       <div className="container mx-auto px-6">
         <SectionLabel>How the Marketplace Works</SectionLabel>
-        <h2 className="font-display text-4xl md:text-5xl font-light leading-tight max-w-xl text-white">
-          Six steps from <em className="italic text-gold-light">request to delivery</em>
+        <h2 className="font-display text-4xl md:text-5xl font-light leading-tight max-w-xl text-foreground">
+          Six steps from <em className="italic text-gold-dark">request to delivery</em>
         </h2>
-        <p className="font-body text-sm text-gray-400 max-w-lg mt-4 leading-relaxed">
+        <p className="font-body text-sm text-muted-foreground max-w-lg mt-4 leading-relaxed">
           EBAN connects you directly with verified travelers on your route. No middlemen, no drop-off centres &mdash; just a structured peer-to-peer marketplace with secure escrow.
         </p>
 
-        <div role="tablist" aria-label="How it works" className="inline-flex mt-10 p-1 rounded-full bg-white/5 border border-white/10">
+        <div role="tablist" aria-label="How it works" className="inline-flex mt-10 p-1 rounded-full bg-card border border-border shadow-sm">
           {tabs.map((t) => (
             <button
               key={t.id}
@@ -333,7 +333,7 @@ const HowItWorks = () => {
               aria-selected={role === t.id}
               onClick={() => setRole(t.id)}
               className={`px-6 py-2.5 rounded-full font-body text-xs tracking-wider uppercase transition-colors ${
-                role === t.id ? "bg-gold text-charcoal font-medium" : "text-gray-300 hover:text-white"
+                role === t.id ? "bg-gold text-charcoal font-medium" : "text-muted-foreground hover:text-foreground"
               }`}
             >
               {t.label}
@@ -345,13 +345,13 @@ const HowItWorks = () => {
           {steps.map((step) => (
             <div
               key={step.title}
-              className="group bg-white/[0.03] border border-white/10 hover:border-gold/40 p-8 rounded-2xl transition-all duration-300 hover:-translate-y-1"
+              className="group bg-card border border-border hover:border-gold/50 shadow-sm hover:shadow-md p-8 rounded-2xl transition-all duration-300 hover:-translate-y-1"
             >
-              <div className="w-12 h-12 rounded-xl bg-gold/10 border border-gold/30 flex items-center justify-center mb-6 text-gold group-hover:bg-gold group-hover:text-charcoal transition-colors">
+              <div className="w-12 h-12 rounded-xl bg-gold/10 border border-gold/30 flex items-center justify-center mb-6 text-gold group-hover:bg-gold group-hover:text-accent-foreground transition-colors">
                 <step.icon className="w-6 h-6" strokeWidth={1.5} />
               </div>
-              <h3 className="font-display text-xl font-normal text-white mb-2">{step.title}</h3>
-              <p className="font-body text-xs text-gray-400 leading-relaxed">{step.desc}</p>
+              <h3 className="font-display text-xl font-normal text-foreground mb-2">{step.title}</h3>
+              <p className="font-body text-xs text-muted-foreground leading-relaxed">{step.desc}</p>
             </div>
           ))}
         </div>
@@ -379,7 +379,7 @@ const prohibitedItems = [
 ];
 
 const WhatWeCarry = () => (
-  <section id="what-we-carry" className="py-24 bg-background">
+  <section id="what-we-carry" className="py-24 bg-background border-t border-gold/10">
     <div className="container mx-auto px-6">
       <SectionLabel>Safety &amp; Compliance</SectionLabel>
       <h2 className="font-display text-4xl md:text-5xl font-light text-foreground leading-tight max-w-xl">
@@ -443,18 +443,18 @@ const trustPillars = [
 ];
 
 const TrustSafety = () => (
-  <section id="trust" className="py-24 bg-charcoal text-white">
+  <section id="trust" className="py-24 bg-background border-t border-gold/10">
     <div className="container mx-auto px-6">
       <SectionLabel>Trust &amp; Safety</SectionLabel>
-      <h2 className="font-display text-4xl md:text-5xl font-light leading-tight max-w-xl text-white">
-        Trust built in <em className="italic text-gold-light">at every step</em>
+      <h2 className="font-display text-4xl md:text-5xl font-light leading-tight max-w-xl text-foreground">
+        Trust built in <em className="italic text-gold-dark">at every step</em>
       </h2>
       <Reveal className="grid sm:grid-cols-3 gap-8 mt-16">
         {trustPillars.map((pillar) => (
-          <div key={pillar.title} className="bg-white/[0.03] border border-white/10 rounded-2xl p-8 hover:border-gold/40 transition-all">
+          <div key={pillar.title} className="bg-card border border-border shadow-sm rounded-2xl p-8 hover:border-gold/50 hover:shadow-md transition-all">
             <pillar.icon className="w-8 h-8 text-gold mb-6" strokeWidth={1.5} />
-            <h3 className="font-display text-xl font-normal text-white mb-3">{pillar.title}</h3>
-            <p className="font-body text-xs text-gray-400 leading-relaxed">{pillar.desc}</p>
+            <h3 className="font-display text-xl font-normal text-foreground mb-3">{pillar.title}</h3>
+            <p className="font-body text-xs text-muted-foreground leading-relaxed">{pillar.desc}</p>
           </div>
         ))}
       </Reveal>

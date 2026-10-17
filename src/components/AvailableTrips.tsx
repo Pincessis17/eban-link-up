@@ -135,7 +135,7 @@ export const AvailableTrips = () => {
   };
 
   return (
-    <section id="routes" className="py-24 bg-earth/5 relative overflow-hidden border-y border-gold/10">
+    <section id="routes" className="py-24 bg-background relative overflow-hidden border-t border-gold/10">
       <div className="container mx-auto px-6 relative z-10">
         <style>{SKY_CSS}</style>
         <div className="relative rounded-3xl overflow-hidden mb-12 min-h-[260px] flex items-end">
