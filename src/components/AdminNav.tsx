@@ -86,7 +86,7 @@ export const AdminNav = () => {
             <span className="font-display text-lg font-bold text-white">EBAN</span>
             <span className="text-gold-light font-body text-xs">Admin</span>
           </Link>
-          <button onClick={signOut} aria-label="Sign out" className="flex items-center gap-1 text-xs font-body text-gray-400 hover:text-white">
+          <button onClick={signOut} className="flex items-center gap-1 text-xs font-body text-gray-400 hover:text-white">
             <LogOut className="w-4 h-4" />
           </button>
         </div>

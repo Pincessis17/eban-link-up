@@ -31,11 +31,11 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen auth-shell flex items-center justify-center px-6 relative overflow-hidden py-12">
+    <div className="min-h-screen bg-gradient-hero flex items-center justify-center px-6 relative overflow-hidden py-12">
       {/* Background ambient lighting */}
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-96 h-96 bg-gold/10 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="w-full max-w-md auth-panel rounded-3xl p-8 md:p-10 border border-gold/20 shadow-2xl relative z-10 text-white">
+      <div className="w-full max-w-md bg-charcoal/90 backdrop-blur-2xl rounded-3xl p-8 md:p-10 border border-gold/20 shadow-2xl relative z-10 text-white">
         <Link to="/" className="flex items-center gap-3 mb-8 justify-center group">
           <div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/30 flex items-center justify-center group-hover:border-gold transition-colors">
             <img src={ebanSymbol} alt="EBAN" className="w-6 h-6 object-contain" />
@@ -57,11 +57,9 @@ const Login = () => {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label htmlFor="login-email" className="font-body text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2 block">Email Address</label>
+            <label className="font-body text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2 block">Email Address</label>
             <input
-              id="login-email"
               type="email"
-              autoComplete="email"
               required
               className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 font-body text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all"
               placeholder="name@example.com"
@@ -71,11 +69,9 @@ const Login = () => {
           </div>
 
           <div>
-            <label htmlFor="login-password" className="font-body text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2 block">Password</label>
+            <label className="font-body text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2 block">Password</label>
             <input
-              id="login-password"
               type="password"
-              autoComplete="current-password"
               required
               className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 font-body text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all"
               placeholder="••••••••"
