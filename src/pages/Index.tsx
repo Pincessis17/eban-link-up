@@ -23,6 +23,7 @@ import { Link, Navigate, useSearchParams } from "react-router-dom";
 import BookingForm from "@/components/BookingForm";
 import { AvailableTrips } from "@/components/AvailableTrips";
 import { FeedbackWall } from "@/components/FeedbackWall";
+import { FaqSection } from "@/components/FaqSection";
 import { useAuth } from "@/hooks/useAuth";
 
 const Reveal = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => {
@@ -483,6 +484,7 @@ const Index = () => {
       <WhatWeCarry />
       <TrustSafety />
       <FeedbackWall />
+      <FaqSection />
       <BookingForm />
       <Footer />
     </div>

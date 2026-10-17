@@ -8,7 +8,7 @@ import { TravelerNav } from "@/components/TravelerNav";
 
 // TESTING MODE: when true, uploading an ID verifies the traveler immediately, with no admin review.
 // Set to false before launch so every ID goes through Admin > ID Verifications.
-const AUTO_APPROVE_ON_UPLOAD = true;
+const AUTO_APPROVE_ON_UPLOAD = false;
 
 const DOCUMENT_TYPES = ["Passport", "National ID", "Driver's License", "Student ID"];
 
