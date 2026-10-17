@@ -286,43 +286,78 @@ const Hero = () => (
   </section>
 );
 
-const processSteps = [
-  { icon: FileText, title: "1. Post Your Request", desc: "Senders post their package details — route, weight, item type, and any special instructions." },
-  { icon: Users, title: "2. Browse Traveler Listings", desc: "Verified travelers share their upcoming flights and available luggage space on the marketplace." },
-  { icon: Handshake, title: "3. Agree & Pay into Escrow", desc: "Sender books a traveler (or a traveler claims the request). Once accepted, the sender pays into escrow and they agree the handover in Messages." },
-  { icon: PackageCheck, title: "4. Direct Handoff", desc: "Sender and traveler meet at a place they agree. The traveler checks the item before taking it." },
-  { icon: Plane, title: "5. In-Flight Carry", desc: "Traveler carries the item in their checked or carry-on luggage as agreed." },
-  { icon: CheckCircle2, title: "6. Confirm & Rate", desc: "The sender confirms receipt, the traveler's earning is released from escrow, and both sides leave a rating." },
+type Role = "sender" | "traveller";
+
+const senderSteps = [
+  { icon: FileText, title: "1. Post Your Request", desc: "Describe your package: route, weight, item type and any special instructions. Or browse trips already listed." },
+  { icon: Users, title: "2. Pick a Verified Traveler", desc: "Travelers on your route are ID-checked by the Eban team. Book one, or wait for a traveler to claim your request." },
+  { icon: Handshake, title: "3. Pay Eban to Hold the Money", desc: "Once accepted, send the payment to Eban with your reference code and tap \"I've sent the payment\". Eban confirms it and holds it safely." },
+  { icon: PackageCheck, title: "4. Hand Over the Item", desc: "Agree a meeting place in Messages. The traveler checks the item before taking it." },
+  { icon: Plane, title: "5. Track the Delivery", desc: "Your traveler carries the item on their flight and marks it delivered when it arrives." },
+  { icon: CheckCircle2, title: "6. Confirm & Rate", desc: "Confirm you received it. The traveler is then paid and you both leave a rating." },
 ];
 
-const HowItWorks = () => (
-  <section id="how-it-works" className="py-24 bg-charcoal text-white relative">
-    <div className="container mx-auto px-6">
-      <SectionLabel>How the Marketplace Works</SectionLabel>
-      <h2 className="font-display text-4xl md:text-5xl font-light leading-tight max-w-xl text-white">
-        Six steps from <em className="italic text-gold-light">request to delivery</em>
-      </h2>
-      <p className="font-body text-sm text-gray-400 max-w-lg mt-4 leading-relaxed">
-        EBAN connects you directly with verified travelers on your route. No middlemen, no drop-off centres &mdash; just a structured peer-to-peer marketplace with secure escrow.
-      </p>
+const travellerSteps = [
+  { icon: ShieldCheck, title: "1. Sign Up & Verify Your ID", desc: "Create a traveler account and upload your ID. An Eban admin reviews it and approves you before you can carry items." },
+  { icon: Plane, title: "2. Post Your Trip", desc: "Add your route, flight date and spare luggage space, and set your price per kg. We show suggested rates, but the price is yours to choose." },
+  { icon: Users, title: "3. Get Requests", desc: "Senders can book you directly, or you can browse open requests on your route and claim the ones you want." },
+  { icon: Lock, title: "4. Wait for Payment Confirmation", desc: "Eban confirms the sender's payment and holds it. You only carry once the payment is secured." },
+  { icon: PackageCheck, title: "5. Collect, Check & Fly", desc: "Meet the sender, inspect the item, carry it as agreed, then mark it delivered on arrival." },
+  { icon: Award, title: "6. Get Paid & Rated", desc: "When the sender confirms receipt, your earnings are paid out by Eban and you both leave a rating." },
+];
 
-      <Reveal className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-16">
-        {processSteps.map((step, i) => (
-          <div
-            key={step.title}
-            className="group bg-white/[0.03] border border-white/10 hover:border-gold/40 p-8 rounded-2xl transition-all duration-300 hover:-translate-y-1"
-          >
-            <div className="w-12 h-12 rounded-xl bg-gold/10 border border-gold/30 flex items-center justify-center mb-6 text-gold group-hover:bg-gold group-hover:text-charcoal transition-colors">
-              <step.icon className="w-6 h-6" strokeWidth={1.5} />
+const HowItWorks = () => {
+  const [role, setRole] = useState<Role>("sender");
+  const steps = role === "sender" ? senderSteps : travellerSteps;
+  const tabs: { id: Role; label: string }[] = [
+    { id: "sender", label: "For senders" },
+    { id: "traveller", label: "For travelers" },
+  ];
+  return (
+    <section id="how-it-works" className="py-24 bg-charcoal text-white relative">
+      <div className="container mx-auto px-6">
+        <SectionLabel>How the Marketplace Works</SectionLabel>
+        <h2 className="font-display text-4xl md:text-5xl font-light leading-tight max-w-xl text-white">
+          Six steps from <em className="italic text-gold-light">request to delivery</em>
+        </h2>
+        <p className="font-body text-sm text-gray-400 max-w-lg mt-4 leading-relaxed">
+          EBAN connects you directly with verified travelers on your route. No middlemen, no drop-off centres &mdash; just a structured peer-to-peer marketplace with secure escrow.
+        </p>
+
+        <div role="tablist" aria-label="How it works" className="inline-flex mt-10 p-1 rounded-full bg-white/5 border border-white/10">
+          {tabs.map((t) => (
+            <button
+              key={t.id}
+              role="tab"
+              aria-selected={role === t.id}
+              onClick={() => setRole(t.id)}
+              className={`px-6 py-2.5 rounded-full font-body text-xs tracking-wider uppercase transition-colors ${
+                role === t.id ? "bg-gold text-charcoal font-medium" : "text-gray-300 hover:text-white"
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+
+        <div key={role} className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10 animate-fade-up">
+          {steps.map((step) => (
+            <div
+              key={step.title}
+              className="group bg-white/[0.03] border border-white/10 hover:border-gold/40 p-8 rounded-2xl transition-all duration-300 hover:-translate-y-1"
+            >
+              <div className="w-12 h-12 rounded-xl bg-gold/10 border border-gold/30 flex items-center justify-center mb-6 text-gold group-hover:bg-gold group-hover:text-charcoal transition-colors">
+                <step.icon className="w-6 h-6" strokeWidth={1.5} />
+              </div>
+              <h3 className="font-display text-xl font-normal text-white mb-2">{step.title}</h3>
+              <p className="font-body text-xs text-gray-400 leading-relaxed">{step.desc}</p>
             </div>
-            <h3 className="font-display text-xl font-normal text-white mb-2">{step.title}</h3>
-            <p className="font-body text-xs text-gray-400 leading-relaxed">{step.desc}</p>
-          </div>
-        ))}
-      </Reveal>
-    </div>
-  </section>
-);
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
 
 const eligibleItems = [
   "Official documents, printed certificates, & legal papers",
