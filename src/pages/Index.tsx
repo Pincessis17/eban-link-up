@@ -19,6 +19,7 @@ import {
   Clock,
   Award,
 } from "lucide-react";
+import { SUPPORT_WHATSAPP_URL } from "@/lib/siteConfig";
 import { Link, Navigate, useSearchParams } from "react-router-dom";
 import BookingForm from "@/components/BookingForm";
 import { AvailableTrips } from "@/components/AvailableTrips";
@@ -92,7 +93,7 @@ const Navbar = () => {
           <a href="#trust" className="hover:text-gold-light transition-colors">Trust &amp; Verification</a>
           <a href="#book" className="hover:text-gold-light transition-colors">Post a Request</a>
           <a
-            href="https://wa.me/23058440472"
+            href={SUPPORT_WHATSAPP_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="text-gold-light hover:text-gold flex items-center gap-1 transition-colors"

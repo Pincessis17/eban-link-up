@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { SUPPORT_EMAIL } from "@/lib/siteConfig";
+import { SUPPORT_WHATSAPP_URL } from "@/lib/siteConfig";
 
 const FAQS: Record<string, { q: string; a: string }[]> = {
   General: [
@@ -76,9 +76,11 @@ export const FaqSection = () => {
             <p className="font-body text-sm text-muted-foreground leading-relaxed mt-5">
               The basics of sending with Eban, how travelers are checked, and how payments work.
             </p>
-            {SUPPORT_EMAIL && (
+            {SUPPORT_WHATSAPP_URL && (
               <a
-                href={`mailto:${SUPPORT_EMAIL}`}
+                href={SUPPORT_WHATSAPP_URL}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="mt-8 self-start inline-flex items-center gap-2 bg-gradient-gold text-accent-foreground px-5 py-3 rounded-xl text-xs font-body font-bold tracking-wider uppercase hover:opacity-90 shadow-sm"
               >
                 Contact support <ArrowUpRight className="w-4 h-4" />
