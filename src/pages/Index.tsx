@@ -182,7 +182,7 @@ const Hero = () => (
           </h1>
 
           <p className="font-body text-base md:text-lg font-light text-gray-300 max-w-xl mb-10 leading-relaxed">
-            EBAN is a marketplace that connects senders with ID-verified travelers who have spare baggage allowance. You agree the details with the traveler, and your payment is held in escrow until you confirm delivery.
+            EBAN connects senders with ID-verified travelers who have spare baggage allowance. Agree the handover details, pay Eban, and wait for the team to confirm your payment before the item is carried. Eban holds the payment until you confirm delivery.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 mb-14">
@@ -203,82 +203,65 @@ const Hero = () => (
           {/* Stats Ticker Bar */}
           <div className="grid grid-cols-3 gap-6 border-t border-white/10 pt-8 max-w-lg">
             <div>
-              <span className="font-mono text-2xl md:text-3xl font-bold text-gold-light">100%</span>
-              <p className="font-body text-xs text-gray-400 mt-1">ID-verified to be booked</p>
+              <span className="font-display text-2xl md:text-3xl font-semibold text-gold-light">Reviewed</span>
+              <p className="font-body text-xs text-gray-400 mt-1">Traveler IDs checked by Eban</p>
             </div>
             <div>
-              <span className="font-mono text-2xl md:text-3xl font-bold text-white">Escrow</span>
-              <p className="font-body text-xs text-gray-400 mt-1">Paid out on your OK</p>
+              <span className="font-display text-2xl md:text-3xl font-semibold text-white">Held</span>
+              <p className="font-body text-xs text-gray-400 mt-1">Eban confirms payment manually</p>
             </div>
             <div>
-              <span className="font-mono text-2xl md:text-3xl font-bold text-gold-light">P2P</span>
-              <p className="font-body text-xs text-gray-400 mt-1">You agree the handover</p>
+              <span className="font-display text-2xl md:text-3xl font-semibold text-gold-light">Together</span>
+              <p className="font-body text-xs text-gray-400 mt-1">Agree handover details directly</p>
             </div>
           </div>
         </div>
 
-        {/* Hero Interactive Flight Card Graphic */}
+        {/* Honest product explainer: no fabricated trips, people, prices or flight details. */}
         <div className="lg:col-span-5 hidden lg:block">
-          <div className="bg-charcoal/80 backdrop-blur-2xl border border-gold/20 rounded-3xl p-8 shadow-2xl relative">
-            <div className="flex items-center justify-between pb-6 border-b border-white/10">
-              <div className="flex items-center gap-3">
-                <div className="w-3 h-3 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="font-body text-xs font-semibold uppercase tracking-widest text-gray-300">Live Trip Board</span>
-              </div>
-              <span className="font-mono text-xs text-gold-light font-bold">FLIGHT EBN-842</span>
+          <div className="hero-trust-card relative overflow-hidden rounded-[1.75rem] border border-white/20 p-7 xl:p-8 shadow-2xl">
+            <div className="absolute inset-0 opacity-20" aria-hidden="true">
+              <div className="absolute -right-16 -top-16 h-64 w-64 rounded-full border border-gold-light/70" />
+              <div className="absolute -right-4 top-0 h-48 w-48 rounded-full border border-gold-light/50" />
+              <div className="absolute right-8 top-8 h-32 w-32 rounded-full border border-gold-light/40" />
             </div>
-
-            <div className="py-8 space-y-6">
-              <div className="flex items-center justify-between">
+            <div className="relative">
+              <div className="flex items-center justify-between gap-4 border-b border-white/15 pb-5">
                 <div>
-                  <span className="font-mono text-3xl font-bold text-white">ACC</span>
-                  <p className="font-body text-xs text-gray-400">Accra, Ghana</p>
+                  <p className="font-body text-[10px] uppercase tracking-[0.22em] text-gold-light">A more personal way to send</p>
+                  <h2 className="font-display mt-1 text-3xl font-medium text-white">Every handover, clearer.</h2>
                 </div>
-
-                <div className="flex-1 flex flex-col items-center px-4">
-                  <div className="w-full flex items-center gap-1">
-                    <span className="w-2 h-2 rounded-full bg-gold" />
-                    <div className="h-px bg-gold/40 flex-1 relative flex items-center justify-center">
-                      <Plane className="w-5 h-5 text-gold absolute -top-2.5 animate-pulse" />
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-gold-light/30 bg-gold-light/10">
+                  <ShieldCheck className="h-5 w-5 text-gold-light" aria-hidden="true" />
+                </div>
+              </div>
+              <div className="space-y-5 py-6">
+                {[
+                  { n: "01", title: "Agree the journey", body: "Match a package with a traveler heading your way.", icon: Plane },
+                  { n: "02", title: "Eban confirms payment", body: "Send payment to Eban and wait for manual confirmation before handover.", icon: Lock },
+                  { n: "03", title: "Confirm delivery", body: "Once you confirm receipt, the traveler can be paid.", icon: CheckCircle2 },
+                ].map((step) => {
+                  const Icon = step.icon;
+                  return (
+                    <div key={step.n} className="flex items-start gap-4">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-gold-light/25 bg-white/5 text-gold-light">
+                        <Icon className="h-4 w-4" aria-hidden="true" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-baseline gap-2">
+                          <span className="font-mono text-[10px] text-gold-light/75">{step.n}</span>
+                          <h3 className="font-body text-sm font-semibold text-white">{step.title}</h3>
+                        </div>
+                        <p className="mt-1 font-body text-xs leading-relaxed text-white/65">{step.body}</p>
+                      </div>
                     </div>
-                    <span className="w-2 h-2 rounded-full bg-gold" />
-                  </div>
-                  <span className="font-body text-[10px] uppercase font-semibold text-gold-light tracking-widest mt-2">6.5 Hours Flight</span>
-                </div>
-
-                <div className="text-right">
-                  <span className="font-mono text-3xl font-bold text-white">JFK</span>
-                  <p className="font-body text-xs text-gray-400">New York, USA</p>
-                </div>
+                  );
+                })}
               </div>
-
-              <div className="bg-white/5 rounded-2xl p-4 border border-white/10 space-y-3">
-                <div className="flex justify-between items-center text-xs">
-                  <span className="text-gray-400">Luggage Allowance</span>
-                  <span className="text-gold-light font-semibold">12 kg Available</span>
-                </div>
-                <div className="flex justify-between items-center text-xs">
-                  <span className="text-gray-400">Traveler Verified</span>
-                  <span className="text-emerald-400 font-semibold flex items-center gap-1">
-                    <ShieldCheck className="w-3.5 h-3.5" /> ID & Passport Confirmed
-                  </span>
-                </div>
+              <div className="flex items-center gap-2 border-t border-white/15 pt-4 font-body text-xs text-white/70">
+                <Lock className="h-3.5 w-3.5 text-gold-light" aria-hidden="true" />
+                <span>Payment is confirmed manually by the Eban team.</span>
               </div>
-            </div>
-
-            <div className="pt-4 border-t border-white/10 flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-gold/20 border border-gold/40 flex items-center justify-center text-gold font-bold text-xs">
-                  KA
-                </div>
-                <div>
-                  <p className="font-body text-xs font-semibold text-white">Kwame A.</p>
-                  <p className="font-body text-[10px] text-gray-400">Verified Traveler</p>
-                </div>
-              </div>
-              <a href="#book" className="bg-gold/10 hover:bg-gold/20 text-gold-light border border-gold/30 font-body text-xs font-semibold px-4 py-2 rounded-xl transition-all">
-                Browse Trips
-              </a>
             </div>
           </div>
         </div>
@@ -322,7 +305,7 @@ const HowItWorks = () => {
           Six steps from <em className="italic text-gold-dark">request to delivery</em>
         </h2>
         <p className="font-body text-sm text-muted-foreground max-w-lg mt-4 leading-relaxed">
-          EBAN connects you directly with verified travelers on your route. No middlemen, no drop-off centres &mdash; just a structured peer-to-peer marketplace with secure escrow.
+          EBAN connects you directly with verified travelers on your route. No drop-off centre: agree the handover directly, while Eban confirms payment and holds it until delivery is confirmed.
         </p>
 
         <div role="tablist" aria-label="How it works" className="inline-flex mt-10 p-1 rounded-full bg-card border border-border shadow-sm">
@@ -427,13 +410,13 @@ const WhatWeCarry = () => (
 const trustPillars = [
   {
     icon: ShieldCheck,
-    title: "100% ID Verified Travelers",
+    title: "ID Verification by Eban",
     desc: "Travelers upload a passport or government photo ID, and our team reviews it. Only approved travelers can be booked or claim requests.",
   },
   {
     icon: Lock,
-    title: "Secure Escrow Payments",
-    desc: "Your payment is held in escrow and only released to the traveler when you confirm you received the item. If something goes wrong, report an issue and the payment stays frozen while we review it.",
+    title: "Payment Confirmed by Eban",
+    desc: "You send payment to Eban, and the team confirms it manually. The traveler is paid after you confirm you received the item. If something goes wrong, report an issue and the payment stays frozen while we review it.",
   },
   {
     icon: FileSignature,

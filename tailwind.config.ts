@@ -60,6 +60,8 @@ export default {
         cream: "hsl(var(--cream))",
         terracotta: "hsl(var(--terracotta))",
         earth: "hsl(var(--earth))",
+        forest: "hsl(var(--forest))",
+        "forest-soft": "hsl(var(--forest-soft))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

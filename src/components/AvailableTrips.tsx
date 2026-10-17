@@ -54,6 +54,8 @@ const Sky = ({ photo, className = "" }: { photo?: string; className?: string }) 
         loading="lazy"
         onError={(e) => (e.currentTarget.style.display = "none")}
         className="absolute inset-0 w-full h-full object-cover"
+        decoding="async"
+        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
       />
     )}
   </div>
@@ -147,15 +149,29 @@ export const AvailableTrips = () => {
               Where space is <em className="italic font-normal">open right now</em>
             </h2>
             <p className="font-body text-white/90 mt-3 text-base">
-              Routes with travelers who have spare luggage space. Traveler details and prices are shown after you sign in.
+              Explore real routes with available luggage space. Sign in to view trip details and continue with a booking.
             </p>
           </div>
         </div>
 
-        {loading ? null : routes.length === 0 ? (
+        {loading ? (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5" aria-label="Loading available routes" aria-busy="true">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <div key={index} className="overflow-hidden rounded-2xl border border-border/80 bg-card">
+                <div className="h-44 animate-pulse bg-secondary/80" />
+                <div className="space-y-4 p-5">
+                  <div className="h-5 w-2/3 animate-pulse rounded bg-secondary" />
+                  <div className="h-3 w-1/3 animate-pulse rounded bg-secondary" />
+                  <div className="h-px bg-border/70" />
+                  <div className="h-4 w-full animate-pulse rounded bg-secondary/70" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : routes.length === 0 ? (
           <div className="max-w-md bg-card rounded-2xl border border-border p-8">
             <Plane className="w-10 h-10 text-gold/60 mb-4" />
-            <h3 className="font-display text-xl font-semibold text-foreground mb-2">No open routes at the moment</h3>
+            <h3 className="font-display text-xl font-semibold text-foreground mb-2">No open routes just yet</h3>
             <p className="font-body text-sm text-muted-foreground leading-relaxed">
               Post a request and travelers heading your way can claim it.
             </p>
@@ -213,7 +229,7 @@ export const AvailableTrips = () => {
             <div className="flex-1">
               <h3 className="font-display text-2xl md:text-3xl font-light text-foreground">New here? Sign in to book or post a request</h3>
               <p className="font-body text-sm text-muted-foreground mt-2 max-w-xl">
-                Create a free Eban account to see traveler profiles and prices, book space on these routes, or post what you need sent. Payment stays in escrow until you confirm delivery.
+                Create a free Eban account to see traveler profiles and prices, book space on these routes, or post what you need sent. Eban manually confirms payment and holds it until you confirm delivery.
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-3">

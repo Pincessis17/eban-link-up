@@ -46,8 +46,8 @@ const Signup = () => {
 
   if (needsConfirmation) {
     return (
-      <div className="min-h-screen bg-gradient-hero flex items-center justify-center px-6 py-12 text-white">
-        <div className="w-full max-w-md bg-charcoal/90 backdrop-blur-2xl rounded-3xl p-10 border border-gold/20 shadow-2xl text-center">
+      <div className="min-h-screen auth-shell flex items-center justify-center px-6 py-12 text-white">
+        <div className="w-full max-w-md auth-panel rounded-3xl p-10 border border-gold/20 shadow-2xl text-center">
           <div className="w-16 h-16 rounded-full bg-gradient-gold flex items-center justify-center mx-auto mb-6 glow-gold">
             <CheckCircle2 className="w-8 h-8 text-charcoal" />
           </div>
@@ -67,10 +67,10 @@ const Signup = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-hero flex items-center justify-center px-6 py-12 relative overflow-hidden">
+    <div className="min-h-screen auth-shell flex items-center justify-center px-6 py-12 relative overflow-hidden">
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-gold/10 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="w-full max-w-md bg-charcoal/90 backdrop-blur-2xl rounded-3xl p-8 md:p-10 border border-gold/20 shadow-2xl relative z-10 text-white">
+      <div className="w-full max-w-md auth-panel rounded-3xl p-8 md:p-10 border border-gold/20 shadow-2xl relative z-10 text-white">
         <Link to="/" className="flex items-center gap-3 mb-8 justify-center group">
           <div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/30 flex items-center justify-center group-hover:border-gold transition-colors">
             <img src={ebanSymbol} alt="EBAN" className="w-6 h-6 object-contain" />
@@ -97,10 +97,11 @@ const Signup = () => {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="font-body text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2 block">I am joining as a</label>
+            <label className="font-body text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2 block" id="signup-role-label">I am joining as a</label>
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
+                aria-pressed={role === "Sender"}
                 onClick={() => setRole("Sender")}
                 className={`py-3.5 rounded-xl font-body text-xs font-bold uppercase tracking-wider transition-all border flex items-center justify-center gap-2 ${
                   role === "Sender"
@@ -112,6 +113,7 @@ const Signup = () => {
               </button>
               <button
                 type="button"
+                aria-pressed={role === "Traveller"}
                 onClick={() => setRole("Traveller")}
                 className={`py-3.5 rounded-xl font-body text-xs font-bold uppercase tracking-wider transition-all border flex items-center justify-center gap-2 ${
                   role === "Traveller"
@@ -125,9 +127,11 @@ const Signup = () => {
           </div>
 
           <div>
-            <label className="font-body text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2 block">Full Legal Name</label>
+            <label htmlFor="signup-name" className="font-body text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2 block">Full Legal Name</label>
             <input
+              id="signup-name"
               type="text"
+              autoComplete="name"
               required
               className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 font-body text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all"
               placeholder="e.g. Kwame Mensah"
@@ -137,9 +141,11 @@ const Signup = () => {
           </div>
 
           <div>
-            <label className="font-body text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2 block">Email Address</label>
+            <label htmlFor="signup-email" className="font-body text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2 block">Email Address</label>
             <input
+              id="signup-email"
               type="email"
+              autoComplete="email"
               required
               className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 font-body text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all"
               placeholder="name@example.com"
@@ -149,9 +155,11 @@ const Signup = () => {
           </div>
 
           <div>
-            <label className="font-body text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2 block">Password</label>
+            <label htmlFor="signup-password" className="font-body text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2 block">Password</label>
             <input
+              id="signup-password"
               type="password"
+              autoComplete="new-password"
               required
               minLength={6}
               className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 font-body text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all"

@@ -9,7 +9,7 @@ export const SenderNav = () => {
   const { pathname } = useLocation();
 
   const linkClasses = (path: string) =>
-    `flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-body font-semibold tracking-wider uppercase transition-all ${
+    `flex items-center gap-1.5 px-3 py-2.5 min-h-11 whitespace-nowrap rounded-xl text-xs font-body font-semibold tracking-wider uppercase transition-all ${
       pathname === path
         ? "bg-gold/15 text-gold-dark border border-gold/30 shadow-sm"
         : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
@@ -19,7 +19,7 @@ export const SenderNav = () => {
     <>
     <AdminViewSwitcher />
     <nav className="bg-card/90 backdrop-blur-xl border-b border-border/80 px-6 py-3.5 sticky top-0 z-40 shadow-sm">
-      <div className="container mx-auto flex items-center justify-between">
+      <div className="container mx-auto flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-6">
           <Link to="/sender/requests" className="flex items-center gap-3 group">
             <div className="w-9 h-9 rounded-xl bg-gold/10 border border-gold/30 flex items-center justify-center group-hover:border-gold transition-colors">
@@ -32,7 +32,7 @@ export const SenderNav = () => {
           </Link>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 sm:gap-3">
           <Link to="/sender/trips" className={linkClasses("/sender/trips")}>
             <Plane className="w-3.5 h-3.5" /> Browse Trips
           </Link>
@@ -41,7 +41,7 @@ export const SenderNav = () => {
           </Link>
           <Link
             to="/sender/new-request"
-            className="flex items-center gap-1.5 bg-gradient-gold text-accent-foreground px-4 py-2 rounded-xl text-xs font-body font-bold tracking-wider uppercase hover:opacity-90 shadow-sm transition-all"
+            className="flex items-center gap-1.5 bg-gradient-gold text-accent-foreground px-3 py-2.5 min-h-11 whitespace-nowrap rounded-xl text-xs font-body font-bold tracking-wider uppercase hover:opacity-90 shadow-sm transition-all"
           >
             <Plus className="w-3.5 h-3.5" /> Post Request
           </Link>
