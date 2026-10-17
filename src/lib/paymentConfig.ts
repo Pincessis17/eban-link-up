@@ -3,7 +3,7 @@
 // Example details: ["MTN MoMo: 024 000 0000", "Account name: EBAN Trading Company"]
 export const PAYMENT_METHODS: { label: string; details: string[] }[] = [
   { label: "Mobile money", details: [] },
-  { label: "Bank transfer (MCB, Mauritius)", details: ["Account number: 000455659117"] },
+  { label: "Bank transfer (MCB, Mauritius)", details: ["Account name: Princess Nhyira Addai", "Account number: 000455659117"] },
 ];
 
 export const paymentReference = (requestId: string) => `EBAN-${requestId.slice(0, 8).toUpperCase()}`;
