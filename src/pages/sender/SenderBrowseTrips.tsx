@@ -8,6 +8,7 @@ import { toast } from "@/hooks/use-toast";
 import { SenderNav } from "@/components/SenderNav";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { errMsg, formatDate, money } from "@/lib/marketplace";
+import { allInRate, parcelQuote, usePlatformFee } from "@/lib/fees";
 
 type OpenTrip = Database["public"]["Functions"]["browse_open_trips"]["Returns"][number];
 
@@ -23,6 +24,7 @@ const SenderBrowseTrips = () => {
   const [loading, setLoading] = useState(true);
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
+  const feeSettings = usePlatformFee();
   const [booking, setBooking] = useState<OpenTrip | null>(null);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ itemType: "Gifts", description: "", weight: "1", value: "50", flags: [] as string[] });
@@ -48,7 +50,8 @@ const SenderBrowseTrips = () => {
   }, [trips, from, to]);
 
   const weight = parseFloat(form.weight) || 0;
-  const total = booking?.price_per_kg != null ? weight * Number(booking.price_per_kg) : null;
+  const quote = booking?.price_per_kg != null && weight > 0 ? parcelQuote(weight, Number(booking.price_per_kg), feeSettings) : null;
+  const total = quote?.total ?? null;
 
   const blockedReason = (t: OpenTrip) => {
     if (t.is_mine) return "This is your own trip";
@@ -156,7 +159,7 @@ const SenderBrowseTrips = () => {
                     </div>
                     <div className="bg-secondary/60 rounded-xl p-3">
                       <span className="text-muted-foreground block mb-0.5">Price</span>
-                      <strong className="text-foreground text-sm">{t.price_per_kg != null ? `${money(t.price_per_kg)} / kg` : "Not set"}</strong>
+                      <strong className="text-foreground text-sm">{t.price_per_kg != null ? `${money(allInRate(t.price_per_kg, feeSettings))} / kg` : "Not set"}</strong>
                     </div>
                   </div>
                   <p className="font-body text-xs text-muted-foreground flex items-center gap-1.5">
@@ -246,6 +249,13 @@ const SenderBrowseTrips = () => {
               <span className="text-xs uppercase tracking-wider text-muted-foreground">Total (held in escrow)</span>
               <span className="font-display text-2xl font-bold text-gold-dark">{money(total)}</span>
             </div>
+            {quote && quote.minimumTopUp > 0 && booking?.price_per_kg != null && (
+              <div className="font-body text-xs text-muted-foreground space-y-1">
+                <div className="flex justify-between"><span>{weight} kg &times; {money(allInRate(booking.price_per_kg, feeSettings))}</span><span>{money(quote.subtotal)}</span></div>
+                <div className="flex justify-between"><span>Small parcel minimum</span><span>+ {money(quote.minimumTopUp)}</span></div>
+                <p>Small parcels have a {money(feeSettings.minimum)} minimum service fee.</p>
+              </div>
+            )}
             <p className="font-body text-xs text-muted-foreground">
               Nothing is charged yet. You pay into escrow after the traveler accepts, and the money is released only when you confirm you received the item.
             </p>

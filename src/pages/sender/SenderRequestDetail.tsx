@@ -494,8 +494,8 @@ const SenderRequestDetail = () => {
               </div>
 
               <div>
-                <label className="font-body text-xs font-semibold uppercase text-foreground mb-1 block">Price you'll pay (USD $)</label>
-                <input type="number" step="0.5" min="0" className={fieldClasses} placeholder="Leave empty to accept the traveler's price per kg" value={form.offeredPrice} onChange={(e) => setForm({ ...form, offeredPrice: e.target.value })} />
+                <label className="font-body text-xs font-semibold uppercase text-foreground mb-1 block">Price you offer the traveler (USD $)</label>
+                <input type="number" step="0.5" min="0" className={fieldClasses} placeholder="Leave empty to accept the traveler's price per kg. Eban's service fee is added when you pay." value={form.offeredPrice} onChange={(e) => setForm({ ...form, offeredPrice: e.target.value })} />
               </div>
 
               <div className="flex gap-3 pt-4">
@@ -567,8 +567,8 @@ const SenderRequestDetail = () => {
               </div>
               {price != null && (
                 <p className="font-body text-xs text-muted-foreground mt-4">
-                  Price: <strong className="text-foreground">{money(price)}</strong>
-                  {request.agreed_price == null && " (your offer; the traveler confirms when they claim it)"}
+                  Total: <strong className="text-foreground">{money(total)}</strong>, including Eban's service fee
+                  {request.agreed_price == null && " (based on your offer; the traveler confirms when they claim it)"}
                 </p>
               )}
             </div>
@@ -601,10 +601,12 @@ const SenderRequestDetail = () => {
             <DialogDescription>Send the money to EBAN, then tell us you've sent it. EBAN holds it until you confirm delivery.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 font-body text-sm">
-            <div className="rounded-xl border border-border p-4 space-y-1.5">
-              <div className="flex justify-between"><span className="text-muted-foreground">Traveler's price</span><span>{money(price)}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Eban service fee</span><span>{money(serviceFee)}</span></div>
-              <div className="flex justify-between border-t border-border pt-1.5 font-semibold"><span>Total to send</span><span>{money(total)}</span></div>
+            <div className="rounded-xl border border-border p-4">
+              <div className="flex justify-between font-semibold"><span>Total to send</span><span>{money(total)}</span></div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Price includes Eban's service fee.
+                {serviceFee > 0 && price != null && serviceFee > Math.round(Number(price) * feeSettings.percent) / 100 && ` Small parcels have a ${money(feeSettings.minimum)} minimum.`}
+              </p>
             </div>
             <div className="rounded-xl border border-border bg-secondary/40 p-4">
               <p className="text-xs uppercase tracking-wider text-muted-foreground">Use this reference</p>

@@ -337,13 +337,13 @@ const BookingForm = () => {
                     <span className="font-body text-sm font-semibold text-foreground">${form.itemValue} USD</span>
                   </div>
                   <div>
-                    <label className="font-body text-xs text-muted-foreground uppercase tracking-wider mb-2 block">Your offer (USD, optional)</label>
+                    <label className="font-body text-xs text-muted-foreground uppercase tracking-wider mb-2 block">Your offer to the traveler (USD, optional)</label>
                     <input
                       type="number"
                       step="0.5"
                       min="0"
                       className={inputClasses}
-                      placeholder="Leave empty to accept the traveler's price per kg"
+                      placeholder="Leave empty to accept the traveler's price. Eban's service fee is added when you pay."
                       value={form.offeredPrice}
                       onChange={(e) => setForm({ ...form, offeredPrice: e.target.value })}
                     />
