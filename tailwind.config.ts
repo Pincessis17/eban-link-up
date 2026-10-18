@@ -14,8 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ['Cormorant Garamond', 'serif'],
-        body: ['Jost', 'sans-serif'],
+        display: ['Young Serif', 'Georgia', 'serif'],
+        body: ['Hanken Grotesk', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -60,6 +60,8 @@ export default {
         cream: "hsl(var(--cream))",
         terracotta: "hsl(var(--terracotta))",
         earth: "hsl(var(--earth))",
+        forest: "hsl(var(--forest))",
+        "kente-red": "hsl(var(--kente-red))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
