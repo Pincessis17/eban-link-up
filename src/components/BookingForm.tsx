@@ -178,7 +178,7 @@ const BookingForm = () => {
                 <div>
                   <label className="font-body text-xs font-semibold uppercase tracking-wider text-foreground mb-2 block">Preferred Target Date</label>
                   <div className="relative">
-                    <input type="date" className={inputClasses} value={form.preferredDate} onChange={(e) => setForm({ ...form, preferredDate: e.target.value })} />
+                    <input type="date" min={new Date().toISOString().slice(0, 10)} className={inputClasses} value={form.preferredDate} onChange={(e) => setForm({ ...form, preferredDate: e.target.value })} />
                     <Calendar className="w-4 h-4 text-muted-foreground absolute right-4 top-3.5 pointer-events-none" />
                   </div>
                 </div>
