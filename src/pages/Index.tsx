@@ -150,13 +150,6 @@ const heroAssurances = [
   { icon: Handshake, text: "You agree the handover with the traveler in Messages" },
 ];
 
-const moneyJourney = [
-  { title: "You pay Eban", note: "Send the amount with your reference code." },
-  { title: "Eban confirms and holds it", note: "The traveler is told it is safe to carry." },
-  { title: "The traveler delivers", note: "They mark the item delivered on arrival." },
-  { title: "You confirm, they get paid", note: "Nothing is released before you say so." },
-];
-
 const Hero = () => (
   <section className="relative min-h-screen flex flex-col justify-center bg-gradient-hero overflow-hidden pt-28 pb-20">
     {/* Background photo: public/images/hero-bg.jpg. Falls back to the gradient if missing. */}
@@ -172,8 +165,8 @@ const Hero = () => (
     <div className="eban-weave absolute inset-0 opacity-[0.045] pointer-events-none" aria-hidden="true" />
 
     <div className="container mx-auto px-6 relative z-10 my-auto">
-      <div className="grid lg:grid-cols-12 gap-14 items-center">
-        <div className="lg:col-span-7 animate-fade-up">
+      <div>
+        <div className="max-w-2xl animate-fade-up">
           <h1 className="font-display text-4xl sm:text-5xl md:text-6xl text-white leading-[1.1] mb-6 max-w-2xl">
             Send a package with a traveler who is already flying your route.
           </h1>
@@ -207,27 +200,6 @@ const Hero = () => (
           </ul>
         </div>
 
-        {/* How the money moves: an honest explainer, no made-up people or flights */}
-        <div className="lg:col-span-5 hidden lg:block">
-          <div className="bg-charcoal/80 backdrop-blur-xl border border-gold/25 rounded-2xl p-8 shadow-2xl">
-            <h2 className="font-display text-2xl text-white mb-1">Where your money is</h2>
-            <p className="font-body text-sm text-gray-300 mb-8">From the moment you pay to the moment you confirm.</p>
-            <ol className="relative space-y-7">
-              <span className="absolute left-[11px] top-2 bottom-2 w-px bg-gold/30" aria-hidden="true" />
-              {moneyJourney.map((step, i) => (
-                <li key={step.title} className="relative flex gap-4">
-                  <span className="relative z-10 w-6 h-6 rounded-full bg-charcoal border border-gold flex items-center justify-center font-body text-xs font-semibold text-gold-light shrink-0">
-                    {i + 1}
-                  </span>
-                  <div>
-                    <p className="font-body text-sm font-semibold text-white">{step.title}</p>
-                    <p className="font-body text-sm text-gray-300 mt-0.5">{step.note}</p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </div>
-        </div>
       </div>
     </div>
     <div className="kente-band absolute inset-x-0 bottom-0" aria-hidden="true" />
@@ -237,21 +209,17 @@ const Hero = () => (
 type Role = "sender" | "traveller";
 
 const senderSteps = [
-  { icon: FileText, title: "1. Post Your Request", desc: "Describe your package: route, weight, item type and any special instructions. Or browse trips already listed." },
-  { icon: Users, title: "2. Pick a Verified Traveler", desc: "Travelers on your route are ID-checked by the Eban team. Book one, or wait for a traveler to claim your request." },
-  { icon: Handshake, title: "3. Pay Eban to Hold the Money", desc: "Once accepted, send the payment to Eban with your reference code and tap \"I've sent the payment\". Eban confirms it and holds it safely." },
-  { icon: PackageCheck, title: "4. Hand Over the Item", desc: "Agree a meeting place in Messages. The traveler checks the item before taking it." },
-  { icon: Plane, title: "5. Track the Delivery", desc: "Your traveler carries the item on their flight and marks it delivered when it arrives." },
-  { icon: CheckCircle2, title: "6. Confirm & Rate", desc: "Confirm you received it. The traveler is then paid and you both leave a rating." },
+  { icon: FileText, title: "Post a request", desc: "Say what you're sending and where. Or pick a trip that's already listed." },
+  { icon: Lock, title: "Pay Eban", desc: "Eban holds your money until the item arrives." },
+  { icon: Handshake, title: "Hand it over", desc: "Meet your traveler and agree the handover in Messages." },
+  { icon: CheckCircle2, title: "Confirm delivery", desc: "Tell us it arrived and the traveler gets paid." },
 ];
 
 const travellerSteps = [
-  { icon: ShieldCheck, title: "1. Sign Up & Verify Your ID", desc: "Create a traveler account and upload your ID. An Eban admin reviews it and approves you before you can carry items." },
-  { icon: Plane, title: "2. Post Your Trip", desc: "Add your route, flight date and spare luggage space, and set your price per kg. We show suggested rates, but the price is yours to choose." },
-  { icon: Users, title: "3. Get Requests", desc: "Senders can book you directly, or you can browse open requests on your route and claim the ones you want." },
-  { icon: Lock, title: "4. Wait for Payment Confirmation", desc: "Eban confirms the sender's payment and holds it. You only carry once the payment is secured." },
-  { icon: PackageCheck, title: "5. Collect, Check & Fly", desc: "Meet the sender, inspect the item, carry it as agreed, then mark it delivered on arrival." },
-  { icon: Award, title: "6. Get Paid & Rated", desc: "When the sender confirms receipt, your earnings are paid out by Eban and you both leave a rating." },
+  { icon: ShieldCheck, title: "Get verified", desc: "Upload your ID. An Eban admin approves it." },
+  { icon: Plane, title: "Post your trip", desc: "Add your flight and spare kg, and set your own price per kg." },
+  { icon: PackageCheck, title: "Carry and deliver", desc: "Take a request once Eban confirms the sender has paid." },
+  { icon: Award, title: "Get paid", desc: "Your earnings are released when the sender confirms." },
 ];
 
 const HowItWorks = () => {
@@ -262,11 +230,11 @@ const HowItWorks = () => {
     { id: "traveller", label: "I am a traveler" },
   ];
   return (
-    <section id="how-it-works" className="py-24 bg-background relative border-t border-gold/10">
+    <section id="how-it-works" className="py-20 bg-background relative border-t border-gold/10">
       <div className="container mx-auto px-6">
         <SectionLabel>How the Marketplace Works</SectionLabel>
         <h2 className="font-display text-3xl md:text-4xl leading-tight max-w-xl text-foreground">
-          Six steps from request to delivery
+          Four steps from request to delivery
         </h2>
         <p className="font-body text-sm text-muted-foreground max-w-lg mt-4 leading-relaxed">
           EBAN connects you directly with verified travelers on your route. No middlemen, no drop-off centres &mdash; just a structured peer-to-peer marketplace with secure escrow.
@@ -288,17 +256,15 @@ const HowItWorks = () => {
           ))}
         </div>
 
-        <ol key={role} className="mt-10 grid md:grid-cols-2 md:gap-x-16 border-t border-border animate-fade-up">
+        <ol key={role} className="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-x-10 gap-y-8 animate-fade-up">
           {steps.map((step, i) => (
-            <li key={step.title} className="flex gap-6 py-8 border-b border-border">
-              <span className="font-display text-5xl leading-none text-gold w-12 shrink-0" aria-hidden="true">{i + 1}</span>
-              <div>
-                <h3 className="font-display text-xl text-foreground mb-2 flex items-center gap-2.5">
-                  <step.icon className="w-5 h-5 text-forest shrink-0" strokeWidth={1.5} />
-                  {step.title.replace(/^\d+\.\s*/, "")}
-                </h3>
-                <p className="font-body text-sm text-muted-foreground leading-relaxed max-w-md">{step.desc}</p>
-              </div>
+            <li key={step.title} className="border-t-2 border-gold pt-5">
+              <span className="font-display text-4xl leading-none text-gold" aria-hidden="true">{i + 1}</span>
+              <h3 className="font-display text-xl text-foreground mt-4 mb-2 flex items-center gap-2.5">
+                <step.icon className="w-5 h-5 text-forest shrink-0" strokeWidth={1.5} />
+                {step.title}
+              </h3>
+              <p className="font-body text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
             </li>
           ))}
         </ol>
