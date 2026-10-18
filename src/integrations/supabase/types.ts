@@ -358,6 +358,7 @@ export type Database = {
           id: string
           request_id: string
           sender_id: string
+          service_fee: number
           status: string
           stripe_payment_intent_id: string | null
         }
@@ -367,6 +368,7 @@ export type Database = {
           id?: string
           request_id: string
           sender_id: string
+          service_fee?: number
           status?: string
           stripe_payment_intent_id?: string | null
         }
@@ -376,6 +378,7 @@ export type Database = {
           id?: string
           request_id?: string
           sender_id?: string
+          service_fee?: number
           status?: string
           stripe_payment_intent_id?: string | null
         }
@@ -487,6 +490,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      platform_settings: {
+        Row: {
+          fee_minimum: number
+          fee_percent: number
+          id: boolean
+          updated_at: string
+        }
+        Insert: {
+          fee_minimum?: number
+          fee_percent?: number
+          id?: boolean
+          updated_at?: string
+        }
+        Update: {
+          fee_minimum?: number
+          fee_percent?: number
+          id?: boolean
+          updated_at?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {

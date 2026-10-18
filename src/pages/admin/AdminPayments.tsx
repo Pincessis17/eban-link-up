@@ -9,6 +9,7 @@ interface PaymentRow {
   id: string;
   request_id: string;
   amount: number;
+  service_fee: number;
   status: string;
   created_at: string;
   delivery_requests: { origin_city: string; destination_city: string } | null;
@@ -24,7 +25,7 @@ const AdminPayments = () => {
     setLoading(true);
     const { data } = await supabase
       .from("payments")
-      .select("id, request_id, amount, status, created_at, delivery_requests(origin_city, destination_city), profiles:sender_id(full_name, email)")
+      .select("id, request_id, amount, service_fee, status, created_at, delivery_requests(origin_city, destination_city), profiles:sender_id(full_name, email)")
       .in("status", ["pending", "held"])
       .order("created_at", { ascending: false });
     setRows((data as unknown as PaymentRow[]) || []);
@@ -50,7 +51,7 @@ const AdminPayments = () => {
     <div className="p-5 rounded-xl border border-border bg-card flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
         <p className="font-display text-sm font-bold text-foreground">
-          {money(r.amount)} · {r.delivery_requests?.origin_city} → {r.delivery_requests?.destination_city}
+          {money(r.amount)}{Number(r.service_fee) > 0 ? ` (incl. ${money(r.service_fee)} Eban fee)` : ""} · {r.delivery_requests?.origin_city} → {r.delivery_requests?.destination_city}
         </p>
         <p className="font-body text-xs text-muted-foreground mt-1">
           From {r.profiles?.full_name ?? "sender"} ({r.profiles?.email ?? "-"}) · reference{" "}

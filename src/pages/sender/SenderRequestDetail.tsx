@@ -10,6 +10,7 @@ import { RateCounterparty } from "@/components/RateCounterparty";
 import { ReportIssueButton } from "@/components/ReportIssueButton";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { PAYMENT_METHODS, paymentReference } from "@/lib/paymentConfig";
+import { calcServiceFee, usePlatformFee } from "@/lib/fees";
 import { REQUEST_STEPS, stepIndex, SENDER_DELETABLE, IN_FLIGHT, errMsg, money } from "@/lib/marketplace";
 
 interface DeliveryRequest {
@@ -90,7 +91,8 @@ const SenderRequestDetail = () => {
   const [form, setForm] = useState<EditForm | null>(null);
   const [acting, setActing] = useState(false);
   const [counterparty, setCounterparty] = useState<Counterparty | null>(null);
-  const [payment, setPayment] = useState<{ status: string } | null>(null);
+  const [payment, setPayment] = useState<{ status: string; amount: number; service_fee: number } | null>(null);
+  const feeSettings = usePlatformFee();
   const [payOpen, setPayOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -99,7 +101,7 @@ const SenderRequestDetail = () => {
     setLoading(true);
     const { data } = await supabase.from("delivery_requests").select("*").eq("id", id).maybeSingle();
     setRequest(data as DeliveryRequest);
-    const { data: pay } = await supabase.from("payments").select("status").eq("request_id", id).maybeSingle();
+    const { data: pay } = await supabase.from("payments").select("status, amount, service_fee").eq("request_id", id).maybeSingle();
     setPayment(pay);
     if (data?.matched_traveller_id) {
       const { data: cp } = await supabase.rpc("get_request_counterparty", { p_request_id: id });
@@ -222,6 +224,8 @@ const SenderRequestDetail = () => {
   const canEdit = request.status === "submitted";
   const currentIdx = stepIndex(request.status);
   const price = request.agreed_price ?? request.offered_price;
+  const serviceFee = price != null ? calcServiceFee(price, feeSettings) : 0;
+  const total = price != null ? Number(price) + serviceFee : null;
   const hasTraveler = !!request.matched_traveller_id && !isCancelled && request.status !== "submitted";
 
   return (
@@ -348,7 +352,7 @@ const SenderRequestDetail = () => {
           <div className="bg-gold/10 border border-gold/30 rounded-2xl p-6 mb-8">
             <h4 className="font-display text-lg font-semibold text-foreground">Payment reported. Waiting for EBAN to confirm it arrived.</h4>
             <p className="font-body text-xs text-muted-foreground mt-1">
-              Reference <span className="font-mono font-semibold text-foreground">{paymentReference(request.id)}</span> · {money(price)}. Once confirmed, the traveler can collect your item.
+              Reference <span className="font-mono font-semibold text-foreground">{paymentReference(request.id)}</span> · {money(payment.amount)}. Once confirmed, the traveler can collect your item.
             </p>
           </div>
         )}
@@ -360,21 +364,21 @@ const SenderRequestDetail = () => {
                 {counterparty?.first_name ?? "The traveler"} accepted. Pay to lock it in.
               </h4>
               <p className="font-body text-xs text-muted-foreground mt-1">
-                EBAN holds {money(price)} and only releases it to the traveler after you confirm you received the item.
+                EBAN holds your payment and only releases it to the traveler after you confirm you received the item.
               </p>
             </div>
             <button
               onClick={() => setPayOpen(true)}
               className="bg-gradient-gold text-accent-foreground font-body font-bold text-xs uppercase tracking-wider py-3 px-6 rounded-xl hover:opacity-90 shadow-sm whitespace-nowrap"
             >
-              {`Pay ${money(price)}`}
+              {`Pay ${money(total)}`}
             </button>
           </div>
         )}
 
         {["paid", "dropped_off", "handed_to_traveller", "in_transit"].includes(request.status) && (
           <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-6 mb-8">
-            <h4 className="font-display text-lg font-semibold text-emerald-700">{money(price)} is held by EBAN</h4>
+            <h4 className="font-display text-lg font-semibold text-emerald-700">{money(payment?.amount ?? price)} is held by EBAN</h4>
             <p className="font-body text-xs text-muted-foreground mt-1">
               It stays safe until you confirm receipt. Agree the handover with the traveler in Messages below.
             </p>
@@ -593,10 +597,15 @@ const SenderRequestDetail = () => {
       <Dialog open={payOpen} onOpenChange={setPayOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="font-display">Pay {money(price)}</DialogTitle>
+            <DialogTitle className="font-display">Pay {money(total)}</DialogTitle>
             <DialogDescription>Send the money to EBAN, then tell us you've sent it. EBAN holds it until you confirm delivery.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 font-body text-sm">
+            <div className="rounded-xl border border-border p-4 space-y-1.5">
+              <div className="flex justify-between"><span className="text-muted-foreground">Traveler's price</span><span>{money(price)}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Eban service fee</span><span>{money(serviceFee)}</span></div>
+              <div className="flex justify-between border-t border-border pt-1.5 font-semibold"><span>Total to send</span><span>{money(total)}</span></div>
+            </div>
             <div className="rounded-xl border border-border bg-secondary/40 p-4">
               <p className="text-xs uppercase tracking-wider text-muted-foreground">Use this reference</p>
               <p className="font-mono text-lg font-bold text-foreground">{request ? paymentReference(request.id) : ""}</p>
@@ -616,7 +625,7 @@ const SenderRequestDetail = () => {
               ))
             )}
             <ol className="list-decimal pl-5 text-xs text-muted-foreground space-y-1">
-              <li>Send exactly {money(price)} and put the reference in the note.</li>
+              <li>Send exactly {money(total)} and put the reference in the note.</li>
               <li>Tap the button below once you've sent it.</li>
               <li>EBAN confirms it arrived, usually within a few hours.</li>
             </ol>
