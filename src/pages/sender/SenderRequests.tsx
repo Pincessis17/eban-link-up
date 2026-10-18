@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { EmptyIllustration } from "@/components/EmptyIllustration";
 import { Link } from "react-router-dom";
 import { Package, ArrowRight, Plus, Sparkles, Filter, ChevronRight, Clock, ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -116,7 +117,7 @@ const SenderRequests = () => {
 
         {!loading && filteredRequests.length === 0 && (
           <div className="text-center py-20 bg-card rounded-3xl border border-border/80 p-10 shadow-[var(--shadow-card)] max-w-lg mx-auto">
-            <Package className="w-12 h-12 text-gold-dark/60 mx-auto mb-4" />
+            <EmptyIllustration kind="package" />
             <h3 className="font-display text-2xl font-semibold text-foreground mb-2">No package requests found</h3>
             <p className="font-body text-sm text-muted-foreground mb-6">
               Browse trips to book a traveler, or post a request and let travelers claim it.

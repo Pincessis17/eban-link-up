@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { EmptyIllustration } from "@/components/EmptyIllustration";
 import { Link, useNavigate } from "react-router-dom";
 import { Package, ArrowRight, Calendar, Weight, ShieldAlert, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -144,7 +145,7 @@ const TravelerBrowseRequests = () => {
 
         {!loading && visible.length === 0 && (
           <div className="text-center py-16 bg-card rounded-3xl border border-border/80 shadow-[var(--shadow-card)]">
-            <Package className="w-10 h-10 text-gold-dark/60 mx-auto mb-3" />
+            <EmptyIllustration kind="package" />
             <p className="font-display text-xl font-semibold text-foreground mb-1">No open requests right now</p>
             <p className="font-body text-sm text-muted-foreground">Post a trip so senders can find and book you directly.</p>
           </div>

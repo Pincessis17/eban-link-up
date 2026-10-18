@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { EmptyIllustration } from "@/components/EmptyIllustration";
 import { Link } from "react-router-dom";
 import { Package } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -78,7 +79,7 @@ const TravelerRequests = () => {
 
         {!loading && matches.length === 0 && (
           <div className="text-center py-16 bg-card rounded-2xl border border-border">
-            <Package className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+            <EmptyIllustration kind="package" />
             <p className="font-display font-semibold text-foreground mb-1">No requests yet</p>
             <p className="font-body text-sm text-muted-foreground">
               When a sender books one of your trips, or you claim a request, it shows up here. Browse open requests to find one.

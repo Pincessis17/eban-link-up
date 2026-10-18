@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { EmptyIllustration } from "@/components/EmptyIllustration";
 import { Link, useNavigate } from "react-router-dom";
 import { Plane, ArrowRight, Calendar, Weight, ShieldCheck, ShieldAlert, Star, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -108,7 +109,7 @@ const SenderBrowseTrips = () => {
 
         {!loading && visible.length === 0 && (
           <div className="text-center py-16 bg-card rounded-3xl border border-border/80 shadow-[var(--shadow-card)]">
-            <Plane className="w-10 h-10 text-gold-dark/60 mx-auto mb-3" />
+            <EmptyIllustration kind="plane" />
             <p className="font-display text-xl font-semibold text-foreground mb-1">No trips on that route yet</p>
             <p className="font-body text-sm text-muted-foreground mb-5">
               Post an open request and travelers heading your way will be able to claim it.

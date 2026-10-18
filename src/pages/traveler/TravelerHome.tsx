@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { EmptyIllustration } from "@/components/EmptyIllustration";
 import { Link } from "react-router-dom";
 import { Plane, Plus, Calendar, Weight, ShieldCheck, ArrowRight, Sparkles, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -105,7 +106,7 @@ const TravelerHome = () => {
 
         {!loading && trips.length === 0 && (
           <div className="text-center py-20 bg-card rounded-3xl border border-border/80 p-10 shadow-[var(--shadow-card)] max-w-lg mx-auto">
-            <Plane className="w-12 h-12 text-gold-dark/60 mx-auto mb-4" />
+            <EmptyIllustration kind="plane" />
             <h3 className="font-display text-2xl font-semibold text-foreground mb-2">No active flight trips listed</h3>
             <p className="font-body text-sm text-muted-foreground mb-6">
               Share your upcoming flight and your price per kg. Senders can book you, and you can claim open requests on your route.
