@@ -63,7 +63,7 @@ export const FeedbackWall = () => {
       const dup = errMsg(error).includes("feedback_one_per_user");
       return setMsg({ ok: false, text: dup ? "You've already sent feedback. Thank you!" : errMsg(error) });
     }
-    setMsg({ ok: true, text: "Thank you! Your feedback will appear once our team has reviewed it." });
+    setMsg({ ok: true, text: "Thank you! Your review is now live." });
     setRating(0);
     setComment("");
   };
@@ -78,7 +78,7 @@ export const FeedbackWall = () => {
               Straight from <em className="italic text-gold-dark">our members</em>
             </h2>
             <p className="font-body text-sm text-muted-foreground leading-relaxed mt-5">
-              Every review here is written by a real Eban account and approved by our team. No edits, no invented quotes.
+              Every review here is written by a real Eban account. No edits, no invented quotes.
             </p>
 
             {stats.total > 0 && (
@@ -160,7 +160,7 @@ export const FeedbackWall = () => {
           <DialogHeader>
             <DialogTitle className="font-display">Share your experience</DialogTitle>
             <DialogDescription>
-              Posting as {profile?.full_name?.split(" ")[0] ?? "you"}. Reviews are checked by our team before they appear.
+              Posting as {profile?.full_name?.split(" ")[0] ?? "you"}. Your review appears straight away.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">

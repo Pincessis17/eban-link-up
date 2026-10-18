@@ -22,7 +22,7 @@ const BADGE: Record<string, string> = {
 
 const AdminFeedback = () => {
   const [rows, setRows] = useState<Row[]>([]);
-  const [filter, setFilter] = useState<"all" | "pending" | "approved" | "hidden">("pending");
+  const [filter, setFilter] = useState<"all" | "pending" | "approved" | "hidden">("approved");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -63,9 +63,9 @@ const AdminFeedback = () => {
       <div className={ADMIN_SIDEBAR_OFFSET_CLASS}>
         <div className="container mx-auto px-6 py-10 max-w-3xl">
           <h1 className="font-display text-2xl font-bold text-foreground mb-2">Feedback &amp; reviews</h1>
-          <p className="font-body text-sm text-muted-foreground mb-6">Approved reviews appear on the public landing page.</p>
+          <p className="font-body text-sm text-muted-foreground mb-6">Reviews go live as soon as they are posted. Hide any that break the rules.</p>
           <div className="flex gap-2 mb-6">
-            {(["pending", "approved", "hidden", "all"] as const).map((f) => (
+            {(["approved", "hidden", "all"] as const).map((f) => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
@@ -102,7 +102,7 @@ const AdminFeedback = () => {
                 <div className="flex items-center gap-2 mt-4">
                   {r.status !== "approved" && (
                     <button onClick={() => setStatus(r.id, "approved")} className="px-3 py-1.5 rounded-lg bg-green-600 text-white text-xs font-body font-semibold">
-                      Approve
+                      Show again
                     </button>
                   )}
                   {r.status !== "hidden" && (
