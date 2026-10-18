@@ -646,6 +646,10 @@ export type Database = {
           created_at: string
           id: string
           name: string | null
+          payout_account_name: string | null
+          payout_account_number: string | null
+          payout_method: string | null
+          payout_provider: string | null
           phone: string | null
           rating: number
           school_affiliation: string | null
@@ -657,6 +661,10 @@ export type Database = {
           created_at?: string
           id?: string
           name?: string | null
+          payout_account_name?: string | null
+          payout_account_number?: string | null
+          payout_method?: string | null
+          payout_provider?: string | null
           phone?: string | null
           rating?: number
           school_affiliation?: string | null
@@ -668,6 +676,10 @@ export type Database = {
           created_at?: string
           id?: string
           name?: string | null
+          payout_account_name?: string | null
+          payout_account_number?: string | null
+          payout_method?: string | null
+          payout_provider?: string | null
           phone?: string | null
           rating?: number
           school_affiliation?: string | null

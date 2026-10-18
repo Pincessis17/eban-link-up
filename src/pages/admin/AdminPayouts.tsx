@@ -16,7 +16,7 @@ interface DeliveredRequest {
   item_value: number;
   status: string;
   matched_traveller_id: string | null;
-  traveller_profiles: { name: string | null } | null;
+  traveller_profiles: { name: string | null; payout_method: string | null; payout_account_name: string | null; payout_account_number: string | null; payout_provider: string | null } | null;
   payouts: PayoutRow | null;
 }
 
@@ -38,7 +38,7 @@ const AdminPayouts = () => {
     const { data } = await supabase
       .from("delivery_requests")
       .select(
-        "id, origin_city, destination_city, item_value, status, matched_traveller_id, traveller_profiles:matched_traveller_id(name), payouts(id, status, amount)"
+        "id, origin_city, destination_city, item_value, status, matched_traveller_id, traveller_profiles:matched_traveller_id(name, payout_method, payout_account_name, payout_account_number, payout_provider), payouts(id, status, amount)"
       )
       .in("status", ["delivered", "completed"])
       .not("matched_traveller_id", "is", null)
@@ -102,6 +102,11 @@ const AdminPayouts = () => {
                 </p>
                 <p className="font-body text-xs text-muted-foreground mt-1">
                   Traveler: {r.traveller_profiles?.name ?? "-"} &middot; Declared value ${r.item_value}
+                </p>
+                <p className="font-body text-xs text-foreground mt-1">
+                  {r.traveller_profiles?.payout_account_number
+                    ? `Pay to: ${r.traveller_profiles.payout_method === "mobile_money" ? "Mobile money" : "Bank"} · ${r.traveller_profiles.payout_account_name ?? ""} · ${r.traveller_profiles.payout_account_number}${r.traveller_profiles.payout_provider ? ` · ${r.traveller_profiles.payout_provider}` : ""}`
+                    : "No payout details added yet"}
                 </p>
               </div>
 

@@ -11,6 +11,10 @@ export interface TravellerProfile {
   school_affiliation: string | null;
   total_deliveries: number;
   verification_status: string;
+  payout_method?: string | null;
+  payout_account_name?: string | null;
+  payout_account_number?: string | null;
+  payout_provider?: string | null;
 }
 
 export function useTravellerProfile() {
