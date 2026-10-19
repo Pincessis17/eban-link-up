@@ -833,6 +833,18 @@ export type Database = {
       admin_delete_traveller: { Args: { p_traveller_id: string }; Returns: undefined }
       is_admin: { Args: never; Returns: boolean }
       switch_role: { Args: { p_role: string }; Returns: string }
+      counterparty_user_id: { Args: { p_request_id: string }; Returns: string | null }
+      get_profile: {
+        Args: { p_user_id: string }
+        Returns: {
+          user_id: string; first_name: string; full_name: string | null; is_self: boolean; avg_rating: number | null
+          rating_count: number; parcels_sent: number; parcels_carried: number; verified: boolean; member_since: string | null
+        }[]
+      }
+      get_reviews: {
+        Args: { p_user_id: string }
+        Returns: { rating: number; comment: string | null; created_at: string; reviewer_first_name: string; reviewer_role: string; route: string }[]
+      }
       expire_stale_matches: { Args: { p_hours?: number }; Returns: number }
       get_handover_contact: {
         Args: { p_request_id: string }

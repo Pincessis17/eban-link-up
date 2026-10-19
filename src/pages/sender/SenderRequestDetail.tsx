@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { SenderNav } from "@/components/SenderNav";
 import { DeleteButton } from "@/components/AdminDeleteButton";
+import { ProfileLink } from "@/components/ProfileLink";
 import { RequestMessages } from "@/components/RequestMessages";
 import { RateCounterparty } from "@/components/RateCounterparty";
 import { ReportIssueButton } from "@/components/ReportIssueButton";
@@ -415,6 +416,7 @@ const SenderRequestDetail = () => {
             <div>
               <p className="font-body text-[10px] uppercase font-semibold text-muted-foreground">Your traveler</p>
               <p className="font-display text-lg font-semibold text-foreground">{counterparty.first_name}</p>
+              <ProfileLink requestId={request.id} name={counterparty.first_name} />
             </div>
             <div className="text-right font-body text-xs text-muted-foreground">
               <p className="flex items-center justify-end gap-1">

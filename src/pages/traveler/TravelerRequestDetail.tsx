@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
 import { TravelerNav } from "@/components/TravelerNav";
 import { SignaturePad } from "@/components/SignaturePad";
+import { ProfileLink } from "@/components/ProfileLink";
 import { RequestMessages } from "@/components/RequestMessages";
 import { RateCounterparty } from "@/components/RateCounterparty";
 import { ReportIssueButton } from "@/components/ReportIssueButton";
@@ -208,6 +209,12 @@ const TravelerRequestDetail = () => {
           <h1 className="font-display text-xl font-bold text-foreground mb-4">
             {request.origin_city}, {request.origin_country} &rarr; {request.destination_city}, {request.destination_country}
           </h1>
+
+          {counterparty && (
+            <div className="mb-4">
+              <ProfileLink requestId={request.id} name={counterparty.first_name} />
+            </div>
+          )}
 
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="bg-secondary rounded-lg p-3">

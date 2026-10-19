@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { LogOut, Plane, ShieldCheck, DollarSign, Plus, Globe, Search } from "lucide-react";
+import { LogOut, Plane, ShieldCheck, DollarSign, Plus, Globe, Search, UserRound } from "lucide-react";
 import ebanSymbol from "@/assets/eban-symbol.png";
 import { useAuth } from "@/hooks/useAuth";
 import { AdminViewSwitcher } from "@/components/AdminViewSwitcher";
@@ -60,6 +60,9 @@ export const TravelerNav = () => {
           </Link>
 
           <ModeSwitcher />
+          <Link to="/profile" className={linkClasses("/profile")}>
+            <UserRound className="w-3.5 h-3.5" /> <span className="hidden md:inline">Profile</span>
+          </Link>
           <div className="h-5 w-px bg-border mx-1" />
           <Link to="/?view=site" className="text-muted-foreground hover:text-foreground p-2 rounded-lg transition-colors flex items-center gap-1 text-xs font-body">
             <Globe className="w-4 h-4" />

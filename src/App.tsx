@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import InstallPrompt from "@/components/InstallPrompt";
+import Profile from "./pages/Profile";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
@@ -76,6 +77,8 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
+            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            <Route path="/profile/:userId" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route
               path="/traveler"
               element={

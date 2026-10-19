@@ -50,7 +50,7 @@ export const RateCounterparty = ({ requestId, existingRating, who, onDone }: Pro
   return (
     <div className="bg-card rounded-3xl border border-border/80 p-6 shadow-[var(--shadow-card)]">
       <h3 className="font-display text-xl font-medium text-foreground mb-1">Rate {who}</h3>
-      <p className="font-body text-xs text-muted-foreground mb-4">Ratings are shown on profiles and help others decide who to trust.</p>
+      <p className="font-body text-xs text-muted-foreground mb-4">Your rating and comment appear on their profile, with your first name, and help others decide who to trust.</p>
       <div className="flex gap-1 mb-4" onMouseLeave={() => setHover(0)}>
         {[1, 2, 3, 4, 5].map((n) => (
           <button
