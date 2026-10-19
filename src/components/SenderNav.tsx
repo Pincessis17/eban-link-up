@@ -3,6 +3,7 @@ import { LogOut, Package, Plus, Globe, Plane } from "lucide-react";
 import ebanSymbol from "@/assets/eban-symbol.png";
 import { useAuth } from "@/hooks/useAuth";
 import { AdminViewSwitcher } from "@/components/AdminViewSwitcher";
+import { ModeSwitcher } from "@/components/ModeSwitcher";
 
 export const SenderNav = () => {
   const { signOut, profile } = useAuth();
@@ -45,6 +46,7 @@ export const SenderNav = () => {
           >
             <Plus className="w-3.5 h-3.5" /> Post Request
           </Link>
+          <ModeSwitcher />
           <div className="h-5 w-px bg-border mx-1" />
           <Link to="/?view=site" className="text-muted-foreground hover:text-foreground p-2 rounded-lg transition-colors flex items-center gap-1 text-xs font-body">
             <Globe className="w-4 h-4" /> <span className="hidden sm:inline">Site</span>

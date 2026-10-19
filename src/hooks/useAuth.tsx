@@ -23,6 +23,7 @@ type AuthContextType = {
   ) => Promise<{ error: string | null; needsConfirmation: boolean }>;
   signIn: (email: string, password: string) => Promise<{ error: string | null; role: string | null }>;
   signOut: () => Promise<void>;
+  switchRole: (role: "Sender" | "Traveller") => Promise<{ error: string | null }>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -90,8 +91,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut();
   };
 
+  // One account can both send and travel; the role is the side currently being used.
+  const switchRole: AuthContextType["switchRole"] = async (role) => {
+    const { error } = await (supabase as any).rpc("switch_role", { p_role: role });
+    if (error) return { error: error.message };
+    if (user) await loadProfile(user.id);
+    return { error: null };
+  };
+
   return (
-    <AuthContext.Provider value={{ user, session, profile, loading, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, session, profile, loading, signUp, signIn, signOut, switchRole }}>
       {children}
     </AuthContext.Provider>
   );

@@ -97,7 +97,7 @@ const Signup = () => {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="font-body text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2 block">I am joining as a</label>
+            <label className="font-body text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2 block">Start as a</label>
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
@@ -122,6 +122,7 @@ const Signup = () => {
                 <Plane className="w-3.5 h-3.5" /> Traveler
               </button>
             </div>
+            <p className="font-body text-xs text-gray-400 mt-2">One account does both. You can switch between sending and travelling any time.</p>
           </div>
 
           <div>

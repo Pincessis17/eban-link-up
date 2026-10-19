@@ -3,6 +3,7 @@ import { LogOut, Plane, ShieldCheck, DollarSign, Plus, Globe, Search } from "luc
 import ebanSymbol from "@/assets/eban-symbol.png";
 import { useAuth } from "@/hooks/useAuth";
 import { AdminViewSwitcher } from "@/components/AdminViewSwitcher";
+import { ModeSwitcher } from "@/components/ModeSwitcher";
 
 export const TravelerNav = () => {
   const { signOut } = useAuth();
@@ -56,6 +57,7 @@ export const TravelerNav = () => {
             <Plus className="w-3.5 h-3.5" /> <span className="hidden md:inline">Post Trip</span>
           </Link>
 
+          <ModeSwitcher />
           <div className="h-5 w-px bg-border mx-1" />
           <Link to="/?view=site" className="text-muted-foreground hover:text-foreground p-2 rounded-lg transition-colors flex items-center gap-1 text-xs font-body">
             <Globe className="w-4 h-4" />
