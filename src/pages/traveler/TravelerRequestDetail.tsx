@@ -367,7 +367,7 @@ const TravelerRequestDetail = () => {
 
         {match.status === "accepted" && (
           <div className="mt-6 space-y-6">
-            <RequestMessages requestId={request.id} otherName={counterparty?.first_name} />
+            <RequestMessages requestId={request.id} status={request.status} otherName={counterparty?.first_name} />
             {request.status === "completed" && (
               <RateCounterparty
                 requestId={request.id}

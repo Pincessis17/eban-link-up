@@ -4,8 +4,10 @@ import ebanSymbol from "@/assets/eban-symbol.png";
 import { useAuth } from "@/hooks/useAuth";
 import { AdminViewSwitcher } from "@/components/AdminViewSwitcher";
 import { ModeSwitcher } from "@/components/ModeSwitcher";
+import { useExpireStale } from "@/hooks/useExpireStale";
 
 export const TravelerNav = () => {
+  useExpireStale();
   const { signOut } = useAuth();
   const { pathname } = useLocation();
 

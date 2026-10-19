@@ -1,9 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Send, MessageCircle } from "lucide-react";
+import { Send, MessageCircle, Lock, Phone, ShieldAlert } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
-import { errMsg } from "@/lib/marketplace";
+import { errMsg, CHAT_OPEN_STATUSES, PAYMENT_WINDOW_HOURS } from "@/lib/marketplace";
+
+// Phone numbers, emails and chat apps: a nudge to keep the deal on Eban.
+const CONTACT_PATTERN = /(\+?\d[\d\s().-]{7,}\d)|([\w.+-]+@[\w-]+\.[\w.]+)|whats\s?app|telegram|signal|paypal|western\s?union|cash\s+app|momo|mobile\s+money|outside/i;
 
 interface Message {
   id: string;
@@ -13,21 +16,29 @@ interface Message {
 }
 
 /** Simple chat between the sender and the matched traveler of one request. */
-export const RequestMessages = ({ requestId, otherName }: { requestId: string; otherName?: string }) => {
+export const RequestMessages = ({ requestId, status, otherName }: { requestId: string; status: string; otherName?: string }) => {
   const { user } = useAuth();
+  const open = CHAT_OPEN_STATUSES.includes(status);
+  const [contact, setContact] = useState<{ first_name: string; phone: string | null } | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [body, setBody] = useState("");
   const [sending, setSending] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
 
   const load = useCallback(async () => {
+    if (!open) return;
     const { data } = await supabase
       .from("messages")
       .select("id, author_id, body, created_at")
       .eq("request_id", requestId)
       .order("created_at", { ascending: true });
     setMessages(data ?? []);
-  }, [requestId]);
+  }, [requestId, open]);
+
+  useEffect(() => {
+    if (!open) return;
+    supabase.rpc("get_handover_contact", { p_request_id: requestId }).then(({ data }) => setContact(data?.[0] ?? null));
+  }, [requestId, open]);
 
   useEffect(() => {
     load();
@@ -54,6 +65,21 @@ export const RequestMessages = ({ requestId, otherName }: { requestId: string; o
     load();
   };
 
+  if (!open) {
+    return (
+      <div className="bg-card rounded-3xl border border-border/80 p-6 shadow-[var(--shadow-card)]">
+        <h3 className="font-display text-xl font-medium text-foreground mb-1 flex items-center gap-2">
+          <Lock className="w-5 h-5 text-gold-dark" /> Messages unlock after payment
+        </h3>
+        <p className="font-body text-sm text-muted-foreground">
+          Once the sender's payment is confirmed, EBAN holds the money and you can chat with {otherName ?? "each other"} and
+          get the handover contact. Until then, everything is agreed here in the app. Unpaid matches are released after{" "}
+          {PAYMENT_WINDOW_HOURS} hours so the space goes back on offer.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-card rounded-3xl border border-border/80 p-6 shadow-[var(--shadow-card)]">
       <h3 className="font-display text-xl font-medium text-foreground mb-1 flex items-center gap-2">
@@ -63,6 +89,15 @@ export const RequestMessages = ({ requestId, otherName }: { requestId: string; o
         Agree on the handover place and time here{otherName ? ` with ${otherName}` : ""}. Keep payments and personal
         details on EBAN so both of you stay protected.
       </p>
+      {contact && (
+        <p className="font-body text-sm text-foreground bg-secondary/60 rounded-xl px-4 py-3 mb-4 flex items-center gap-2">
+          <Phone className="w-4 h-4 text-gold-dark" />
+          <span>
+            Handover contact: <strong>{contact.first_name}</strong>
+            {contact.phone ? <> · <span className="font-mono">{contact.phone}</span></> : " (no phone number added yet, use the chat)"}
+          </span>
+        </p>
+      )}
 
       <div className="max-h-72 overflow-y-auto space-y-2 mb-4 pr-1">
         {messages.length === 0 && (
@@ -88,6 +123,13 @@ export const RequestMessages = ({ requestId, otherName }: { requestId: string; o
         <div ref={endRef} />
       </div>
 
+      {CONTACT_PATTERN.test(body) && (
+        <p className="font-body text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-2 flex items-start gap-2">
+          <ShieldAlert className="w-4 h-4 shrink-0 mt-0.5" />
+          Paying or arranging anything outside EBAN removes your protection: escrow, dispute help and your ratings only
+          work for deliveries paid through EBAN.
+        </p>
+      )}
       <form onSubmit={send} className="flex gap-2">
         <input
           value={body}

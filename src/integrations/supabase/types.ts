@@ -832,6 +832,12 @@ export type Database = {
     Functions: {
       admin_delete_traveller: { Args: { p_traveller_id: string }; Returns: undefined }
       is_admin: { Args: never; Returns: boolean }
+      switch_role: { Args: { p_role: string }; Returns: string }
+      expire_stale_matches: { Args: { p_hours?: number }; Returns: number }
+      get_handover_contact: {
+        Args: { p_request_id: string }
+        Returns: { counterparty_role: string; first_name: string; phone: string | null }[]
+      }
       report_payment_sent: { Args: { p_request_id: string }; Returns: undefined }
       admin_confirm_payment: { Args: { p_request_id: string }; Returns: undefined }
       admin_reject_payment: { Args: { p_request_id: string }; Returns: undefined }

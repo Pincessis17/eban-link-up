@@ -364,7 +364,7 @@ const SenderRequestDetail = () => {
                 {counterparty?.first_name ?? "The traveler"} accepted. Pay to lock it in.
               </h4>
               <p className="font-body text-xs text-muted-foreground mt-1">
-                EBAN holds your payment and only releases it to the traveler after you confirm you received the item.
+                EBAN holds your payment and only releases it to the traveler after you confirm you received the item. Chat and the handover contact unlock once payment is confirmed. Unpaid matches are released after 48 hours.
               </p>
             </div>
             <button
@@ -577,7 +577,7 @@ const SenderRequestDetail = () => {
 
         {hasTraveler && (
           <div className="mt-8 space-y-6">
-            <RequestMessages requestId={request.id} otherName={counterparty?.first_name} />
+            <RequestMessages requestId={request.id} status={request.status} otherName={counterparty?.first_name} />
             {request.status === "completed" && (
               <RateCounterparty
                 requestId={request.id}

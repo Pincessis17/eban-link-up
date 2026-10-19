@@ -20,15 +20,42 @@ const AdminPayments = () => {
   const [rows, setRows] = useState<PaymentRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
+  const [waiting, setWaiting] = useState<{ id: string; origin_city: string; destination_city: string; status: string; matched_at: string | null; sender: string; traveller: string }[]>([]);
 
   const load = useCallback(async () => {
     setLoading(true);
+    await supabase.rpc("expire_stale_matches");
     const { data } = await supabase
       .from("payments")
       .select("id, request_id, amount, service_fee, status, created_at, delivery_requests(origin_city, destination_city), profiles:sender_id(full_name, email)")
       .in("status", ["pending", "held"])
       .order("created_at", { ascending: false });
     setRows((data as unknown as PaymentRow[]) || []);
+
+    // Matches that have not been paid yet, oldest first. These expire after the payment window.
+    const { data: unpaid } = await (supabase as any)
+      .from("delivery_requests")
+      .select("id, origin_city, destination_city, status, matched_at, sender_id, matched_traveller_id")
+      .in("status", ["matched", "accepted_by_traveller"])
+      .order("matched_at", { ascending: true });
+    const list = (unpaid ?? []) as any[];
+    if (list.length === 0) {
+      setWaiting([]);
+    } else {
+      const { data: senders } = await supabase.from("profiles").select("id, full_name").in("id", list.map((r) => r.sender_id));
+      const { data: travs } = await supabase.from("traveller_profiles").select("id, name").in("id", list.map((r) => r.matched_traveller_id).filter(Boolean));
+      setWaiting(
+        list.map((r) => ({
+          id: r.id,
+          origin_city: r.origin_city,
+          destination_city: r.destination_city,
+          status: r.status,
+          matched_at: r.matched_at,
+          sender: senders?.find((s) => s.id === r.sender_id)?.full_name ?? "Sender",
+          traveller: travs?.find((t) => t.id === r.matched_traveller_id)?.name ?? "Traveller",
+        }))
+      );
+    }
     setLoading(false);
   }, []);
   useEffect(() => {
@@ -99,6 +126,31 @@ const AdminPayments = () => {
             {pending.map((r) => (
               <Card key={r.id} r={r} actions />
             ))}
+          </div>
+
+          <h2 className="font-display text-lg font-semibold mb-1">Matched, not paid yet ({waiting.length})</h2>
+          <p className="font-body text-xs text-muted-foreground mb-3">
+            Chat stays locked until payment. Matches still unpaid after 48 hours are released automatically. Many stalled
+            matches with the same people can mean a deal moved off Eban.
+          </p>
+          <div className="grid gap-3 mb-10">
+            {!loading && waiting.length === 0 && (
+              <p className="font-body text-sm text-muted-foreground bg-card p-6 rounded-2xl border border-border">No unpaid matches.</p>
+            )}
+            {waiting.map((w) => {
+              const hrs = w.matched_at ? Math.floor((Date.now() - new Date(w.matched_at).getTime()) / 3600000) : 0;
+              return (
+                <div key={w.id} className="p-4 rounded-xl border border-border bg-card flex items-center justify-between gap-4">
+                  <div>
+                    <p className="font-display text-sm font-bold text-foreground">{w.origin_city} → {w.destination_city}</p>
+                    <p className="font-body text-xs text-muted-foreground mt-1">{w.sender} with {w.traveller} · {w.status === "matched" ? "waiting for traveler" : "accepted, waiting for payment"}</p>
+                  </div>
+                  <span className={`font-body text-xs font-semibold px-3 py-1 rounded-full ${hrs >= 24 ? "bg-red-100 text-red-700" : "bg-secondary text-muted-foreground"}`}>
+                    {hrs}h ago
+                  </span>
+                </div>
+              );
+            })}
           </div>
 
           <h2 className="font-display text-lg font-semibold mb-3">Held for travelers ({held.length})</h2>
