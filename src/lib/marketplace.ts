@@ -89,9 +89,9 @@ export const errMsg = (e: unknown, fallback = "Something went wrong. Please try 
 export const formatDate = (d: string | null | undefined) =>
   d ? new Date(d).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }) : "Flexible";
 
-/** Statuses where Eban holds the sender's money. Chat and handover contact unlock here, not before. */
+/** Statuses where sender and traveller can chat: from the moment they are matched. */
 export const CHAT_OPEN_STATUSES = [
-  "paid", "dropped_off", "handed_to_traveller", "in_transit", "delivered", "completed", "disputed",
+  "matched", "accepted_by_traveller", "paid", "dropped_off", "handed_to_traveller", "in_transit", "delivered", "completed", "disputed",
 ];
 
 /** Hours a match can wait for payment before it is released. */

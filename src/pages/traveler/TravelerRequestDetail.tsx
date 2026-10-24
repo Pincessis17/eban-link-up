@@ -6,6 +6,7 @@ import { toast } from "@/hooks/use-toast";
 import { TravelerNav } from "@/components/TravelerNav";
 import { SignaturePad } from "@/components/SignaturePad";
 import { ProfileLink } from "@/components/ProfileLink";
+import { ExtraBagCard } from "@/components/ExtraBagCard";
 import { RequestMessages } from "@/components/RequestMessages";
 import { RateCounterparty } from "@/components/RateCounterparty";
 import { ReportIssueButton } from "@/components/ReportIssueButton";
@@ -372,8 +373,9 @@ const TravelerRequestDetail = () => {
           )}
         </div>
 
-        {match.status === "accepted" && (
+        {(match.status === "accepted" || match.status === "pending") && (
           <div className="mt-6 space-y-6">
+            {match.status === "accepted" && <ExtraBagCard requestId={request.id} role="traveller" requestStatus={request.status} />}
             <RequestMessages requestId={request.id} status={request.status} otherName={counterparty?.first_name} />
             {request.status === "completed" && (
               <RateCounterparty

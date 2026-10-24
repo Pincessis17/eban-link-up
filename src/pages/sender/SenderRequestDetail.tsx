@@ -9,6 +9,8 @@ import { ProfileLink } from "@/components/ProfileLink";
 import { RequestMessages } from "@/components/RequestMessages";
 import { RateCounterparty } from "@/components/RateCounterparty";
 import { ReportIssueButton } from "@/components/ReportIssueButton";
+import { ReportNotReceivedButton } from "@/components/ReportNotReceivedButton";
+import { ExtraBagCard } from "@/components/ExtraBagCard";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { PAYMENT_METHODS, paymentReference } from "@/lib/paymentConfig";
 import { calcServiceFee, usePlatformFee } from "@/lib/fees";
@@ -387,20 +389,23 @@ const SenderRequestDetail = () => {
         )}
 
         {request.status === "delivered" && (
-          <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-6 mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-6 mb-8 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
             <div>
               <h4 className="font-display text-lg font-semibold text-emerald-700">The traveler says it's delivered</h4>
               <p className="font-body text-xs text-muted-foreground mt-1">
-                Check the item. Confirming releases {money(price)} to the traveler. If something is wrong, report an issue instead.
+                Check the item. Confirming releases {money(price)} to the traveler. If it hasn't reached you, say so and your payment stays safe in escrow while EBAN looks into it.
               </p>
             </div>
-            <button
-              onClick={confirmReceipt}
-              disabled={acting}
-              className="bg-emerald-600 text-white font-body font-bold text-xs uppercase tracking-wider py-3 px-6 rounded-xl hover:bg-emerald-700 transition-all shadow-sm disabled:opacity-50 whitespace-nowrap"
-            >
-              {acting ? "Confirming..." : "Confirm receipt & release payment"}
-            </button>
+            <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+              <ReportNotReceivedButton requestId={request.id} onDone={load} />
+              <button
+                onClick={confirmReceipt}
+                disabled={acting}
+                className="bg-emerald-600 text-white font-body font-bold text-xs uppercase tracking-wider py-3 px-6 rounded-xl hover:bg-emerald-700 transition-all shadow-sm disabled:opacity-50 whitespace-nowrap"
+              >
+                {acting ? "Confirming..." : "Confirm receipt & release payment"}
+              </button>
+            </div>
           </div>
         )}
 
@@ -429,6 +434,8 @@ const SenderRequestDetail = () => {
             </div>
           </div>
         )}
+
+        {hasTraveler && <ExtraBagCard requestId={request.id} role="sender" requestStatus={request.status} />}
 
         {/* Package Specifications Container */}
         <div className="bg-card rounded-3xl border border-border/80 p-8 shadow-[var(--shadow-card)]">

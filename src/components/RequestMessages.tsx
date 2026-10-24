@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Send, MessageCircle, Lock, Phone, ShieldAlert, X, ChevronDown } from "lucide-react";
+import { Send, MessageCircle, Lock, Phone, ShieldCheck, X, ChevronDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
-import { errMsg, CHAT_OPEN_STATUSES, PAYMENT_WINDOW_HOURS } from "@/lib/marketplace";
+import { errMsg, CHAT_OPEN_STATUSES } from "@/lib/marketplace";
 
-// Phone numbers, emails and chat apps: a nudge to keep the deal on Eban.
+// Phone numbers, emails and payment apps: the moment to remind people that escrow is the safer way to pay.
 const CONTACT_PATTERN = /(\+?\d[\d\s().-]{7,}\d)|([\w.+-]+@[\w-]+\.[\w.]+)|whats\s?app|telegram|signal|paypal|western\s?union|cash\s+app|momo|mobile\s+money|outside/i;
 
 interface Message {
@@ -103,7 +103,7 @@ export const RequestMessages = ({ requestId, status, otherName }: { requestId: s
       type="button"
       onClick={() => setExpanded((v) => !v)}
       aria-expanded={expanded}
-      aria-label={expanded ? "Close chat" : chatOpen ? "Open chat" : "Chat locked until payment"}
+      aria-label={expanded ? "Close chat" : chatOpen ? "Open chat" : "Chat not available"}
       className="relative h-14 w-14 rounded-full bg-gradient-gold text-accent-foreground shadow-lg flex items-center justify-center hover:opacity-90 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       {expanded ? <ChevronDown className="w-6 h-6" /> : chatOpen ? <MessageCircle className="w-6 h-6" /> : <Lock className="w-6 h-6" />}
@@ -124,13 +124,12 @@ export const RequestMessages = ({ requestId, status, otherName }: { requestId: s
           <div className={panel} role="dialog" aria-label="Chat locked">
             <div className="flex items-start justify-between gap-3 mb-2">
               <h3 className="font-display text-base font-medium text-foreground flex items-center gap-2">
-                <Lock className="w-4 h-4 text-gold-dark" /> Messages unlock after payment
+                <Lock className="w-4 h-4 text-gold-dark" /> Chat is not available
               </h3>
               <button onClick={() => setExpanded(false)} aria-label="Close" className="text-muted-foreground"><X className="w-4 h-4" /></button>
             </div>
             <p className="font-body text-xs text-muted-foreground">
-              Once the sender's payment is confirmed, EBAN holds the money and you can chat with {otherName ?? "each other"} and
-              get the handover contact. Unpaid matches are released after {PAYMENT_WINDOW_HOURS} hours so the space goes back on offer.
+              Chat opens as soon as a traveler is matched with this request and closes if the request is cancelled.
             </p>
           </div>
         )}
@@ -152,7 +151,11 @@ export const RequestMessages = ({ requestId, status, otherName }: { requestId: s
             </button>
           </div>
           <p className="font-body text-[11px] text-muted-foreground mb-3">
-            Agree on the handover place and time here. Keep payments and personal details on EBAN so both of you stay protected.
+            Ask questions and agree on the handover here. The phone number for calls appears once the traveler accepts.
+          </p>
+          <p className="font-body text-[11px] text-foreground bg-gold/10 border border-gold/30 rounded-lg px-3 py-2 mb-3 flex items-start gap-2">
+            <ShieldCheck className="w-4 h-4 shrink-0 mt-0.5 text-gold-dark" />
+            It is safer to pay through EBAN. Your money is held in escrow until the parcel arrives, and EBAN steps in if something goes wrong.
           </p>
           {contact && (
             <p className="font-body text-xs text-foreground bg-secondary/60 rounded-xl px-3 py-2 mb-3 flex items-center gap-2">
@@ -189,10 +192,9 @@ export const RequestMessages = ({ requestId, status, otherName }: { requestId: s
           </div>
 
           {CONTACT_PATTERN.test(body) && (
-            <p className="font-body text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-2 flex items-start gap-2">
-              <ShieldAlert className="w-4 h-4 shrink-0 mt-0.5" />
-              Paying or arranging anything outside EBAN removes your protection: escrow, dispute help and your ratings only
-              work for deliveries paid through EBAN.
+            <p className="font-body text-[11px] text-foreground bg-gold/15 border border-gold/40 rounded-lg px-3 py-2 mb-2 flex items-start gap-2">
+              <ShieldCheck className="w-4 h-4 shrink-0 mt-0.5 text-gold-dark" />
+              Sending money through EBAN escrow keeps you covered: disputes, refunds and your ratings only work for deliveries paid there.
             </p>
           )}
           <form onSubmit={send} className="flex gap-2">

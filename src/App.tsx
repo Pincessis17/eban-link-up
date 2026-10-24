@@ -4,6 +4,10 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import InstallPrompt from "@/components/InstallPrompt";
 import Profile from "./pages/Profile";
+import AdminDisputes from "./pages/admin/AdminDisputes";
+import AdminExtraBags from "./pages/admin/AdminExtraBags";
+import AdminIdentity from "./pages/admin/AdminIdentity";
+import VerifyIdentity from "./pages/VerifyIdentity";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
@@ -77,6 +81,10 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
+            <Route path="/admin/identity" element={<ProtectedRoute requireRole="Admin"><AdminIdentity /></ProtectedRoute>} />
+            <Route path="/verify-identity" element={<ProtectedRoute><VerifyIdentity /></ProtectedRoute>} />
+            <Route path="/admin/extra-bags" element={<ProtectedRoute requireRole="Admin"><AdminExtraBags /></ProtectedRoute>} />
+            <Route path="/admin/disputes" element={<ProtectedRoute requireRole="Admin"><AdminDisputes /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/profile/:userId" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route

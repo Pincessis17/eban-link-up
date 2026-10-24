@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { LogOut, Package, Users, GitMerge, ShieldCheck, DollarSign, Globe, Eye, Plane, MessageSquare, Percent } from "lucide-react";
+import { LogOut, Package, Users, GitMerge, ShieldCheck, DollarSign, Globe, Eye, Plane, MessageSquare, Percent, AlertTriangle, Luggage, Video } from "lucide-react";
 import ebanSymbol from "@/assets/eban-symbol.png";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -8,8 +8,11 @@ const NAV_ITEMS = [
   { to: "/admin/travelers", label: "Traveler Directory", icon: Users },
   { to: "/admin/match", label: "Smart Matcher", icon: GitMerge },
   { to: "/admin/verifications", label: "ID Verifications", icon: ShieldCheck },
+  { to: "/admin/identity", label: "Face Checks", icon: Video },
   { to: "/admin/payments", label: "Payments In", icon: DollarSign },
   { to: "/admin/payouts", label: "Payout Console", icon: DollarSign },
+  { to: "/admin/extra-bags", label: "Extra Bags", icon: Luggage },
+  { to: "/admin/disputes", label: "Disputes", icon: AlertTriangle },
   { to: "/admin/fees", label: "Fees", icon: Percent },
   { to: "/admin/feedback", label: "Feedback", icon: MessageSquare },
 ];

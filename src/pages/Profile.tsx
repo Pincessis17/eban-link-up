@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { Star, ShieldCheck, Package, Plane, CalendarDays } from "lucide-react";
+import { Link, useParams } from "react-router-dom";
+import { Star, ShieldCheck, Package, Plane, CalendarDays, ScanFace } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
@@ -11,7 +11,7 @@ import { AdminNav } from "@/components/AdminNav";
 
 type ProfileData = {
   user_id: string; first_name: string; full_name: string | null; is_self: boolean; avg_rating: number | null;
-  rating_count: number; parcels_sent: number; parcels_carried: number; verified: boolean; member_since: string | null;
+  rating_count: number; parcels_sent: number; parcels_carried: number; verified: boolean; member_since: string | null; face_verified: boolean;
 };
 type Review = { rating: number; comment: string | null; created_at: string; reviewer_first_name: string; reviewer_role: string; route: string };
 
@@ -101,6 +101,10 @@ const Profile = () => {
                       <ShieldCheck className={`w-3.5 h-3.5 ${data.verified ? "text-emerald-600" : "text-amber-500"}`} />
                       {data.verified ? "ID verified traveler" : "No ID verification"}
                     </span>
+                    <span className="inline-flex items-center gap-1">
+                      <ScanFace className={`w-3.5 h-3.5 ${data.face_verified ? "text-emerald-600" : "text-muted-foreground"}`} />
+                      {data.face_verified ? "Face check passed" : "No face check yet"}
+                    </span>
                   </p>
                 </div>
                 <div className="text-right">
@@ -133,6 +137,16 @@ const Profile = () => {
                 </div>
               </div>
             </div>
+
+            {own && !data.face_verified && (
+              <Link to="/verify-identity" className="mt-6 flex items-center justify-between gap-3 bg-gold/10 border border-gold/30 rounded-2xl p-5 font-body text-sm hover:bg-gold/15 transition-colors">
+                <span className="flex items-center gap-3">
+                  <ScanFace className="w-5 h-5 text-gold-dark" />
+                  <span><strong className="text-foreground">Do your face check.</strong> <span className="text-muted-foreground">A 12 second video builds trust with senders and travelers.</span></span>
+                </span>
+                <span className="text-xs font-bold uppercase tracking-wider text-gold-dark whitespace-nowrap">Start</span>
+              </Link>
+            )}
 
             {own && (
               <form onSubmit={save} className="bg-card rounded-3xl border border-border/80 p-8 shadow-[var(--shadow-card)] mt-6 space-y-4">
