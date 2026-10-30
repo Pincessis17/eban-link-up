@@ -33,6 +33,7 @@ const Profile = () => {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [saving, setSaving] = useState(false);
+  const [idStatus, setIdStatus] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     if (!id) return;
@@ -49,6 +50,12 @@ const Profile = () => {
   useEffect(() => {
     load();
   }, [load]);
+
+  useEffect(() => {
+    if (!user || (userId && userId !== user.id)) return;
+    (supabase as any).from("id_documents").select("status").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1).maybeSingle()
+      .then(({ data: d }: { data: { status: string } | null }) => setIdStatus(d?.status ?? "none"));
+  }, [user, userId]);
 
   useEffect(() => {
     if (data?.is_self) {
@@ -137,6 +144,19 @@ const Profile = () => {
                 </div>
               </div>
             </div>
+
+            {own && idStatus && idStatus !== "approved" && idStatus !== "pending" && (
+              <Link to="/verify-id" className="mt-6 flex items-center justify-between gap-3 bg-gold/10 border border-gold/30 rounded-2xl p-5 font-body text-sm hover:bg-gold/15 transition-colors">
+                <span className="flex items-center gap-3">
+                  <ShieldCheck className="w-5 h-5 text-gold-dark" />
+                  <span><strong className="text-foreground">{idStatus === "rejected" ? "Upload your ID again." : "Upload your ID."}</strong> <span className="text-muted-foreground">Every sender and traveller shows an ID before using Eban.</span></span>
+                </span>
+                <span className="text-xs font-bold uppercase tracking-wider text-gold-dark whitespace-nowrap">Start</span>
+              </Link>
+            )}
+            {own && idStatus === "pending" && (
+              <p className="mt-6 font-body text-sm text-muted-foreground bg-card border border-border/80 rounded-2xl p-5">Your ID is with our team for review.</p>
+            )}
 
             {own && !data.face_verified && (
               <Link to="/verify-identity" className="mt-6 flex items-center justify-between gap-3 bg-gold/10 border border-gold/30 rounded-2xl p-5 font-body text-sm hover:bg-gold/15 transition-colors">

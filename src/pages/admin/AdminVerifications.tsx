@@ -16,7 +16,17 @@ interface VerificationRow {
   traveller_profiles: { name: string | null; school_affiliation: string | null } | null;
 }
 
+interface IdRow {
+  id: string;
+  user_id: string;
+  document_url: string;
+  id_document_type: string;
+  created_at: string;
+  profiles: { full_name: string | null; email: string | null; role: string | null } | null;
+}
+
 const AdminVerifications = () => {
+  const [ids, setIds] = useState<IdRow[]>([]);
   const { user } = useAuth();
   const [rows, setRows] = useState<VerificationRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,6 +40,12 @@ const AdminVerifications = () => {
       .eq("status", "pending")
       .order("created_at", { ascending: true });
     setRows((data as unknown as VerificationRow[]) || []);
+    const { data: idData } = await (supabase as any)
+      .from("id_documents")
+      .select("id, user_id, document_url, id_document_type, created_at, profiles:user_id(full_name, email, role)")
+      .eq("status", "pending")
+      .order("created_at", { ascending: true });
+    setIds((idData as IdRow[]) || []);
     setLoading(false);
   }, []);
 
@@ -64,6 +80,19 @@ const AdminVerifications = () => {
     load();
   };
 
+  const reviewId = async (row: IdRow, approve: boolean) => {
+    const note = approve ? null : window.prompt("Reason for rejecting (the person will see this):") ;
+    if (!approve && note === null) return;
+    setBusy(row.id);
+    const { error } = await (supabase as any).rpc("admin_review_id_document", { p_id: row.id, p_approve: approve, p_note: note });
+    setBusy(null);
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+      return;
+    }
+    load();
+  };
+
   const handleDelete = async (row: VerificationRow): Promise<string | null> => {
     const { data, error } = await supabase.from("verifications").delete().eq("id", row.id).select("id");
     if (error) return error.message;
@@ -78,14 +107,38 @@ const AdminVerifications = () => {
     <div className={`min-h-screen bg-background ${ADMIN_SIDEBAR_OFFSET_CLASS}`}>
       <AdminNav />
       <div className="container mx-auto px-6 py-10">
-        <h1 className="font-display text-2xl font-bold text-foreground mb-8">Traveler verifications</h1>
+        <h1 className="font-display text-2xl font-bold text-foreground mb-8">ID verifications</h1>
 
         {loading && <div className="font-body text-sm text-muted-foreground">Loading...</div>}
-        {!loading && rows.length === 0 && (
+        {!loading && rows.length === 0 && ids.length === 0 && (
           <div className="text-center py-16 bg-card rounded-2xl border border-border font-body text-sm text-muted-foreground">
             No pending verifications.
           </div>
         )}
+
+        <div className="grid gap-3 max-w-2xl mb-3">
+          {ids.map((r) => (
+            <div key={r.id} className="p-5 rounded-xl border border-border bg-card flex items-center justify-between gap-4">
+              <div>
+                <p className="font-display text-sm font-bold text-foreground">{r.profiles?.full_name ?? r.profiles?.email ?? "User"}</p>
+                <p className="font-body text-xs text-muted-foreground mt-1">
+                  {r.id_document_type} &middot; {r.profiles?.role ?? "-"} &middot; {new Date(r.created_at).toLocaleDateString()}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button onClick={() => handleView(r.document_url)} className="p-2 rounded-lg border border-border text-foreground hover:bg-secondary transition-colors" title="View document">
+                  <Eye className="w-4 h-4" />
+                </button>
+                <button onClick={() => reviewId(r, true)} disabled={busy === r.id} className="p-2 rounded-lg bg-green-100 text-green-800 hover:opacity-80 disabled:opacity-50" title="Approve">
+                  <Check className="w-4 h-4" />
+                </button>
+                <button onClick={() => reviewId(r, false)} disabled={busy === r.id} className="p-2 rounded-lg bg-red-100 text-red-800 hover:opacity-80 disabled:opacity-50" title="Reject">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
 
         <div className="grid gap-3 max-w-2xl">
           {rows.map((r) => (

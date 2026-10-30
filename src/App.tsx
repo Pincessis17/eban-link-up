@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import InstallPrompt from "@/components/InstallPrompt";
@@ -8,6 +8,7 @@ import AdminDisputes from "./pages/admin/AdminDisputes";
 import AdminExtraBags from "./pages/admin/AdminExtraBags";
 import AdminIdentity from "./pages/admin/AdminIdentity";
 import VerifyIdentity from "./pages/VerifyIdentity";
+import VerifyId from "./pages/VerifyId";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
@@ -23,7 +24,6 @@ import TravelerHome from "./pages/traveler/TravelerHome.tsx";
 import TravelerNewTrip from "./pages/traveler/TravelerNewTrip.tsx";
 import TravelerRequests from "./pages/traveler/TravelerRequests.tsx";
 import TravelerRequestDetail from "./pages/traveler/TravelerRequestDetail.tsx";
-import TravelerVerification from "./pages/traveler/TravelerVerification.tsx";
 import TravelerEarnings from "./pages/traveler/TravelerEarnings.tsx";
 import AdminMatch from "./pages/admin/AdminMatch.tsx";
 import AdminVerifications from "./pages/admin/AdminVerifications.tsx";
@@ -82,6 +82,7 @@ const App = () => (
               }
             />
             <Route path="/admin/identity" element={<ProtectedRoute requireRole="Admin"><AdminIdentity /></ProtectedRoute>} />
+            <Route path="/verify-id" element={<ProtectedRoute><VerifyId /></ProtectedRoute>} />
             <Route path="/verify-identity" element={<ProtectedRoute><VerifyIdentity /></ProtectedRoute>} />
             <Route path="/admin/extra-bags" element={<ProtectedRoute requireRole="Admin"><AdminExtraBags /></ProtectedRoute>} />
             <Route path="/admin/disputes" element={<ProtectedRoute requireRole="Admin"><AdminDisputes /></ProtectedRoute>} />
@@ -163,7 +164,7 @@ const App = () => (
               path="/traveler/verification"
               element={
                 <ProtectedRoute requireRole="Traveller">
-                  <TravelerVerification />
+                  <Navigate to="/verify-id" replace />
                 </ProtectedRoute>
               }
             />
