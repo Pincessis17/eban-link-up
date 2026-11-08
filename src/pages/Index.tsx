@@ -234,14 +234,17 @@ const Escrow = () => (
 
 const Fence = () => (
   <section id="safety" className="py-20 md:py-24 bg-paper-2">
-    <div className="container mx-auto grid md:grid-cols-2 gap-12 items-center">
+    <div className="container mx-auto grid md:grid-cols-[1.25fr_1fr] gap-10 lg:gap-14 items-center">
       <div className="relative mb-8 md:mb-0">
-        <div className="rounded-3xl overflow-hidden aspect-[5/4] bg-ink-2">
+        {/* The illustration is wide, so it sits whole inside a squarer frame, on a soft blurred copy of itself. */}
+        <div className="relative rounded-3xl overflow-hidden aspect-[6/5] bg-ink-2">
+          <img src={journeyPhoto} alt="" aria-hidden="true" loading="lazy" className="absolute inset-0 w-full h-full object-cover scale-125 blur-2xl opacity-70" />
+          <div className="absolute inset-0 bg-paper/25" />
           <img
             src={journeyPhoto}
             alt="A sender posts items, a traveller with spare luggage space carries them, and the receiver collects the parcel"
             loading="lazy"
-            className="w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-contain"
           />
         </div>
         <div className="absolute -bottom-6 left-4 sm:left-6 inline-flex items-center gap-3 bg-white rounded-2xl border border-line px-4 py-3 shadow-[var(--shadow-elevated)]">
