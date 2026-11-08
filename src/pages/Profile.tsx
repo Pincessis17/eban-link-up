@@ -34,6 +34,7 @@ const Profile = () => {
   const [phone, setPhone] = useState("");
   const [saving, setSaving] = useState(false);
   const [idStatus, setIdStatus] = useState<string | null>(null);
+  const [faceStatus, setFaceStatus] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     if (!id) return;
@@ -55,6 +56,8 @@ const Profile = () => {
     if (!user || (userId && userId !== user.id)) return;
     (supabase as any).from("id_documents").select("status").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1).maybeSingle()
       .then(({ data: d }: { data: { status: string } | null }) => setIdStatus(d?.status ?? "none"));
+    (supabase as any).from("identity_checks").select("status").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1).maybeSingle()
+      .then(({ data: d }: { data: { status: string } | null }) => setFaceStatus(d?.status ?? "none"));
   }, [user, userId]);
 
   useEffect(() => {
@@ -79,6 +82,7 @@ const Profile = () => {
 
   const Nav = me?.role === "Admin" ? AdminNav : me?.role === "Traveller" ? TravelerNav : SenderNav;
   const own = data?.is_self;
+  const isMine = !!user && (!userId || userId === user.id);
 
   return (
     <div className="min-h-screen bg-background">
@@ -145,27 +149,46 @@ const Profile = () => {
               </div>
             </div>
 
-            {own && idStatus && idStatus !== "approved" && idStatus !== "pending" && (
-              <Link to="/verify-id" className="mt-6 flex items-center justify-between gap-3 bg-gold/10 border border-gold/30 rounded-2xl p-5 font-body text-sm hover:bg-gold/15 transition-colors">
-                <span className="flex items-center gap-3">
-                  <ShieldCheck className="w-5 h-5 text-gold-dark" />
-                  <span><strong className="text-foreground">{idStatus === "rejected" ? "Upload your ID again." : "Upload your ID."}</strong> <span className="text-muted-foreground">Every sender and traveller shows an ID before using Eban.</span></span>
-                </span>
-                <span className="text-xs font-bold uppercase tracking-wider text-gold-dark whitespace-nowrap">Start</span>
-              </Link>
-            )}
-            {own && idStatus === "pending" && (
-              <p className="mt-6 font-body text-sm text-muted-foreground bg-card border border-border/80 rounded-2xl p-5">Your ID is with our team for review.</p>
-            )}
-
-            {own && !data.face_verified && (
-              <Link to="/verify-identity" className="mt-6 flex items-center justify-between gap-3 bg-gold/10 border border-gold/30 rounded-2xl p-5 font-body text-sm hover:bg-gold/15 transition-colors">
-                <span className="flex items-center gap-3">
-                  <ScanFace className="w-5 h-5 text-gold-dark" />
-                  <span><strong className="text-foreground">Do your face check.</strong> <span className="text-muted-foreground">A 12 second video builds trust with senders and travelers.</span></span>
-                </span>
-                <span className="text-xs font-bold uppercase tracking-wider text-gold-dark whitespace-nowrap">Start</span>
-              </Link>
+            {isMine && (
+              <div className="bg-card rounded-2xl border border-line p-6 md:p-8 mt-6">
+                <h2 className="font-display text-xl text-ink">Verification</h2>
+                <p className="font-body text-sm text-slate mt-1 mb-5">Every sender and traveller does both checks. A person on our team reviews them.</p>
+                {[
+                  { key: "id", label: "ID document", desc: "A photo of your passport or national ID.", Icon: ShieldCheck, status: idStatus, to: "/verify-id" },
+                  { key: "face", label: "Face check", desc: "A 12 second video of your face.", Icon: ScanFace, status: faceStatus, to: "/verify-identity" },
+                ].map((row) => {
+                  const st = row.status ?? "loading";
+                  const badge =
+                    st === "approved" ? { t: "Verified", c: "bg-forest/10 text-forest" }
+                    : st === "pending" ? { t: "In review", c: "bg-brass/15 text-brass-deep" }
+                    : st === "rejected" ? { t: "Not accepted", c: "bg-kente/10 text-kente" }
+                    : st === "loading" ? { t: "Checking...", c: "bg-paper-2 text-slate" }
+                    : { t: "Not started", c: "bg-paper-2 text-slate" };
+                  const action = st === "none" ? "Start" : st === "rejected" ? "Try again" : st === "approved" || st === "pending" ? "View" : null;
+                  return (
+                    <div key={row.key} className="flex items-center gap-4 py-4 border-t border-line">
+                      <span className="w-10 h-10 shrink-0 rounded-full bg-paper-2 border border-line flex items-center justify-center"><row.Icon className="w-4 h-4 text-brass-deep" /></span>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-body text-[15px] font-semibold text-ink flex flex-wrap items-center gap-2">
+                          {row.label}
+                          <span className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${badge.c}`}>{badge.t}</span>
+                        </p>
+                        <p className="font-body text-sm text-slate mt-0.5">{row.desc}</p>
+                      </div>
+                      {action && (
+                        <Link
+                          to={row.to}
+                          className={`shrink-0 h-10 inline-flex items-center px-4 rounded-lg font-body text-sm font-semibold ${
+                            action === "View" ? "border border-line bg-white text-ink hover:bg-paper-2" : "bg-brass text-ink hover:bg-[#CB9A22]"
+                          }`}
+                        >
+                          {action}
+                        </Link>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             )}
 
             {own && (
