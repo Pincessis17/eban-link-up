@@ -243,7 +243,7 @@ const Fence = () => (
           <img src={ebanSymbol} alt="" className="w-10 h-10 object-contain scale-150" />
           <div>
             <p className="font-display text-lg leading-none text-ink">Eban</p>
-            <p className="font-body text-xs text-slate mt-1">Adinkra for “fence”: safety and home</p>
+            <p className="font-body text-xs text-slate mt-1">A fence around your parcel</p>
           </div>
         </div>
       </div>
