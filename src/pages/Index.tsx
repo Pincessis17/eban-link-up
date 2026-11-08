@@ -235,18 +235,16 @@ const Escrow = () => (
 const Fence = () => (
   <section id="safety" className="py-20 md:py-24 bg-paper-2">
     <div className="container mx-auto grid md:grid-cols-2 gap-12 items-center">
-      <div className="relative">
-        <div className="rounded-3xl overflow-hidden bg-white border border-line">
+      <div className="relative mb-8 md:mb-0">
+        <div className="rounded-3xl overflow-hidden aspect-[5/4] bg-ink-2">
           <img
             src={journeyPhoto}
             alt="A sender posts items, a traveller with spare luggage space carries them, and the receiver collects the parcel"
             loading="lazy"
-            width={582}
-            height={262}
-            className="w-full h-auto block"
+            className="w-full h-full object-cover"
           />
         </div>
-        <div className="mt-4 inline-flex items-center gap-3 bg-white rounded-2xl border border-line px-4 py-3">
+        <div className="absolute -bottom-6 left-4 sm:left-6 inline-flex items-center gap-3 bg-white rounded-2xl border border-line px-4 py-3 shadow-[var(--shadow-elevated)]">
           <img src={ebanSymbol} alt="" className="w-10 h-10 object-contain scale-150" />
           <div>
             <p className="font-display text-lg leading-none text-ink">Eban</p>
