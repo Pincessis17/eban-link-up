@@ -5,47 +5,72 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
 import { AdminNav, ADMIN_SIDEBAR_OFFSET_CLASS } from "@/components/AdminNav";
 import { AdminDeleteButton } from "@/components/AdminDeleteButton";
+import { ReviewBadge, ReviewTabs, type ReviewFilter } from "@/components/ReviewStatus";
 
-interface VerificationRow {
+/** One row on the page, from either the shared ID table (everyone) or the older traveller-only table. */
+type Item = {
+  key: string;
+  source: "id" | "legacy";
   id: string;
-  document_url: string;
+  name: string;
+  detail: string;
+  docType: string;
+  documentUrl: string;
   status: string;
-  id_document_type: string | null;
-  created_at: string;
-  traveller_id: string;
-  traveller_profiles: { name: string | null; school_affiliation: string | null } | null;
-}
-
-interface IdRow {
-  id: string;
-  user_id: string;
-  document_url: string;
-  id_document_type: string;
-  created_at: string;
-  profiles: { full_name: string | null; email: string | null; role: string | null } | null;
-}
+  note: string | null;
+  createdAt: string;
+  travellerId?: string;
+};
 
 const AdminVerifications = () => {
-  const [ids, setIds] = useState<IdRow[]>([]);
   const { user } = useAuth();
-  const [rows, setRows] = useState<VerificationRow[]>([]);
+  const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
+  const [filter, setFilter] = useState<ReviewFilter>("all");
 
   const load = useCallback(async () => {
     setLoading(true);
-    const { data } = await supabase
-      .from("verifications")
-      .select("id, document_url, status, id_document_type, created_at, traveller_id, traveller_profiles(name, school_affiliation)")
-      .eq("status", "pending")
-      .order("created_at", { ascending: true });
-    setRows((data as unknown as VerificationRow[]) || []);
-    const { data: idData } = await (supabase as any)
-      .from("id_documents")
-      .select("id, user_id, document_url, id_document_type, created_at, profiles:user_id(full_name, email, role)")
-      .eq("status", "pending")
-      .order("created_at", { ascending: true });
-    setIds((idData as IdRow[]) || []);
+    const [{ data: idData }, { data: legacy }] = await Promise.all([
+      (supabase as any)
+        .from("id_documents")
+        .select("id, user_id, document_url, id_document_type, status, reviewer_note, created_at, profiles:user_id(full_name, email, role)")
+        .order("created_at", { ascending: false })
+        .limit(300),
+      supabase
+        .from("verifications")
+        .select("id, document_url, status, id_document_type, created_at, traveller_id, traveller_profiles(name, user_id)")
+        .eq("status", "pending")
+        .order("created_at", { ascending: false }),
+    ]);
+    const a: Item[] = ((idData as any[]) ?? []).map((r) => ({
+      key: `id-${r.id}`,
+      source: "id",
+      id: r.id,
+      name: r.profiles?.full_name ?? r.profiles?.email ?? "User",
+      detail: [r.profiles?.role, r.profiles?.email].filter(Boolean).join(" · "),
+      docType: r.id_document_type,
+      documentUrl: r.document_url,
+      status: r.status,
+      note: r.reviewer_note,
+      createdAt: r.created_at,
+    }));
+    const b: Item[] = ((legacy as any[]) ?? []).map((r) => ({
+      key: `legacy-${r.id}`,
+      source: "legacy",
+      id: r.id,
+      name: r.traveller_profiles?.name ?? "Traveller",
+      detail: "Traveller (older upload)",
+      docType: r.id_document_type ?? "ID",
+      documentUrl: r.document_url,
+      status: r.status,
+      note: null,
+      createdAt: r.created_at,
+      travellerId: r.traveller_id,
+    }));
+    // Waiting first, newest first. Order is kept after a decision so the row stays put and just changes label.
+    const rank = (st: string) => (st === "pending" ? 0 : 1);
+    setItems([...a, ...b].sort((x, y) => rank(x.status) - rank(y.status) || y.createdAt.localeCompare(x.createdAt)));
     setLoading(false);
   }, []);
 
@@ -53,126 +78,104 @@ const AdminVerifications = () => {
     load();
   }, [load]);
 
-  const handleView = async (documentUrl: string) => {
-    const { data, error } = await supabase.storage.from("verification-documents").createSignedUrl(documentUrl, 600);
-    if (error || !data) {
-      toast({ title: "Error", description: "Couldn't load the document.", variant: "destructive" });
-      return;
-    }
+  const view = async (path: string) => {
+    const { data, error } = await supabase.storage.from("verification-documents").createSignedUrl(path, 600);
+    if (error || !data) return toast({ title: "Couldn't open the document", variant: "destructive" });
     window.open(data.signedUrl, "_blank", "noopener,noreferrer");
   };
 
-  const handleDecision = async (row: VerificationRow, decision: "approved" | "rejected") => {
-    setBusy(row.id);
-    const { error: verificationError } = await supabase
-      .from("verifications")
-      .update({ status: decision, reviewed_by: user?.id })
-      .eq("id", row.id);
-    const { error: profileError } = await supabase
-      .from("traveller_profiles")
-      .update({ verification_status: decision })
-      .eq("id", row.traveller_id);
-    setBusy(null);
-    if (verificationError || profileError) {
-      toast({ title: "Error", description: "Couldn't save the decision. Try again.", variant: "destructive" });
-      return;
+  const decide = async (it: Item, approve: boolean) => {
+    let note: string | null = null;
+    if (!approve) {
+      note = window.prompt("Reason for declining (the person will see this):");
+      if (note === null) return;
     }
-    load();
+    setBusy(it.key);
+    let error: { message: string } | null = null;
+    if (it.source === "id") {
+      ({ error } = await (supabase as any).rpc("admin_review_id_document", { p_id: it.id, p_approve: approve, p_note: note }));
+    } else {
+      const status = approve ? "approved" : "rejected";
+      const r1 = await supabase.from("verifications").update({ status, reviewed_by: user?.id }).eq("id", it.id);
+      const r2 = await supabase.from("traveller_profiles").update({ verification_status: status }).eq("id", it.travellerId!);
+      error = r1.error ?? r2.error;
+    }
+    setBusy(null);
+    if (error) return toast({ title: "Couldn't save", description: error.message, variant: "destructive" });
+    // Keep the row on screen with its new label.
+    setItems((prev) => prev.map((p) => (p.key === it.key ? { ...p, status: approve ? "approved" : "rejected", note } : p)));
+    toast({ title: approve ? "Approved" : "Declined", description: approve ? `${it.name} is now ID verified.` : `${it.name} can upload again.` });
   };
 
-  const reviewId = async (row: IdRow, approve: boolean) => {
-    const note = approve ? null : window.prompt("Reason for rejecting (the person will see this):") ;
-    if (!approve && note === null) return;
-    setBusy(row.id);
-    const { error } = await (supabase as any).rpc("admin_review_id_document", { p_id: row.id, p_approve: approve, p_note: note });
-    setBusy(null);
-    if (error) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
-      return;
+  const remove = async (it: Item): Promise<string | null> => {
+    if (it.source === "id") {
+      const { data: path, error } = await (supabase as any).rpc("admin_delete_id_document", { p_id: it.id });
+      if (error) return error.message;
+      if (path) await supabase.storage.from("verification-documents").remove([path as string]);
+    } else {
+      const { data, error } = await supabase.from("verifications").delete().eq("id", it.id).select("id");
+      if (error) return error.message;
+      if (!data || data.length === 0) return "Nothing was deleted. You may not have permission.";
+      await supabase.storage.from("verification-documents").remove([it.documentUrl]);
     }
-    load();
-  };
-
-  const handleDelete = async (row: VerificationRow): Promise<string | null> => {
-    const { data, error } = await supabase.from("verifications").delete().eq("id", row.id).select("id");
-    if (error) return error.message;
-    if (!data || data.length === 0) return "Nothing was deleted. You may not have permission.";
-    // Best effort: also remove the uploaded document from storage.
-    await supabase.storage.from("verification-documents").remove([row.document_url]);
-    setRows((prev) => prev.filter((r) => r.id !== row.id));
+    setItems((prev) => prev.filter((p) => p.key !== it.key));
     return null;
   };
+
+  const counts = {
+    pending: items.filter((i) => i.status === "pending").length,
+    approved: items.filter((i) => i.status === "approved").length,
+    rejected: items.filter((i) => i.status === "rejected").length,
+    all: items.length,
+  };
+  const shown = filter === "all" ? items : items.filter((i) => i.status === filter);
 
   return (
     <div className={`min-h-screen bg-background ${ADMIN_SIDEBAR_OFFSET_CLASS}`}>
       <AdminNav />
-      <div className="container mx-auto px-6 py-10">
-        <h1 className="font-display text-3xl md:text-[34px] leading-tight text-ink mb-8">ID verifications</h1>
+      <div className="container mx-auto py-10 max-w-3xl">
+        <h1 className="font-display text-3xl md:text-[34px] leading-tight text-ink mb-2">ID verifications</h1>
+        <p className="font-body text-sm text-slate mb-6">Open each document, then approve or decline. Reviewed IDs stay here with their result, and you can delete any of them.</p>
+        <ReviewTabs value={filter} onChange={setFilter} counts={counts} />
 
-        {loading && <div className="font-body text-sm text-muted-foreground">Loading...</div>}
-        {!loading && rows.length === 0 && ids.length === 0 && (
-          <div className="text-center py-16 bg-card rounded-2xl border border-border font-body text-sm text-muted-foreground">
-            No pending verifications.
+        {loading && <p className="font-body text-sm text-slate">Loading...</p>}
+        {!loading && shown.length === 0 && (
+          <div className="text-center py-14 bg-card rounded-xl border border-line font-body text-sm text-slate">
+            {filter === "pending" ? "Nothing waiting for review." : "Nothing here yet."}
           </div>
         )}
 
-        <div className="grid gap-3 max-w-2xl mb-3">
-          {ids.map((r) => (
-            <div key={r.id} className="p-5 rounded-xl border border-border bg-card flex items-center justify-between gap-4">
-              <div>
-                <p className="font-display text-sm font-bold text-foreground">{r.profiles?.full_name ?? r.profiles?.email ?? "User"}</p>
-                <p className="font-body text-sm text-slate mt-2">
-                  {r.id_document_type} &middot; {r.profiles?.role ?? "-"} &middot; {new Date(r.created_at).toLocaleDateString()}
+        <div className="grid gap-3">
+          {shown.map((it) => (
+            <div key={it.key} className="p-5 rounded-xl border border-line bg-card flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="font-body text-[15px] font-semibold text-ink">{it.name}</p>
+                  <ReviewBadge status={it.status} />
+                </div>
+                <p className="font-body text-sm text-slate mt-1">
+                  {it.docType} · {it.detail} · {new Date(it.createdAt).toLocaleDateString()}
                 </p>
+                {it.status === "rejected" && it.note && <p className="font-body text-sm text-kente mt-1">Reason: {it.note}</p>}
               </div>
-              <div className="flex items-center gap-2">
-                <button onClick={() => handleView(r.document_url)} className="p-2 rounded-lg border border-border text-foreground hover:bg-secondary transition-colors" title="View document">
-                  <Eye className="w-4 h-4" />
+              <div className="flex items-center gap-2 shrink-0">
+                <button onClick={() => view(it.documentUrl)} className="h-9 px-3 inline-flex items-center gap-1.5 rounded-lg border border-line bg-white font-body text-sm font-semibold text-ink hover:bg-paper-2">
+                  <Eye className="w-4 h-4" /> View
                 </button>
-                <button onClick={() => reviewId(r, true)} disabled={busy === r.id} className="p-2 rounded-lg bg-green-100 text-green-800 hover:opacity-80 disabled:opacity-50" title="Approve">
-                  <Check className="w-4 h-4" />
-                </button>
-                <button onClick={() => reviewId(r, false)} disabled={busy === r.id} className="p-2 rounded-lg bg-red-100 text-red-800 hover:opacity-80 disabled:opacity-50" title="Reject">
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="grid gap-3 max-w-2xl">
-          {rows.map((r) => (
-            <div key={r.id} className="p-5 rounded-xl border border-border bg-card flex items-center justify-between gap-4">
-              <div>
-                <p className="font-display text-sm font-bold text-foreground">{r.traveller_profiles?.name ?? "Traveler"}</p>
-                <p className="font-body text-sm text-slate mt-2">
-                  {r.id_document_type} &middot; {r.traveller_profiles?.school_affiliation ?? "-"} &middot; {new Date(r.created_at).toLocaleDateString()}
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <button onClick={() => handleView(r.document_url)} className="p-2 rounded-lg border border-border text-foreground hover:bg-secondary transition-colors" title="View document">
-                  <Eye className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => handleDecision(r, "approved")}
-                  disabled={busy === r.id}
-                  className="p-2 rounded-lg bg-green-100 text-green-800 hover:opacity-80 transition-opacity disabled:opacity-50"
-                  title="Approve"
-                >
-                  <Check className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => handleDecision(r, "rejected")}
-                  disabled={busy === r.id}
-                  className="p-2 rounded-lg bg-red-100 text-red-800 hover:opacity-80 transition-opacity disabled:opacity-50"
-                  title="Reject"
-                >
-                  <X className="w-4 h-4" />
-                </button>
+                {it.status === "pending" && (
+                  <>
+                    <button onClick={() => decide(it, true)} disabled={busy === it.key} className="h-9 px-3 inline-flex items-center gap-1.5 rounded-lg bg-forest text-white font-body text-sm font-semibold hover:opacity-90 disabled:opacity-50">
+                      <Check className="w-4 h-4" /> Approve
+                    </button>
+                    <button onClick={() => decide(it, false)} disabled={busy === it.key} className="h-9 px-3 inline-flex items-center gap-1.5 rounded-lg border border-kente/30 text-kente font-body text-sm font-semibold hover:bg-kente/5 disabled:opacity-50">
+                      <X className="w-4 h-4" /> Decline
+                    </button>
+                  </>
+                )}
                 <AdminDeleteButton
-                  title="Delete this verification?"
-                  description={`The ${r.id_document_type ?? "ID"} submission from ${r.traveller_profiles?.name ?? "this traveler"} will be permanently removed. This can't be undone.`}
-                  onConfirm={() => handleDelete(r)}
+                  title="Delete this ID?"
+                  description={`${it.name}'s ${it.docType} and its record will be permanently removed. If it was approved, they will need to upload an ID again. This can't be undone.`}
+                  onConfirm={() => remove(it)}
                 />
               </div>
             </div>
