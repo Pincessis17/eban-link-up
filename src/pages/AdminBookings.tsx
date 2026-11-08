@@ -75,12 +75,12 @@ const AdminBookings = () => {
       <div className="container mx-auto px-6 py-10 max-w-6xl">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-gold flex items-center justify-center shadow-md">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-gold flex items-center justify-center">
               <Package className="w-6 h-6 text-accent-foreground" />
             </div>
             <div>
-              <h1 className="font-display text-3xl font-light text-foreground">Delivery Requests Console</h1>
-              <p className="font-body text-xs text-muted-foreground mt-0.5">
+              <h1 className="font-display text-3xl md:text-[34px] leading-tight text-ink">Delivery Requests Console</h1>
+              <p className="font-body text-sm text-slate mt-2">
                 Total Requests Logged: <strong>{requests.length}</strong>
               </p>
             </div>
@@ -107,7 +107,7 @@ const AdminBookings = () => {
         )}
 
         {!loading && !error && requests.length === 0 && (
-          <div className="text-center py-20 bg-card rounded-3xl border border-border/80 p-10 max-w-lg mx-auto shadow-[var(--shadow-card)]">
+          <div className="text-center py-20 bg-card rounded-2xl border border-border/80 p-10 max-w-lg mx-auto">
             <Package className="w-12 h-12 text-gold-dark/60 mx-auto mb-4" />
             <h3 className="font-display text-2xl font-semibold text-foreground mb-2">No delivery requests found</h3>
             <p className="font-body text-sm text-muted-foreground">New package submissions will stream here in real-time.</p>
@@ -119,7 +119,7 @@ const AdminBookings = () => {
             {requests.map((req) => (
               <div
                 key={req.id}
-                className="bg-card rounded-3xl border border-border/80 p-6 hover:border-gold/50 shadow-[var(--shadow-card)] transition-all duration-300"
+                className="bg-card rounded-2xl border border-border/80 p-6 hover:border-gold/50 transition-all duration-300"
               >
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                   <div className="space-y-3 flex-1">

@@ -7,9 +7,9 @@ export default {
   theme: {
     container: {
       center: true,
-      padding: "2rem",
+      padding: { DEFAULT: "1rem", sm: "1.5rem", lg: "2rem" },
       screens: {
-        "2xl": "1400px",
+        "2xl": "1224px",
       },
     },
     extend: {
@@ -62,6 +62,13 @@ export default {
         earth: "hsl(var(--earth))",
         forest: "hsl(var(--forest))",
         "kente-red": "hsl(var(--kente-red))",
+        paper: { DEFAULT: "hsl(var(--paper))", 2: "hsl(var(--paper2))" },
+        ink: { DEFAULT: "hsl(var(--ink))", 2: "hsl(var(--ink2))" },
+        slate: "hsl(var(--slate))",
+        line: "hsl(var(--line))",
+        brass: { DEFAULT: "hsl(var(--brass))", deep: "hsl(var(--brass-deep))" },
+        clay: "hsl(var(--clay))",
+        kente: "hsl(var(--kente))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

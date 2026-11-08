@@ -84,7 +84,7 @@ const AdminDisputes = () => {
       <AdminNav />
       <div className={ADMIN_SIDEBAR_OFFSET_CLASS}>
         <div className="container mx-auto px-6 py-10 max-w-3xl">
-          <h1 className="font-display text-2xl font-bold text-foreground mb-2">Disputes</h1>
+          <h1 className="font-display text-3xl md:text-[34px] leading-tight text-ink mb-2">Disputes</h1>
           <p className="font-body text-sm text-muted-foreground mb-8">
             The payment stays held while a dispute is open. Read the sender's report, check with both people, then choose an outcome.
             A refund only marks the payment as refunded; you send the money back yourself.
@@ -101,14 +101,14 @@ const AdminDisputes = () => {
                     {r.kind === "not_received" ? "Item not received" : "Issue reported"}
                   </span>
                 </div>
-                <p className="font-body text-xs text-muted-foreground mt-1">
+                <p className="font-body text-sm text-slate mt-2">
                   {r.sender} (sender) with {r.traveller} (traveler) · {new Date(r.created_at).toLocaleString()}
                 </p>
                 <p className="font-body text-sm text-foreground mt-3 whitespace-pre-wrap bg-secondary/50 rounded-lg p-3">{r.reason}</p>
                 <p className="font-body text-xs text-muted-foreground mt-3">
                   Held: <strong className="text-foreground">{r.held != null ? money(r.held) : "-"}</strong> · Traveler's price: <strong className="text-foreground">{r.price != null ? money(r.price) : "-"}</strong>
                 </p>
-                <p className="font-body text-xs text-muted-foreground mt-1">Pay traveler to: {r.payout}</p>
+                <p className="font-body text-sm text-slate mt-2">Pay traveler to: {r.payout}</p>
                 <textarea
                   rows={2}
                   value={notes[r.id] ?? ""}

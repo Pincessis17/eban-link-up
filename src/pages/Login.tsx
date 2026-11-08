@@ -1,11 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import ebanSymbol from "@/assets/eban-symbol.png";
-import { Lock, Mail, ArrowRight } from "lucide-react";
-
-const inputClasses =
-  "w-full bg-card border border-border/80 rounded-xl px-4 py-3.5 font-body text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all";
+import { ArrowRight } from "lucide-react";
+import { AuthShell, authInput, authLabel } from "@/components/AuthShell";
 
 const Login = () => {
   const { signIn } = useAuth();
@@ -31,72 +28,34 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-hero flex items-center justify-center px-6 relative overflow-hidden py-12">
-      {/* Background ambient lighting */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-96 h-96 bg-gold/10 rounded-full blur-3xl pointer-events-none" />
+    <AuthShell headline="Send it with someone already going.">
+      <h1 className="font-display text-3xl md:text-[34px] leading-tight text-ink">Welcome back.</h1>
+      <p className="font-body text-sm text-slate mt-2 mb-8">Sign in to manage requests, trips and payouts.</p>
 
-      <div className="w-full max-w-md bg-charcoal/90 backdrop-blur-2xl rounded-3xl p-8 md:p-10 border border-gold/20 shadow-2xl relative z-10 text-white">
-        <Link to="/" className="flex items-center gap-3 mb-8 justify-center group">
-          <div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/30 flex items-center justify-center group-hover:border-gold transition-colors">
-            <img src={ebanSymbol} alt="EBAN" className="w-6 h-6 object-contain" />
-          </div>
-          <div>
-            <span className="font-display text-2xl font-bold tracking-[0.18em] text-white block leading-tight">EBAN</span>
-            <span className="font-body text-[9px] uppercase tracking-widest text-gold-light">Global Network Access</span>
-          </div>
-        </Link>
+      {error && (
+        <div className="bg-kente/10 border border-kente/30 text-kente rounded-lg p-3 mb-5 text-sm font-body">{error}</div>
+      )}
 
-        <h1 className="font-display text-3xl font-light text-white mb-2 text-center">Welcome Back</h1>
-        <p className="font-body text-xs text-gray-400 text-center mb-8">Sign in to manage your deliveries &amp; flight schedules</p>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className={authLabel} htmlFor="email">Email address</label>
+          <input id="email" type="email" required autoComplete="email" className={authInput} placeholder="name@example.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+        </div>
+        <div>
+          <label className={authLabel} htmlFor="password">Password</label>
+          <input id="password" type="password" required autoComplete="current-password" className={authInput} placeholder="Your password" value={password} onChange={(e) => setPassword(e.target.value)} />
+        </div>
+        <button type="submit" disabled={loading} className="w-full h-11 bg-brass text-ink font-body font-semibold text-sm rounded-lg hover:bg-[#CB9A22] disabled:opacity-60 flex items-center justify-center gap-2 mt-2">
+          {loading ? "Signing in..." : "Sign in"} <ArrowRight className="w-4 h-4" />
+        </button>
+      </form>
 
-        {error && (
-          <div className="bg-destructive/20 border border-destructive/40 text-rose-300 rounded-xl p-3.5 mb-6 text-xs font-body text-center">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label className="font-body text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2 block">Email Address</label>
-            <input
-              type="email"
-              required
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 font-body text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all"
-              placeholder="name@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label className="font-body text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2 block">Password</label>
-            <input
-              type="password"
-              required
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 font-body text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-gradient-gold text-charcoal font-body font-bold text-xs uppercase tracking-widest py-4 rounded-xl hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg glow-gold mt-2"
-          >
-            {loading ? "Authenticating..." : "Sign In to Account"} <ArrowRight className="w-4 h-4" />
-          </button>
-        </form>
-
-        <p className="font-body text-xs text-gray-400 text-center mt-8">
-          Don't have an account yet?{" "}
-          <Link to="/signup" className="text-gold-light font-semibold hover:underline">
-            Create Account
-          </Link>
-        </p>
-      </div>
-    </div>
+      <div className="flex items-center gap-3 my-6"><span className="h-px flex-1 bg-line" /><span className="font-body text-xs text-slate">or</span><span className="h-px flex-1 bg-line" /></div>
+      <Link to="/signup" className="w-full h-11 border border-line bg-white text-ink font-body font-semibold text-sm rounded-lg hover:bg-paper-2 flex items-center justify-center">
+        Create an account
+      </Link>
+      <p className="font-body text-xs text-slate mt-6">No account? It takes about two minutes.</p>
+    </AuthShell>
   );
 };
 

@@ -107,7 +107,7 @@ export const ExtraBagCard = ({ requestId, role, requestStatus }: { requestId: st
               <button
                 disabled={busy || c <= 0}
                 onClick={() => run(() => rpc("propose_extra_bag", { p_request_id: requestId, p_bag_cost: c, p_compensation: p, p_note: note.trim() || null }), "Sent to EBAN for review")}
-                className="bg-gradient-gold text-accent-foreground font-body font-bold text-xs uppercase tracking-wider px-5 py-2.5 rounded-xl disabled:opacity-50"
+                className="bg-gradient-gold text-accent-foreground font-body font-semibold text-xs px-5 py-2.5 rounded-xl disabled:opacity-50"
               >
                 {busy ? "Sending..." : "Send to EBAN"}
               </button>
@@ -156,7 +156,7 @@ export const ExtraBagCard = ({ requestId, role, requestStatus }: { requestId: st
       {bag.note && <p className="font-body text-xs text-muted-foreground mt-2">Note: {bag.note}</p>}
       <div className="flex flex-wrap gap-2 mt-4">
         {role === "sender" && bag.status === "approved" && (
-          <button onClick={() => setPayOpen(true)} className="bg-gradient-gold text-accent-foreground font-body font-bold text-xs uppercase tracking-wider px-5 py-2.5 rounded-xl">
+          <button onClick={() => setPayOpen(true)} className="bg-gradient-gold text-accent-foreground font-body font-semibold text-xs px-5 py-2.5 rounded-xl">
             Pay {money(bag.total)}
           </button>
         )}
@@ -190,7 +190,7 @@ export const ExtraBagCard = ({ requestId, role, requestStatus }: { requestId: st
             <button
               onClick={() => run(() => rpc("report_extra_bag_payment", { p_id: bag.id }), "Thanks! EBAN will confirm your payment shortly.")}
               disabled={busy}
-              className="w-full bg-gradient-gold text-accent-foreground font-bold text-xs uppercase tracking-wider py-3 rounded-xl disabled:opacity-50"
+              className="w-full bg-gradient-gold text-accent-foreground font-semibold text-xs py-3 rounded-xl disabled:opacity-50"
             >
               {busy ? "Saving..." : "I've sent the payment"}
             </button>

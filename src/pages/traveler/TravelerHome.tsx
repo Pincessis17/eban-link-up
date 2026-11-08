@@ -76,7 +76,7 @@ const TravelerHome = () => {
             </div>
             <Link
               to="/traveler/verification"
-              className="bg-earth text-gold-light font-body text-xs font-semibold px-4 py-2.5 rounded-xl hover:opacity-90 transition-all shrink-0 uppercase tracking-wider"
+              className="bg-earth text-gold-light font-body text-xs font-semibold px-4 py-2.5 rounded-xl hover:opacity-90 transition-all shrink-0"
             >
               Verify Passport
             </Link>
@@ -85,13 +85,13 @@ const TravelerHome = () => {
 
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="font-display text-3xl md:text-4xl font-light text-foreground">Flight Departures</h1>
-            <p className="font-body text-xs text-muted-foreground mt-1">Manage your active flight itineraries and luggage space.</p>
+            <h1 className="font-display text-3xl md:text-[34px] leading-tight text-ink">Your trips</h1>
+            <p className="font-body text-sm text-slate mt-2">Manage your active flight itineraries and luggage space.</p>
           </div>
 
           <Link
             to="/traveler/new-trip"
-            className="inline-flex items-center gap-2 bg-gradient-gold text-accent-foreground font-body font-bold text-xs uppercase tracking-wider px-6 py-3.5 rounded-xl hover:opacity-90 shadow-md transition-all"
+            className="inline-flex items-center gap-2 bg-gradient-gold text-accent-foreground font-body font-semibold text-xs px-6 py-3.5 rounded-xl hover:opacity-90 transition-all"
           >
             <Plus className="w-4 h-4" /> Share a Flight Trip
           </Link>
@@ -105,7 +105,7 @@ const TravelerHome = () => {
         )}
 
         {!loading && trips.length === 0 && (
-          <div className="text-center py-20 bg-card rounded-3xl border border-border/80 p-10 shadow-[var(--shadow-card)] max-w-lg mx-auto">
+          <div className="text-center py-20 bg-card rounded-2xl border border-border/80 p-10 max-w-lg mx-auto">
             <EmptyIllustration kind="plane" />
             <h3 className="font-display text-2xl font-semibold text-foreground mb-2">No active flight trips listed</h3>
             <p className="font-body text-sm text-muted-foreground mb-6">
@@ -113,7 +113,7 @@ const TravelerHome = () => {
             </p>
             <Link
               to="/traveler/new-trip"
-              className="inline-flex items-center gap-2 bg-gradient-gold text-accent-foreground font-body font-bold text-xs uppercase tracking-wider px-8 py-3.5 rounded-xl hover:opacity-90 transition-all shadow-md"
+              className="inline-flex items-center gap-2 bg-gradient-gold text-accent-foreground font-body font-semibold text-xs px-8 py-3.5 rounded-xl hover:opacity-90 transition-all"
             >
               Post Flight Itinerary
             </Link>
@@ -128,7 +128,7 @@ const TravelerHome = () => {
             return (
               <div
                 key={trip.id}
-                className="bg-card rounded-3xl border border-border/80 p-6 md:p-8 hover:border-gold/50 shadow-[var(--shadow-card)] hover:shadow-gold-glow transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-6"
+                className="bg-card rounded-2xl border border-border/80 p-6 md:p-8 hover:border-gold/50 hover:shadow-gold-glow transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-6"
               >
                 <div className="space-y-4 flex-1">
                   <div className="flex items-center justify-between">

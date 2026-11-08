@@ -21,7 +21,7 @@ export const RateCounterparty = ({ requestId, existingRating, who, onDone }: Pro
 
   if (existingRating != null) {
     return (
-      <div className="bg-card rounded-3xl border border-border/80 p-6 shadow-[var(--shadow-card)] font-body text-sm text-muted-foreground">
+      <div className="bg-card rounded-2xl border border-border/80 p-6 font-body text-sm text-muted-foreground">
         You rated {who} <strong className="text-foreground">{existingRating}/5</strong>. Thank you.
       </div>
     );
@@ -48,7 +48,7 @@ export const RateCounterparty = ({ requestId, existingRating, who, onDone }: Pro
   };
 
   return (
-    <div className="bg-card rounded-3xl border border-border/80 p-6 shadow-[var(--shadow-card)]">
+    <div className="bg-card rounded-2xl border border-border/80 p-6">
       <h3 className="font-display text-xl font-medium text-foreground mb-1">Rate {who}</h3>
       <p className="font-body text-xs text-muted-foreground mb-4">Your rating and comment appear on their profile, with your first name, and help others decide who to trust.</p>
       <div className="flex gap-1 mb-4" onMouseLeave={() => setHover(0)}>
@@ -74,7 +74,7 @@ export const RateCounterparty = ({ requestId, existingRating, who, onDone }: Pro
       <button
         onClick={submit}
         disabled={busy}
-        className="bg-gradient-gold text-accent-foreground font-body font-bold text-xs uppercase tracking-wider px-6 py-3 rounded-xl hover:opacity-90 disabled:opacity-50"
+        className="bg-gradient-gold text-accent-foreground font-body font-semibold text-xs px-6 py-3 rounded-xl hover:opacity-90 disabled:opacity-50"
       >
         {busy ? "Saving..." : "Submit rating"}
       </button>

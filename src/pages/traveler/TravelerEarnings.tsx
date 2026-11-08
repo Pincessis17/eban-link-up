@@ -114,18 +114,18 @@ const TravelerEarnings = () => {
 
       <div className="container mx-auto px-6 py-10 max-w-3xl">
         <div className="flex items-center gap-4 mb-8">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-gold flex items-center justify-center shadow-md">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-gold flex items-center justify-center">
             <Wallet className="w-6 h-6 text-accent-foreground" />
           </div>
           <div>
-            <h1 className="font-display text-3xl font-light text-foreground">Traveler Earnings &amp; Payouts</h1>
-            <p className="font-body text-xs text-muted-foreground mt-0.5">Track your baggage space compensation and withdrawal history.</p>
+            <h1 className="font-display text-3xl md:text-[34px] leading-tight text-ink">Earnings and payouts</h1>
+            <p className="font-body text-sm text-slate mt-2">Track your baggage space compensation and withdrawal history.</p>
           </div>
         </div>
 
         {/* Metric Summary Cards */}
         <div className="grid sm:grid-cols-2 gap-4 mb-10">
-          <div className="bg-charcoal text-white rounded-3xl p-6 border border-gold/20 shadow-xl relative overflow-hidden">
+          <div className="bg-charcoal text-white rounded-2xl p-6 border border-gold/20 shadow-xl relative overflow-hidden">
             <span className="font-body text-[10px] uppercase tracking-widest text-gold-light">Total Disbursed Payouts</span>
             <div className="flex items-baseline gap-1 mt-2">
               <span className="font-display text-4xl font-bold text-white">${totalPaid}</span>
@@ -136,7 +136,7 @@ const TravelerEarnings = () => {
             </p>
           </div>
 
-          <div className="bg-card rounded-3xl p-6 border border-border/80 shadow-[var(--shadow-card)]">
+          <div className="bg-card rounded-2xl p-6 border border-border/80">
             <span className="font-body text-[10px] uppercase tracking-widest text-muted-foreground">In escrow</span>
             <div className="flex items-baseline gap-1 mt-2">
               <span className="font-display text-4xl font-bold text-gold-dark">${inEscrow}</span>
@@ -151,7 +151,7 @@ const TravelerEarnings = () => {
           </div>
         </div>
 
-        <div className="bg-card rounded-3xl p-6 border border-border/80 shadow-[var(--shadow-card)] mb-10">
+        <div className="bg-card rounded-2xl p-6 border border-border/80 mb-10">
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-3">
               <Landmark className="w-5 h-5 text-forest" />
@@ -212,7 +212,7 @@ const TravelerEarnings = () => {
                 <input className={inputCls} value={details.provider} onChange={(e) => setDetails({ ...details, provider: e.target.value })} />
               </div>
               <div className="sm:col-span-2 flex gap-3">
-                <button onClick={saveDetails} disabled={saving} className="bg-gradient-gold text-accent-foreground font-body text-sm font-bold px-6 py-3 rounded-xl hover:opacity-90 disabled:opacity-50">
+                <button onClick={saveDetails} disabled={saving} className="bg-gradient-gold text-accent-foreground font-body text-sm font-semibold px-6 py-3 rounded-xl hover:opacity-90 disabled:opacity-50">
                   {saving ? "Saving..." : "Save payout details"}
                 </button>
                 {hasDetails && (
@@ -234,7 +234,7 @@ const TravelerEarnings = () => {
         )}
 
         {!loading && payouts.length === 0 && (
-          <div className="text-center py-16 bg-card rounded-3xl border border-border/80 p-8 font-body text-sm text-muted-foreground max-w-md mx-auto">
+          <div className="text-center py-16 bg-card rounded-2xl border border-border/80 p-8 font-body text-sm text-muted-foreground max-w-md mx-auto">
             No payouts processed yet. Completed package handoffs will automatically trigger payouts here.
           </div>
         )}
@@ -246,7 +246,7 @@ const TravelerEarnings = () => {
                 <p className="font-body text-sm font-semibold text-foreground">
                   {p.delivery_requests?.origin_city ?? "Route"} &rarr; {p.delivery_requests?.destination_city ?? "Destination"}
                 </p>
-                <p className="font-body text-xs text-muted-foreground mt-0.5">{new Date(p.created_at).toLocaleDateString()}</p>
+                <p className="font-body text-sm text-slate mt-2">{new Date(p.created_at).toLocaleDateString()}</p>
               </div>
 
               <div className="flex items-center gap-4">

@@ -83,7 +83,7 @@ const AdminTravelers = () => {
       <AdminNav />
       <div className="container mx-auto px-6 py-10">
         <div className="flex items-center justify-between flex-wrap gap-4 mb-8">
-          <h1 className="font-display text-2xl font-bold text-foreground">Travelers</h1>
+          <h1 className="font-display text-3xl md:text-[34px] leading-tight text-ink">Travellers</h1>
           <div className="flex gap-2">
             {(["all", "approved", "pending", "rejected"] as const).map((f) => (
               <button
@@ -125,10 +125,10 @@ const AdminTravelers = () => {
                       {r.verification_status ?? "pending"}
                     </span>
                   </div>
-                  <p className="font-body text-xs text-muted-foreground mt-1">
+                  <p className="font-body text-sm text-slate mt-2">
                     {r.profiles?.email ?? "-"} {r.phone ? `· ${r.phone}` : ""}
                   </p>
-                  <p className="font-body text-xs text-muted-foreground mt-1">
+                  <p className="font-body text-sm text-slate mt-2">
                     Joined {new Date(r.created_at).toLocaleDateString()}
                     {r.school_affiliation ? ` · ${r.school_affiliation}` : ""}
                   </p>
@@ -137,12 +137,12 @@ const AdminTravelers = () => {
                   <p className="font-display text-sm font-bold text-foreground">
                     {r.total_deliveries ?? 0} {r.total_deliveries === 1 ? "delivery" : "deliveries"}
                   </p>
-                  <p className="font-body text-xs text-muted-foreground mt-1">
+                  <p className="font-body text-sm text-slate mt-2">
                     {(r.trips ?? []).length} trips logged
                     {openTrips > 0 ? ` · ${openTrips} open` : ""}
                   </p>
                   {r.rating != null && (
-                    <p className="font-body text-xs text-muted-foreground mt-1">{Number(r.rating).toFixed(1)}★ rating</p>
+                    <p className="font-body text-sm text-slate mt-2">{Number(r.rating).toFixed(1)}★ rating</p>
                   )}
                   <div className="flex justify-end mt-2">
                     <AdminDeleteButton

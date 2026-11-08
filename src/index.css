@@ -1,93 +1,95 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=Young+Serif&family=Hanken+Grotesk:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Young+Serif&family=Hanken+Grotesk:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Eban design system v1 — "Parchment, ink, brass."
+   One warm paper surface, one ink, one brass accent. Kente runs at the page and nav edges.
+   Brass is a fill. Brass-deep is text. Never swap them. */
 @layer base {
   :root {
-    --background: 220 20% 97%;
-    --foreground: 220 30% 10%;
+    /* Raw palette */
+    --paper: 40 60% 96%;        /* #FBF7EF page */
+    --paper2: 40 47% 93%;       /* #F5EFE3 subtle fill */
+    --ink: 217 35% 7%;          /* #0C1119 primary text */
+    --ink2: 218 30% 15%;        /* #1A2230 dark surface */
+    --slate: 218 9% 41%;        /* #5F6672 secondary text */
+    --line: 41 32% 85%;         /* #E4DCCB hairline */
+    --brass: 43 70% 51%;        /* #D9A62A action fill */
+    --brass-deep: 38 71% 32%;   /* #8B6118 links / label text */
+    --forest: 153 49% 24%;      /* #1F5B40 trust, success */
+    --clay: 16 71% 41%;         /* #B4471F attention */
+    --kente: 6 61% 40%;         /* #A33327 destructive */
 
+    /* shadcn roles */
+    --background: var(--paper);
+    --foreground: var(--ink);
     --card: 0 0% 100%;
-    --card-foreground: 220 30% 10%;
-
+    --card-foreground: var(--ink);
     --popover: 0 0% 100%;
-    --popover-foreground: 220 30% 10%;
+    --popover-foreground: var(--ink);
+    --primary: var(--brass);
+    --primary-foreground: var(--ink);
+    --secondary: var(--paper2);
+    --secondary-foreground: var(--ink);
+    --muted: var(--paper2);
+    --muted-foreground: var(--slate);
+    --accent: var(--paper2);
+    --accent-foreground: var(--ink);
+    --destructive: var(--kente);
+    --destructive-foreground: 0 0% 100%;
+    --border: var(--line);
+    --input: var(--line);
+    --ring: var(--brass);
+    --radius: 0.625rem;
 
-    --primary: 220 30% 10%;
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 44 40% 94%;
-    --secondary-foreground: 220 30% 10%;
-
-    --muted: 220 15% 94%;
-    --muted-foreground: 220 10% 45%;
-
-    --accent: 43 75% 52%;
-    --accent-foreground: 220 40% 8%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 220 15% 88%;
-    --input: 220 15% 88%;
-    --ring: 43 75% 52%;
-
-    --radius: 0.85rem;
-
-    --gold: 43 75% 52%;
-    --gold-dark: 38 78% 38%;
-    --gold-light: 44 85% 68%;
-    --charcoal: 220 35% 8%;
-    --cream: 40 55% 97%;
-    --terracotta: 15 75% 54%;
-    --earth: 220 35% 13%;
-    --forest: 153 49% 24%;
-    --kente-red: 6 62% 42%;
+    /* Legacy names used across the app, mapped onto the new palette */
+    --gold: var(--brass);
+    --gold-dark: var(--brass-deep);
+    --gold-light: 43 72% 66%;
+    --charcoal: var(--ink);
+    --cream: var(--paper);
+    --terracotta: var(--clay);
+    --earth: var(--ink2);
+    --kente-red: var(--kente);
 
     --font-display: 'Young Serif', Georgia, serif;
     --font-body: 'Hanken Grotesk', sans-serif;
 
-    --shadow-card: 0 10px 30px -10px rgba(10, 15, 25, 0.08);
-    --shadow-elevated: 0 20px 50px -15px rgba(10, 15, 25, 0.18);
-    --shadow-gold-glow: 0 0 25px -5px rgba(212, 175, 55, 0.35);
+    /* No shadow unless it floats */
+    --shadow-card: 0 0 0 0 transparent;
+    --shadow-elevated: 0 18px 40px -16px rgba(12, 17, 25, 0.22);
+    --shadow-gold-glow: 0 0 0 0 transparent;
 
-    --sidebar-background: 220 35% 8%;
-    --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 43 75% 52%;
-    --sidebar-primary-foreground: 220 40% 8%;
-    --sidebar-accent: 220 30% 14%;
-    --sidebar-accent-foreground: 43 75% 52%;
-    --sidebar-border: 220 20% 18%;
-    --sidebar-ring: 43 75% 52%;
+    --sidebar-background: var(--ink);
+    --sidebar-foreground: 40 60% 96%;
+    --sidebar-primary: var(--brass);
+    --sidebar-primary-foreground: var(--ink);
+    --sidebar-accent: var(--ink2);
+    --sidebar-accent-foreground: var(--brass);
+    --sidebar-border: 218 25% 18%;
+    --sidebar-ring: var(--brass);
   }
 
   .dark {
-    --background: 220 35% 7%;
-    --foreground: 40 30% 96%;
-
-    --card: 220 30% 11%;
-    --card-foreground: 40 30% 96%;
-
-    --popover: 220 30% 11%;
-    --popover-foreground: 40 30% 96%;
-
-    --primary: 43 75% 52%;
-    --primary-foreground: 220 40% 8%;
-
-    --secondary: 220 25% 16%;
-    --secondary-foreground: 40 30% 96%;
-
-    --muted: 220 20% 18%;
-    --muted-foreground: 220 10% 65%;
-
-    --accent: 43 75% 52%;
-    --accent-foreground: 220 40% 8%;
-
-    --border: 220 20% 20%;
-    --input: 220 20% 20%;
-    --ring: 43 75% 52%;
+    --background: var(--ink);
+    --foreground: var(--paper);
+    --card: var(--ink2);
+    --card-foreground: var(--paper);
+    --popover: var(--ink2);
+    --popover-foreground: var(--paper);
+    --primary: var(--brass);
+    --primary-foreground: var(--ink);
+    --secondary: 218 25% 18%;
+    --secondary-foreground: var(--paper);
+    --muted: 218 25% 18%;
+    --muted-foreground: 218 12% 68%;
+    --accent: 218 25% 18%;
+    --accent-foreground: var(--paper);
+    --border: 218 22% 22%;
+    --input: 218 22% 22%;
+    --ring: var(--brass);
   }
 }
 
@@ -101,75 +103,77 @@
   }
 
   body {
-    @apply bg-background text-foreground antialiased selection:bg-gold/30 selection:text-gold-light;
+    @apply bg-background text-foreground antialiased selection:bg-brass/30 selection:text-ink;
     font-family: var(--font-body);
     font-synthesis: none;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: -0.01em;
   }
 }
 
 @layer utilities {
-  /* Woven strip inspired by kente cloth: two offset rows of colour blocks. */
-  .kente-band {
-    height: 10px;
+  /* Kente rail: two offset rows of woven colour blocks (ink, brass, forest, kente). */
+  .kente-band,
+  .kente-rail {
+    height: 6px;
     background:
-      repeating-linear-gradient(90deg, #101826 0 28px, #D4A52A 28px 40px, #1F5A3D 40px 68px, #B03A2E 68px 76px, #D4A52A 76px 88px) top / 100% 5px no-repeat,
-      repeating-linear-gradient(90deg, #1F5A3D 0 20px, #B03A2E 20px 32px, #D4A52A 32px 56px, #101826 56px 68px, #D4A52A 68px 80px) bottom / 100% 5px no-repeat;
+      repeating-linear-gradient(90deg, #0C1119 0 30px, #D9A62A 30px 40px, #1F5B40 40px 64px, #A33327 64px 72px, #D9A62A 72px 82px, #0C1119 82px 96px) top / 100% 3px no-repeat,
+      repeating-linear-gradient(90deg, #1F5B40 0 18px, #A33327 18px 28px, #D9A62A 28px 50px, #0C1119 50px 66px, #D9A62A 66px 76px, #A33327 76px 96px) bottom / 100% 3px no-repeat;
   }
+  .kente-band { height: 8px; background-size: 100% 4px, 100% 4px; }
 
   /* Tile built from the Akan "Eban" (fence, safety, home) symbol. */
   .eban-weave {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56'%3E%3Cg fill='none' stroke='%23D4A52A' stroke-width='1.2'%3E%3Crect x='8' y='8' width='40' height='40'/%3E%3Crect x='19' y='19' width='18' height='18'/%3E%3Cpath d='M8 28h11M37 28h11M28 8v11M28 37v11'/%3E%3C/g%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56'%3E%3Cg fill='none' stroke='%23D9A62A' stroke-opacity='.35' stroke-width='1.2'%3E%3Crect x='8' y='8' width='40' height='40'/%3E%3Crect x='19' y='19' width='18' height='18'/%3E%3Cpath d='M8 28h11M37 28h11M28 8v11M28 37v11'/%3E%3C/g%3E%3C/svg%3E");
     background-size: 56px 56px;
   }
 
+  /* Legacy helpers, flattened to the new system: brass is a flat fill, no glows or gradients. */
   .text-gradient-gold {
-    @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, hsl(var(--gold-light)) 0%, hsl(var(--gold)) 50%, hsl(var(--gold-dark)) 100%);
+    color: hsl(var(--brass-deep));
   }
 
   .bg-gradient-hero {
-    background: radial-gradient(circle at 50% 0%, hsl(220 35% 14%) 0%, hsl(220 40% 6%) 100%);
+    background: hsl(var(--ink2));
   }
 
   .bg-gradient-gold {
-    background: linear-gradient(135deg, hsl(var(--gold-light)) 0%, hsl(var(--gold)) 70%, hsl(var(--gold-dark)) 100%);
+    background: hsl(var(--brass));
+    color: hsl(var(--ink));
   }
 
   .bg-glass {
-    background: rgba(15, 22, 33, 0.65);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(212, 175, 55, 0.15);
+    background: hsl(var(--ink) / 0.92);
+    border: 1px solid hsl(var(--ink2));
   }
 
   .bg-glass-card {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(220, 225, 230, 0.8);
+    background: #fff;
+    border: 1px solid hsl(var(--line));
   }
 
   .dark .bg-glass-card {
-    background: rgba(18, 25, 38, 0.75);
-    border: 1px solid rgba(212, 175, 55, 0.12);
+    background: hsl(var(--ink2));
+    border: 1px solid hsl(var(--ink2));
   }
 
-  .glow-gold {
-    box-shadow: 0 0 30px -5px rgba(212, 175, 55, 0.25);
-  }
-
+  .glow-gold,
   .glow-gold-lg {
-    box-shadow: 0 0 50px 0px rgba(212, 175, 55, 0.35);
+    box-shadow: none;
+  }
+
+  .eyebrow {
+    @apply font-body text-[11px] font-semibold uppercase tracking-[0.14em] text-brass-deep;
   }
 
   .boarding-pass-cutout {
     position: relative;
   }
-  
+
   .boarding-pass-cutout::before, .boarding-pass-cutout::after {
     content: '';
     position: absolute;
@@ -180,17 +184,17 @@
     border-radius: 50%;
     transform: translateY(-50%);
   }
-  
+
   .boarding-pass-cutout::before {
     left: -10px;
   }
-  
+
   .boarding-pass-cutout::after {
     right: -10px;
   }
 
   .adinkra-pattern {
-    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5L35 15L30 25L25 15Z' fill='none' stroke='rgba(212,175,55,0.06)' stroke-width='1.2'/%3E%3Cpath d='M5 30L15 25L25 30L15 35Z' fill='none' stroke='rgba(212,175,55,0.06)' stroke-width='1.2'/%3E%3Cpath d='M35 30L45 25L55 30L45 35Z' fill='none' stroke='rgba(212,175,55,0.06)' stroke-width='1.2'/%3E%3Cpath d='M30 35L35 45L30 55L25 45Z' fill='none' stroke='rgba(212,175,55,0.06)' stroke-width='1.2'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5L35 15L30 25L25 15Z' fill='none' stroke='rgba(217,166,42,0.10)' stroke-width='1.2'/%3E%3Cpath d='M5 30L15 25L25 30L15 35Z' fill='none' stroke='rgba(217,166,42,0.10)' stroke-width='1.2'/%3E%3Cpath d='M35 30L45 25L55 30L45 35Z' fill='none' stroke='rgba(217,166,42,0.10)' stroke-width='1.2'/%3E%3Cpath d='M30 35L35 45L30 55L25 45Z' fill='none' stroke='rgba(217,166,42,0.10)' stroke-width='1.2'/%3E%3C/svg%3E");
   }
 }
 

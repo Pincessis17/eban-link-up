@@ -64,8 +64,8 @@ const TravelerNewTrip = () => {
     <div className="min-h-screen bg-background">
       <TravelerNav />
       <div className="container mx-auto px-6 py-10 max-w-xl">
-        <h1 className="font-display text-2xl font-bold text-foreground mb-6">Share a trip</h1>
-        <form onSubmit={handleSubmit} className="bg-card rounded-2xl p-8 border border-border shadow-[var(--shadow-card)]">
+        <h1 className="font-display text-3xl md:text-[34px] leading-tight text-ink mb-6">Post a trip</h1>
+        <form onSubmit={handleSubmit} className="bg-card rounded-2xl p-8 border border-border">
           <div className="grid sm:grid-cols-2 gap-5 mb-5">
             <div>
               <label className="font-display text-sm font-semibold text-foreground mb-1.5 block">From (country)</label>
@@ -134,7 +134,7 @@ const TravelerNewTrip = () => {
             <label className="font-display text-sm font-semibold text-foreground mb-1.5 block">Anything you'd rather not carry? (optional)</label>
             <textarea className={`${inputClasses} resize-none`} rows={2} placeholder="e.g. no perishables" value={form.restrictions} onChange={(e) => setForm({ ...form, restrictions: e.target.value })} />
           </div>
-          <button type="submit" disabled={loading} className="w-full bg-gradient-gold text-accent-foreground font-display font-bold py-4 rounded-lg text-base hover:opacity-90 transition-opacity flex items-center justify-center gap-2 disabled:opacity-50">
+          <button type="submit" disabled={loading} className="w-full bg-gradient-gold text-accent-foreground font-display font-semibold py-4 rounded-lg text-base hover:opacity-90 transition-opacity flex items-center justify-center gap-2 disabled:opacity-50">
             {loading ? "Posting..." : "Post trip"} <Send className="w-5 h-5" />
           </button>
         </form>

@@ -109,18 +109,18 @@ const TravelerVerification = () => {
 
       <div className="container mx-auto px-6 py-10 max-w-2xl">
         <div className="flex items-center gap-4 mb-8">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-gold flex items-center justify-center shadow-md">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-gold flex items-center justify-center">
             <ShieldCheck className="w-6 h-6 text-accent-foreground" />
           </div>
           <div>
-            <h1 className="font-display text-3xl font-light text-foreground">Identity Verification</h1>
-            <p className="font-body text-xs text-muted-foreground mt-0.5">
+            <h1 className="font-display text-3xl md:text-[34px] leading-tight text-ink">Identity Verification</h1>
+            <p className="font-body text-sm text-slate mt-2">
               Verification Status: <span className="font-semibold text-gold-dark uppercase tracking-wider">{travellerProfile?.verification_status === "pending" && !loading && rows.length === 0 ? "not submitted" : travellerProfile?.verification_status ?? "loading"}</span>
             </p>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-card rounded-3xl p-8 border border-border/80 shadow-[var(--shadow-card)] mb-10">
+        <form onSubmit={handleSubmit} className="bg-card rounded-2xl p-8 border border-border/80 mb-10">
           <div className="space-y-6">
             <div>
               <label className="font-body text-xs font-semibold uppercase tracking-wider text-foreground mb-2 block">Document Type</label>
@@ -150,7 +150,7 @@ const TravelerVerification = () => {
                   <p className="font-body text-sm font-semibold text-foreground">
                     {file ? file.name : "Click or drag & drop photo/scan here"}
                   </p>
-                  <p className="font-body text-xs text-muted-foreground mt-1">Supports PNG, JPG, or PDF (Max 10MB)</p>
+                  <p className="font-body text-sm text-slate mt-2">Supports PNG, JPG, or PDF (Max 10MB)</p>
                 </div>
               </div>
             </div>
@@ -158,7 +158,7 @@ const TravelerVerification = () => {
             <button
               type="submit"
               disabled={uploading || !file}
-              className="w-full bg-gradient-gold text-accent-foreground font-body font-bold text-xs uppercase tracking-widest py-4 rounded-xl hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-md glow-gold"
+              className="w-full bg-gradient-gold text-accent-foreground font-body font-semibold text-xs py-4 rounded-xl hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2 glow-gold"
             >
               <Upload className="w-4 h-4" /> {uploading ? "Submitting Document..." : "Submit for Verification Review"}
             </button>

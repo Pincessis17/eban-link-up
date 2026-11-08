@@ -51,7 +51,7 @@ const AdminIdentity = () => {
       <AdminNav />
       <div className={ADMIN_SIDEBAR_OFFSET_CLASS}>
         <div className="container mx-auto px-6 py-10 max-w-3xl">
-          <h1 className="font-display text-2xl font-bold text-foreground mb-2">Face checks</h1>
+          <h1 className="font-display text-3xl md:text-[34px] leading-tight text-ink mb-2">Face checks</h1>
           <p className="font-body text-sm text-muted-foreground mb-8">
             Watch each video. Check that it is one real person, the face is clear, they turn left and right, and they say their name and the numbers shown. Approve to give them a badge, or reject with a reason.
           </p>
@@ -62,7 +62,7 @@ const AdminIdentity = () => {
             {pending.map((r) => (
               <div key={r.id} className="p-5 rounded-xl border border-border bg-card">
                 <p className="font-display text-sm font-bold text-foreground">{r.name} <span className="font-body font-normal text-muted-foreground">({r.role.toLowerCase()})</span></p>
-                <p className="font-body text-xs text-muted-foreground mt-1">{r.email} · {new Date(r.created_at).toLocaleString()}</p>
+                <p className="font-body text-sm text-slate mt-2">{r.email} · {new Date(r.created_at).toLocaleString()}</p>
                 <p className="font-body text-sm text-foreground mt-3">They were asked to say: <strong className="tracking-widest">{r.challenge_code ? r.challenge_code.split("").join(" ") : "-"}</strong></p>
                 {r.url ? <video src={r.url} controls playsInline className="mt-3 w-full max-w-sm rounded-xl bg-black" /> : <p className="font-body text-xs text-destructive mt-3">Couldn't load the video. Refresh the page.</p>}
                 <input value={notes[r.id] ?? ""} onChange={(e) => setNotes((n) => ({ ...n, [r.id]: e.target.value }))} placeholder="Reason (required if you reject)" className="w-full mt-3 bg-background border border-border rounded-xl px-3 py-2 font-body text-sm" />

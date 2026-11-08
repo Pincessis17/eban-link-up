@@ -31,8 +31,8 @@ export const ModeSwitcher = () => {
       onClick={() => go(role)}
       disabled={busy}
       aria-pressed={profile.role === role}
-      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-body font-bold uppercase tracking-wider transition-all ${
-        profile.role === role ? "bg-gradient-gold text-accent-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+      className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[12px] font-body font-semibold transition-colors ${
+        profile.role === role ? "bg-ink text-paper" : "text-slate hover:text-ink"
       }`}
     >
       <Icon className="w-3.5 h-3.5" /> <span className="hidden sm:inline">{label}</span>
@@ -40,7 +40,7 @@ export const ModeSwitcher = () => {
   );
 
   return (
-    <div className="flex items-center gap-0.5 rounded-xl border border-border bg-secondary/50 p-0.5" role="group" aria-label="Switch between sending and travelling">
+    <div className="flex items-center gap-0.5 rounded-lg border border-line bg-paper-2 p-0.5" role="group" aria-label="Switch between sending and travelling">
       {pill("Sender", "Sending", Package)}
       {pill("Traveller", "Travelling", Plane)}
     </div>

@@ -1,36 +1,18 @@
 import { useEffect, useRef, useState } from "react";
-import ebanSymbol from "@/assets/eban-symbol.png";
-import {
-  FileText,
-  Users,
-  PackageCheck,
-  Handshake,
-  Plane,
-  CheckCircle2,
-  ShieldCheck,
-  Lock,
-  FileSignature,
-  ChevronRight,
-  Sparkles,
-  Globe,
-  ArrowUpRight,
-  Check,
-  X,
-  Clock,
-  Award,
-} from "lucide-react";
-import { SUPPORT_WHATSAPP_URL } from "@/lib/siteConfig";
 import { Link, Navigate, useSearchParams } from "react-router-dom";
+import { ArrowRight, Check, X, ShieldCheck, Lock, FileSignature, Menu } from "lucide-react";
+import ebanSymbol from "@/assets/eban-symbol.png";
+import { SUPPORT_WHATSAPP_URL } from "@/lib/siteConfig";
 import BookingForm from "@/components/BookingForm";
-import { AvailableTrips } from "@/components/AvailableTrips";
+import { AvailableTrips, RouteCodes, codeOf, shortDate, useOpenRoutes } from "@/components/AvailableTrips";
 import { FeedbackWall } from "@/components/FeedbackWall";
 import { FaqSection } from "@/components/FaqSection";
+import { EbanLogo } from "@/components/AppNav";
 import { useAuth } from "@/hooks/useAuth";
 
 const Reveal = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
-
   useEffect(() => {
     const node = ref.current;
     if (!node) return;
@@ -41,230 +23,177 @@ const Reveal = ({ children, className = "" }: { children: React.ReactNode; class
           observer.disconnect();
         }
       },
-      { threshold: 0.15 }
+      { threshold: 0.12 }
     );
     observer.observe(node);
     return () => observer.disconnect();
   }, []);
-
   return (
-    <div
-      ref={ref}
-      className={`transition-all duration-700 ease-out ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"} ${className}`}
-    >
+    <div ref={ref} className={`transition-all duration-700 ease-out motion-reduce:transition-none ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"} ${className}`}>
       {children}
     </div>
   );
 };
 
-const SectionLabel = ({ children }: { children: React.ReactNode }) => (
-  <div className="flex items-center gap-3 mb-5">
-    <span className="kente-band w-10 shrink-0" aria-hidden="true" />
-    <span className="font-body text-sm font-semibold text-forest">{children}</span>
-  </div>
-);
+const NAV_LINKS = [
+  { href: "#how-it-works", label: "How it works" },
+  { href: "#routes", label: "Routes" },
+  { href: "#safety", label: "Safety" },
+  { href: "#pricing", label: "Pricing" },
+];
 
 const Navbar = () => {
   const { user, profile, signOut } = useAuth();
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  const [open, setOpen] = useState(false);
+  const home = profile?.role === "Admin" ? "/admin/bookings" : profile?.role === "Traveller" ? "/traveler" : "/sender/requests";
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-charcoal/90 backdrop-blur-xl border-b border-gold/15 py-3 shadow-lg" : "bg-transparent py-5"}`}>
-      <div className="container mx-auto px-6 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/30 flex items-center justify-center group-hover:border-gold transition-colors">
-            <img src={ebanSymbol} alt="EBAN symbol" className="w-6 h-6 object-contain" />
-          </div>
-          <div className="flex flex-col">
-            <span className="font-display text-2xl font-semibold tracking-[0.18em] text-white">EBAN</span>
-            <span className="font-body text-[9px] font-medium text-gold-light">Global Logistics</span>
-          </div>
-        </Link>
-
-        <div className="hidden md:flex items-center gap-8 font-body text-sm font-medium text-gray-300">
-          <a href="#how-it-works" className="hover:text-gold-light transition-colors">How it works</a>
-          <a href="#what-we-carry" className="hover:text-gold-light transition-colors">Item rules</a>
-          <a href="#trust" className="hover:text-gold-light transition-colors">Trust &amp; Verification</a>
-          <a href="#book" className="hover:text-gold-light transition-colors">Post a request</a>
-          <a
-            href={SUPPORT_WHATSAPP_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-gold-light hover:text-gold flex items-center gap-1 transition-colors"
-          >
-            Support <ArrowUpRight className="w-3 h-3" />
-          </a>
+    <header className="sticky top-0 z-50 bg-paper/95 backdrop-blur">
+      <div className="kente-rail" />
+      <div className="container mx-auto flex h-16 items-center justify-between gap-4">
+        <EbanLogo to="/?view=site" sub="Peer delivery" />
+        <nav className="hidden md:flex items-center gap-8" aria-label="Main">
+          {NAV_LINKS.map((l) => (
+            <a key={l.href} href={l.href} className="font-body text-[14px] text-ink/80 hover:text-ink transition-colors">{l.label}</a>
+          ))}
+        </nav>
+        <div className="flex items-center gap-2">
+          {user ? (
+            <>
+              <Link to={home} className="hidden sm:inline-flex h-10 items-center px-4 rounded-lg font-body text-sm font-semibold text-ink hover:bg-paper-2">
+                {profile?.role === "Admin" ? "Admin" : "My account"}
+              </Link>
+              <button onClick={signOut} className="h-10 px-4 rounded-lg border border-line bg-white font-body text-sm font-semibold text-ink hover:bg-paper-2">Sign out</button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="hidden sm:inline-flex h-10 items-center px-4 rounded-lg font-body text-sm font-semibold text-ink hover:bg-paper-2">Log in</Link>
+              <Link to="/signup" className="inline-flex h-10 items-center px-4 rounded-lg bg-brass font-body text-sm font-semibold text-ink hover:bg-[#CB9A22]">Post a request</Link>
+            </>
+          )}
+          <button className="md:hidden p-2 text-ink" onClick={() => setOpen((o) => !o)} aria-label="Menu" aria-expanded={open}>
+            <Menu className="w-5 h-5" />
+          </button>
         </div>
-
-        {user ? (
-          <div className="flex items-center gap-4">
-            {profile?.role === "Traveller" && (
-              <Link to="/traveler" className="font-body text-sm font-semibold text-gold-light hover:text-white transition-colors">
-                My Trips
-              </Link>
-            )}
-            {profile?.role === "Sender" && (
-              <Link to="/sender/requests" className="font-body text-sm font-semibold text-gold-light hover:text-white transition-colors">
-                My Requests
-              </Link>
-            )}
-            {profile?.role === "Admin" && (
-              <Link to="/admin/bookings" className="font-body text-sm font-semibold text-gold-light hover:text-white transition-colors">
-                Admin Suite
-              </Link>
-            )}
-            <button
-              onClick={signOut}
-              className="border border-gold/30 hover:border-gold text-gold-light font-body text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
-            >
-              Sign Out
-            </button>
-          </div>
-        ) : (
-          <div className="flex items-center gap-3">
-            <Link to="/login" className="font-body text-sm font-semibold text-gray-300 hover:text-white transition-colors px-3 py-2">
-              Log In
-            </Link>
-            <Link
-              to="/signup"
-              className="bg-gradient-gold text-charcoal font-body text-sm font-bold px-6 py-2.5 rounded-xl hover:opacity-90 transition-all shadow-md glow-gold"
-            >
-              Get Started
-            </Link>
-          </div>
-        )}
       </div>
-    </nav>
+      {open && (
+        <nav className="md:hidden container mx-auto flex flex-col pb-3" aria-label="Main">
+          {NAV_LINKS.map((l) => (
+            <a key={l.href} href={l.href} onClick={() => setOpen(false)} className="py-2.5 font-body text-[15px] text-ink border-b border-line last:border-0">{l.label}</a>
+          ))}
+        </nav>
+      )}
+      <div className="kente-rail" />
+    </header>
   );
 };
 
-const heroAssurances = [
-  { icon: ShieldCheck, text: "Every traveler is ID-checked by our team" },
-  { icon: Lock, text: "Eban holds your payment until you confirm delivery" },
-  { icon: Handshake, text: "You agree the handover with the traveler in Messages" },
-];
+const HeroCard = () => {
+  const { routes, loading } = useOpenRoutes();
+  const r = routes[0];
+  return (
+    <div className="absolute -bottom-10 left-4 right-4 sm:left-auto sm:right-6 sm:w-[330px] bg-white rounded-2xl border border-line p-5 shadow-[var(--shadow-elevated)]">
+      <div className="flex items-center justify-between mb-4">
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-forest/10 px-2.5 py-1 font-body text-[12px] font-medium text-forest">
+          <span className="w-1.5 h-1.5 rounded-full bg-forest" /> {r ? "Space open" : "How a trip looks"}
+        </span>
+        <span className="inline-flex items-center gap-1 font-body text-[12px] text-forest"><ShieldCheck className="w-3.5 h-3.5" /> ID checked</span>
+      </div>
+      {loading ? (
+        <div className="h-20 rounded-lg bg-paper-2 animate-pulse" />
+      ) : (
+        <>
+          <RouteCodes from={r ? codeOf(r.origin_city) : "ACC"} to={r ? codeOf(r.destination_city) : "LHR"} size="lg" />
+          <div className="grid grid-cols-3 gap-3 mt-5 pt-4 border-t border-line">
+            <div><p className="text-[10px] font-body font-semibold uppercase tracking-[0.12em] text-slate">Departs</p><p className="font-body text-sm font-semibold text-ink mt-1">{r ? shortDate(r.next) : "Your date"}</p></div>
+            <div><p className="text-[10px] font-body font-semibold uppercase tracking-[0.12em] text-slate">Space</p><p className="font-body text-sm font-semibold text-ink mt-1">{r ? `${r.kg} kg` : "Up to 23 kg"}</p></div>
+            <div><p className="text-[10px] font-body font-semibold uppercase tracking-[0.12em] text-slate">Trips</p><p className="font-body text-sm font-semibold text-ink mt-1">{r ? r.trips : "Open"}</p></div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
 
 const Hero = () => (
-  <section className="relative min-h-screen flex flex-col justify-center bg-gradient-hero overflow-hidden pt-28 pb-20">
-    {/* Background photo: public/images/hero-bg.jpg. Falls back to the gradient if missing. */}
-    <img
-      src="/images/hero-bg.jpg"
-      alt=""
-      aria-hidden="true"
-      onError={(e) => (e.currentTarget.style.display = "none")}
-      className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
-    />
-    <div className="absolute inset-0 bg-gradient-to-r from-charcoal/90 via-charcoal/65 to-charcoal/35 pointer-events-none" />
-    <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-charcoal/80 to-transparent pointer-events-none" />
-    <div className="eban-weave absolute inset-0 opacity-[0.045] pointer-events-none" aria-hidden="true" />
-
-    <div className="container mx-auto px-6 relative z-10 my-auto">
-      <div>
-        <div className="max-w-2xl animate-fade-up">
-          <h1 className="font-display text-4xl sm:text-5xl md:text-6xl text-white leading-[1.1] mb-6 max-w-2xl">
-            Send a package with a traveler who is already flying your route.
-          </h1>
-
-          <p className="font-body text-base md:text-lg font-light text-gray-200 max-w-xl mb-10 leading-relaxed">
-            Eban connects senders with ID-verified travelers who have spare luggage space. You pay Eban, we hold the money, and the traveler is paid only after you confirm the delivery.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 mb-12">
-            <a
-              href="#book"
-              className="bg-gradient-gold text-charcoal font-body text-sm font-bold px-8 py-4 rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-lg glow-gold"
-            >
-              Post a request <ChevronRight className="w-4 h-4" />
-            </a>
-            <a
-              href="#routes"
-              className="border border-white/30 text-white font-body text-sm font-semibold px-8 py-4 rounded-xl hover:border-gold hover:text-gold-light transition-all text-center backdrop-blur-sm"
-            >
-              See available routes
-            </a>
-          </div>
-
-          <ul className="space-y-3 max-w-lg border-t border-white/15 pt-8">
-            {heroAssurances.map((a) => (
-              <li key={a.text} className="flex items-start gap-3 font-body text-sm text-gray-200">
-                <a.icon className="w-5 h-5 text-gold-light shrink-0 mt-0.5" strokeWidth={1.5} />
-                <span>{a.text}</span>
-              </li>
-            ))}
-          </ul>
+  <section className="bg-paper">
+    <div className="container mx-auto grid lg:grid-cols-[1.05fr_1fr] gap-12 lg:gap-16 items-center pt-12 pb-24 md:pt-20 md:pb-28">
+      <div className="animate-fade-up">
+        <p className="eyebrow mb-5">Send · Carry · Deliver</p>
+        <h1 className="font-display text-[42px] leading-[1.05] sm:text-6xl lg:text-[68px] text-ink">
+          Send it with someone already flying your way.
+        </h1>
+        <p className="font-body text-lg text-slate leading-relaxed mt-6 max-w-[520px]">
+          Eban pairs you with ID-checked travellers who have spare luggage. You pay Eban, we hold the money, and the traveller is paid only after you confirm the parcel arrived.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-3 mt-8">
+          <Link to="/signup" className="inline-flex h-12 items-center justify-center gap-2 px-6 rounded-lg bg-brass font-body text-[15px] font-semibold text-ink hover:bg-[#CB9A22]">
+            Post a request <ArrowRight className="w-4 h-4" />
+          </Link>
+          <a href="#routes" className="inline-flex h-12 items-center justify-center px-6 rounded-lg border border-line bg-white font-body text-[15px] font-semibold text-ink hover:bg-paper-2">
+            Browse open trips
+          </a>
         </div>
-
+        <ul className="flex flex-wrap gap-x-6 gap-y-2 mt-8 font-body text-sm text-slate">
+          {["ID-checked travellers", "Escrow until receipt", "Signed handover"].map((t) => (
+            <li key={t} className="flex items-center gap-1.5"><Check className="w-4 h-4 text-brass-deep" /> {t}</li>
+          ))}
+        </ul>
+      </div>
+      <div className="relative">
+        <div className="rounded-3xl overflow-hidden aspect-[4/3.4] bg-ink-2">
+          <img src="/images/hero-bg.jpg" alt="A plane at the gate at sunset" className="w-full h-full object-cover" />
+        </div>
+        <HeroCard />
       </div>
     </div>
-    <div className="kente-band absolute inset-x-0 bottom-0" aria-hidden="true" />
   </section>
 );
 
-type Role = "sender" | "traveller";
-
 const senderSteps = [
-  { icon: FileText, title: "Post a request", desc: "Say what you're sending and where. Or pick a trip that's already listed." },
-  { icon: Lock, title: "Pay Eban", desc: "Eban holds your money until the item arrives." },
-  { icon: Handshake, title: "Hand it over", desc: "Meet your traveler and agree the handover in Messages." },
-  { icon: CheckCircle2, title: "Confirm delivery", desc: "Tell us it arrived and the traveler gets paid." },
+  { title: "Post a request", desc: "Say what you're sending and where, or book a trip that's already listed." },
+  { title: "Pay into escrow", desc: "You pay Eban. We hold the money until the parcel arrives." },
+  { title: "Hand it over", desc: "Meet your traveller. The handover is signed in the app." },
+  { title: "Confirm receipt", desc: "Tell us it arrived and the traveller is paid." },
 ];
-
 const travellerSteps = [
-  { icon: ShieldCheck, title: "Get verified", desc: "Upload your ID. An Eban admin approves it." },
-  { icon: Plane, title: "Post your trip", desc: "Add your flight and spare kg, and set your own price per kg." },
-  { icon: PackageCheck, title: "Carry and deliver", desc: "Take a request once Eban confirms the sender has paid." },
-  { icon: Award, title: "Get paid", desc: "Your earnings are released when the sender confirms." },
+  { title: "Get verified", desc: "Upload your ID and record a short face check. Our team reviews both." },
+  { title: "Post your trip", desc: "Add your flight and spare kg, and set your own price per kg." },
+  { title: "Carry and deliver", desc: "Take a request once Eban confirms the sender has paid." },
+  { title: "Get paid", desc: "Your full price is released when the sender confirms receipt." },
 ];
 
 const HowItWorks = () => {
-  const [role, setRole] = useState<Role>("sender");
+  const [role, setRole] = useState<"sender" | "traveller">("sender");
   const steps = role === "sender" ? senderSteps : travellerSteps;
-  const tabs: { id: Role; label: string }[] = [
-    { id: "sender", label: "I am sending a package" },
-    { id: "traveller", label: "I am a traveler" },
-  ];
   return (
-    <section id="how-it-works" className="py-20 bg-background relative border-t border-gold/10">
-      <div className="container mx-auto px-6">
-        <SectionLabel>How the Marketplace Works</SectionLabel>
-        <h2 className="font-display text-3xl md:text-4xl leading-tight max-w-xl text-foreground">
-          Four steps from request to delivery
-        </h2>
-        <p className="font-body text-sm text-muted-foreground max-w-lg mt-4 leading-relaxed">
-          EBAN connects you directly with verified travelers on your route. No middlemen, no drop-off centres &mdash; just a structured peer-to-peer marketplace with secure escrow.
-        </p>
-
-        <div role="tablist" aria-label="How it works" className="inline-flex mt-10 p-1 rounded-full bg-card border border-border">
-          {tabs.map((t) => (
-            <button
-              key={t.id}
-              role="tab"
-              aria-selected={role === t.id}
-              onClick={() => setRole(t.id)}
-              className={`px-6 py-2.5 rounded-full font-body text-sm transition-colors ${
-                role === t.id ? "bg-forest text-white font-semibold" : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
+    <section id="how-it-works" className="py-20 md:py-24 bg-paper border-t border-line">
+      <div className="container mx-auto">
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
+          <div>
+            <p className="eyebrow mb-3">How it works</p>
+            <h2 className="font-display text-3xl md:text-[40px] leading-tight text-ink">Four steps, one handover.</h2>
+          </div>
+          <div role="tablist" aria-label="How it works for" className="inline-flex self-start p-1 rounded-lg bg-paper-2 border border-line">
+            {([["sender", "I'm sending"], ["traveller", "I'm travelling"]] as const).map(([id, label]) => (
+              <button
+                key={id}
+                role="tab"
+                aria-selected={role === id}
+                onClick={() => setRole(id)}
+                className={`px-4 py-2 rounded-md font-body text-sm font-semibold transition-colors ${role === id ? "bg-ink text-paper" : "text-slate hover:text-ink"}`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
-
-        <ol key={role} className="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-x-10 gap-y-8 animate-fade-up">
-          {steps.map((step, i) => (
-            <li key={step.title} className="border-t-2 border-gold pt-5">
-              <span className="font-display text-4xl leading-none text-gold" aria-hidden="true">{i + 1}</span>
-              <h3 className="font-display text-xl text-foreground mt-4 mb-2 flex items-center gap-2.5">
-                <step.icon className="w-5 h-5 text-forest shrink-0" strokeWidth={1.5} />
-                {step.title}
-              </h3>
-              <p className="font-body text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
+        <ol key={role} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-10 animate-fade-up">
+          {steps.map((s, i) => (
+            <li key={s.title} className="border-t border-line pt-5">
+              <span className="font-display text-[32px] leading-none text-brass">{String(i + 1).padStart(2, "0")}</span>
+              <h3 className="font-display text-xl text-ink mt-4 mb-2">{s.title}</h3>
+              <p className="font-body text-sm text-slate leading-relaxed">{s.desc}</p>
             </li>
           ))}
         </ol>
@@ -273,133 +202,154 @@ const HowItWorks = () => {
   );
 };
 
-const eligibleItems = [
-  "Official documents, printed certificates, & legal papers",
-  "Clothing, apparel, shoes, and luxury accessories",
-  "Personal care, sealed cosmetics, and hygiene items",
-  "Non-perishable, commercially packaged dried foodstuffs",
-  "Small consumer electronics and gadgets",
-  "Household gifts compliant with airport customs",
-];
-
-const prohibitedItems = [
-  "Cash, bank notes, cheques, or bearer bonds",
-  "Weapons, ammunition, explosives, or flammables",
-  "Unprescribed medicine or controlled substances",
-  "Fresh meat, produce, or unsealed perishable food",
-  "Customs-restricted luxury items exceeding limits",
-  "Any item prohibited by airline or customs regulations",
-];
-
-const WhatWeCarry = () => (
-  <section id="what-we-carry" className="py-24 bg-background border-t border-gold/10">
-    <div className="container mx-auto px-6">
-      <SectionLabel>Safety &amp; Compliance</SectionLabel>
-      <h2 className="font-display text-3xl md:text-4xl text-foreground leading-tight max-w-xl">
-        Clear item rules, your responsibility
-      </h2>
-      <Reveal className="grid md:grid-cols-2 gap-8 mt-16">
-        <div className="border border-emerald-500/20 bg-emerald-500/[0.02] rounded-3xl p-10 shadow-sm">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600 font-bold">
-              <Check className="w-4 h-4" />
-            </div>
-            <h3 className="font-display text-2xl font-medium text-foreground">Eligible Cargo</h3>
-          </div>
-          <ul className="space-y-4">
-            {eligibleItems.map((item) => (
-              <li key={item} className="flex gap-3 items-start border-b border-border/50 pb-3 last:border-0 last:pb-0">
-                <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                <span className="font-body text-sm text-muted-foreground leading-relaxed">{item}</span>
-              </li>
-            ))}
-          </ul>
+const Escrow = () => (
+  <section id="pricing" className="bg-ink-2 text-paper">
+    <div className="container mx-auto py-20 md:py-24">
+      <div className="grid lg:grid-cols-[1fr_1.4fr] gap-12">
+        <div>
+          <p className="font-body text-[11px] font-semibold uppercase tracking-[0.14em] text-brass mb-3">Escrow and pricing</p>
+          <h2 className="font-display text-3xl md:text-[40px] leading-tight">Money moves only when the parcel does.</h2>
+          <p className="font-body text-paper/70 mt-5 leading-relaxed max-w-md">
+            The traveller sets their price per kg and keeps all of it. Eban adds a small service fee, shown before you pay. Nothing is charged until a traveller accepts.
+          </p>
         </div>
-
-        <div className="border border-destructive/20 bg-destructive/[0.02] rounded-3xl p-10 shadow-sm">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-8 h-8 rounded-full bg-destructive/10 flex items-center justify-center text-destructive font-bold">
-              <X className="w-4 h-4" />
+        <Reveal className="grid sm:grid-cols-3 gap-8">
+          {[
+            { n: "01", t: "You pay Eban", d: "With your request reference, after the traveller accepts." },
+            { n: "02", t: "We hold it", d: "The money sits in escrow while the parcel travels." },
+            { n: "03", t: "Released on receipt", d: "You confirm it arrived. If not, report it and the payment stays frozen." },
+          ].map((s) => (
+            <div key={s.n} className="border-t border-white/15 pt-5">
+              <span className="font-display text-2xl text-brass">{s.n}</span>
+              <h3 className="font-display text-xl mt-3 mb-2">{s.t}</h3>
+              <p className="font-body text-sm text-paper/65 leading-relaxed">{s.d}</p>
             </div>
-            <h3 className="font-display text-2xl font-medium text-foreground">Prohibited Cargo</h3>
-          </div>
-          <ul className="space-y-4">
-            {prohibitedItems.map((item) => (
-              <li key={item} className="flex gap-3 items-start border-b border-border/50 pb-3 last:border-0 last:pb-0">
-                <X className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
-                <span className="font-body text-sm text-muted-foreground leading-relaxed">{item}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </Reveal>
+          ))}
+        </Reveal>
+      </div>
     </div>
   </section>
 );
 
-const trustPillars = [
-  {
-    icon: ShieldCheck,
-    title: "100% ID Verified Travelers",
-    desc: "Travelers upload a passport or government photo ID, and our team reviews it. Only approved travelers can be booked or claim requests.",
-  },
-  {
-    icon: Lock,
-    title: "Secure Escrow Payments",
-    desc: "Your payment is held in escrow and only released to the traveler when you confirm you received the item. If something goes wrong, report an issue and the payment stays frozen while we review it.",
-  },
-  {
-    icon: FileSignature,
-    title: "Signed Handover & Ratings",
-    desc: "The traveler signs when they take the item, and both sides rate each other after delivery, so reputation builds with every trip.",
-  },
+const Fence = () => (
+  <section id="safety" className="py-20 md:py-24 bg-paper-2">
+    <div className="container mx-auto grid md:grid-cols-2 gap-12 items-center">
+      <div className="relative rounded-3xl overflow-hidden aspect-[5/4] bg-paper border border-line eban-weave flex items-center justify-center">
+        <img src={ebanSymbol} alt="The Eban Adinkra symbol" className="w-36 h-36 object-contain" />
+      </div>
+      <div>
+        <p className="eyebrow mb-3">Why “Eban”</p>
+        <h2 className="font-display text-3xl md:text-[40px] leading-tight text-ink">A fence around your parcel.</h2>
+        <p className="font-body text-slate leading-relaxed mt-5">
+          Eban is the Akan Adinkra symbol for a fence: safety, security and home. That is the promise. Every step between you and the person carrying your parcel is checked.
+        </p>
+        <ul className="mt-8 space-y-5">
+          {[
+            { icon: ShieldCheck, t: "Everyone is verified", d: "Senders and travellers upload an ID and record a short face check. A person on our team reviews both." },
+            { icon: Lock, t: "Payment held in escrow", d: "The traveller is paid only after you confirm the parcel arrived." },
+            { icon: FileSignature, t: "Signed handover and ratings", d: "The traveller signs at pickup, and both sides rate each other after delivery." },
+          ].map((p) => (
+            <li key={p.t} className="flex gap-4">
+              <span className="w-9 h-9 shrink-0 rounded-full bg-white border border-line flex items-center justify-center"><p.icon className="w-4 h-4 text-forest" /></span>
+              <div>
+                <h3 className="font-body text-[15px] font-semibold text-ink">{p.t}</h3>
+                <p className="font-body text-sm text-slate leading-relaxed mt-1">{p.d}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </section>
+);
+
+const eligibleItems = [
+  "Documents, certificates and legal papers",
+  "Clothing, shoes and accessories",
+  "Sealed cosmetics and personal care",
+  "Packaged, non-perishable foodstuffs",
+  "Small electronics and gadgets",
+  "Gifts that meet customs rules",
+];
+const prohibitedItems = [
+  "Cash, cheques or bearer bonds",
+  "Weapons, explosives or flammables",
+  "Unprescribed medicine or controlled substances",
+  "Fresh meat, produce or unsealed food",
+  "Restricted goods over customs limits",
+  "Anything the airline or customs prohibits",
 ];
 
-const TrustSafety = () => (
-  <section id="trust" className="py-24 bg-background border-t border-gold/10">
-    <div className="container mx-auto px-6">
-      <SectionLabel>Trust &amp; Safety</SectionLabel>
-      <h2 className="font-display text-3xl md:text-4xl leading-tight max-w-xl text-foreground">
-        Trust built in at every step
-      </h2>
-      <Reveal className="grid sm:grid-cols-3 mt-12 border-t border-border">
-        {trustPillars.map((pillar) => (
-          <div key={pillar.title} className="py-8 sm:px-8 sm:first:pl-0 sm:last:pr-0 border-b sm:border-b-0 sm:border-r last:border-r-0 border-border">
-            <pillar.icon className="w-8 h-8 text-forest mb-5" strokeWidth={1.5} />
-            <h3 className="font-display text-xl font-normal text-foreground mb-3">{pillar.title}</h3>
-            <p className="font-body text-xs text-muted-foreground leading-relaxed">{pillar.desc}</p>
+const Rules = () => (
+  <section id="what-we-carry" className="py-20 md:py-24 bg-paper">
+    <div className="container mx-auto">
+      <p className="eyebrow mb-3">Item rules</p>
+      <h2 className="font-display text-3xl md:text-[40px] leading-tight text-ink max-w-xl">Clear rules, shared responsibility.</h2>
+      <Reveal className="grid md:grid-cols-2 gap-6 mt-10">
+        {[
+          { title: "What travellers carry", items: eligibleItems, Icon: Check, tone: "text-forest", ring: "bg-forest/10" },
+          { title: "What we never carry", items: prohibitedItems, Icon: X, tone: "text-kente", ring: "bg-kente/10" },
+        ].map((col) => (
+          <div key={col.title} className="rounded-xl border border-line bg-white p-6 md:p-8">
+            <h3 className="font-display text-xl text-ink mb-5 flex items-center gap-3">
+              <span className={`w-7 h-7 rounded-full ${col.ring} flex items-center justify-center`}><col.Icon className={`w-4 h-4 ${col.tone}`} /></span>
+              {col.title}
+            </h3>
+            <ul>
+              {col.items.map((it) => (
+                <li key={it} className="flex gap-3 py-3 border-t border-line font-body text-sm text-ink/85">
+                  <col.Icon className={`w-4 h-4 mt-0.5 shrink-0 ${col.tone}`} /> {it}
+                </li>
+              ))}
+            </ul>
           </div>
         ))}
       </Reveal>
+      <p className="font-body text-sm text-slate mt-6">Eban is a marketplace. Senders and travellers are responsible for what they send and carry.</p>
+    </div>
+  </section>
+);
+
+const Cta = () => (
+  <section className="bg-brass">
+    <div className="container mx-auto py-16 md:py-20 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
+      <div>
+        <h2 className="font-display text-3xl md:text-[40px] leading-tight text-ink">Someone is already flying your way.</h2>
+        <p className="font-body text-ink/75 mt-3">Post a request in two minutes. Pay only when a traveller accepts.</p>
+      </div>
+      <div className="flex flex-col sm:flex-row gap-3">
+        <Link to="/signup" className="inline-flex h-12 items-center justify-center gap-2 px-6 rounded-lg bg-ink font-body text-[15px] font-semibold text-paper hover:bg-ink-2">
+          Post a request <ArrowRight className="w-4 h-4" />
+        </Link>
+        <Link to="/signup" className="inline-flex h-12 items-center justify-center px-6 rounded-lg border border-ink/20 font-body text-[15px] font-semibold text-ink hover:bg-ink/5">
+          Become a traveller
+        </Link>
+      </div>
     </div>
   </section>
 );
 
 const Footer = () => (
-  <footer className="bg-charcoal text-white pb-16">
-    <div className="kente-band mb-16" aria-hidden="true" />
-    <div className="container mx-auto px-6">
-      <div className="flex flex-col md:flex-row items-center justify-between gap-8 pb-12 border-b border-white/10">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/30 flex items-center justify-center">
-            <img src={ebanSymbol} alt="EBAN" className="w-6 h-6 object-contain" />
-          </div>
-          <div>
-            <span className="font-display text-2xl font-semibold tracking-[0.18em]">EBAN</span>
-            <p className="font-body text-xs text-gold-light">International peer logistics</p>
-          </div>
+  <footer className="bg-ink text-paper">
+    <div className="kente-rail" aria-hidden="true" />
+    <div className="container mx-auto py-14">
+      <div className="grid md:grid-cols-[1.4fr_1fr_1fr] gap-10 pb-10 border-b border-white/10">
+        <div>
+          <EbanLogo to="/?view=site" sub="Peer delivery" dark />
+          <p className="font-body text-sm text-paper/60 mt-4 max-w-xs">Send it with someone already flying your way.</p>
         </div>
-        <div className="flex gap-8 font-body text-sm text-gray-300">
-          <a href="#how-it-works" className="hover:text-white transition-colors">How it works</a>
-          <a href="#what-we-carry" className="hover:text-white transition-colors">Item rules</a>
-          <a href="#trust" className="hover:text-white transition-colors">Trust and safety</a>
-          <a href="#book" className="hover:text-white transition-colors">Post a request</a>
+        <div className="font-body text-sm space-y-2.5">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-paper/40 mb-3">Eban</p>
+          {NAV_LINKS.map((l) => <a key={l.href} href={l.href} className="block text-paper/75 hover:text-paper">{l.label}</a>)}
+        </div>
+        <div className="font-body text-sm space-y-2.5">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-paper/40 mb-3">Help</p>
+          <a href="#faq" className="block text-paper/75 hover:text-paper">Questions</a>
+          <a href={SUPPORT_WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="block text-paper/75 hover:text-paper">WhatsApp support</a>
+          <Link to="/login" className="block text-paper/75 hover:text-paper">Log in</Link>
         </div>
       </div>
-      <div className="mt-8 pt-4 flex flex-col sm:flex-row items-center justify-between text-xs font-body text-gray-500 gap-4">
-        <p>&copy; {new Date().getFullYear()} EBAN Logistics Network. All rights reserved.</p>
-        <p className="text-gray-400">EBAN is a marketplace. Senders and travelers are responsible for what they send and carry.</p>
-      </div>
+      <p className="pt-6 font-body text-xs text-paper/45">© {new Date().getFullYear()} Eban. A marketplace: senders and travellers are responsible for what they send and carry.</p>
     </div>
   </footer>
 );
@@ -410,11 +360,8 @@ const Index = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center font-body text-muted-foreground bg-charcoal text-white">
-        <div className="flex items-center gap-3">
-          <div className="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin" />
-          <span>Connecting to EBAN Network...</span>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-paper">
+        <img src={ebanSymbol} alt="Loading Eban" className="w-10 h-10 animate-pulse" />
       </div>
     );
   }
@@ -431,15 +378,16 @@ const Index = () => {
       <Hero />
       <AvailableTrips />
       <HowItWorks />
-      <WhatWeCarry />
-      <TrustSafety />
+      <Escrow />
+      <Fence />
+      <Rules />
       <FeedbackWall />
       <FaqSection />
-      <BookingForm />
+      {user && <BookingForm />}
+      <Cta />
       <Footer />
     </div>
   );
 };
 
 export default Index;
-

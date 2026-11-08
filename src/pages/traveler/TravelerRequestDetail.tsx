@@ -205,9 +205,9 @@ const TravelerRequestDetail = () => {
     <div className="min-h-screen bg-background">
       <TravelerNav />
       <div className="container mx-auto px-6 py-10 max-w-xl">
-        <div className="bg-card rounded-2xl border border-border p-8 shadow-[var(--shadow-card)]">
+        <div className="bg-card rounded-2xl border border-border p-8">
           <p className="font-body text-xs text-muted-foreground mb-1">Request</p>
-          <h1 className="font-display text-xl font-bold text-foreground mb-4">
+          <h1 className="font-display text-3xl md:text-[34px] leading-tight text-ink mb-4">
             {request.origin_city}, {request.origin_country} &rarr; {request.destination_city}, {request.destination_country}
           </h1>
 
@@ -248,7 +248,7 @@ const TravelerRequestDetail = () => {
 
           {match.status === "pending" && (
             <div className="flex gap-3">
-              <button onClick={handleAccept} disabled={busy} className="flex-1 bg-gradient-gold text-accent-foreground font-display font-bold py-3 rounded-lg text-sm hover:opacity-90 transition-opacity disabled:opacity-50">
+              <button onClick={handleAccept} disabled={busy} className="flex-1 bg-gradient-gold text-accent-foreground font-display font-semibold py-3 rounded-lg text-sm hover:opacity-90 transition-opacity disabled:opacity-50">
                 Accept
               </button>
               <button onClick={handleDecline} disabled={busy} className="flex-1 border border-border text-foreground font-display font-bold py-3 rounded-lg text-sm hover:bg-secondary transition-colors disabled:opacity-50">
@@ -273,7 +273,7 @@ const TravelerRequestDetail = () => {
                   }`}
                 >
                   <p className="font-display text-sm font-semibold text-foreground">Airport handoff (standard)</p>
-                  <p className="font-body text-xs text-muted-foreground mt-1">Sender brings the package to the airport before your flight.</p>
+                  <p className="font-body text-sm text-slate mt-2">Sender brings the package to the airport before your flight.</p>
                 </button>
                 <button
                   type="button"
@@ -283,7 +283,7 @@ const TravelerRequestDetail = () => {
                   }`}
                 >
                   <p className="font-display text-sm font-semibold text-foreground">Custom location</p>
-                  <p className="font-body text-xs text-muted-foreground mt-1">Agree on a convenient time and place with the sender.</p>
+                  <p className="font-body text-sm text-slate mt-2">Agree on a convenient time and place with the sender.</p>
                 </button>
               </div>
               {handoffType === "custom" && (
@@ -298,7 +298,7 @@ const TravelerRequestDetail = () => {
                   </div>
                 </div>
               )}
-              <button type="submit" disabled={busy} className="w-full bg-gradient-gold text-accent-foreground font-display font-bold py-3 rounded-lg text-sm hover:opacity-90 transition-opacity disabled:opacity-50">
+              <button type="submit" disabled={busy} className="w-full bg-gradient-gold text-accent-foreground font-display font-semibold py-3 rounded-lg text-sm hover:opacity-90 transition-opacity disabled:opacity-50">
                 Confirm handoff
               </button>
             </form>
@@ -350,7 +350,7 @@ const TravelerRequestDetail = () => {
                   <button
                     onClick={() => advanceStatus("delivered", { delivered_at: new Date().toISOString() })}
                     disabled={busy}
-                    className="w-full bg-gradient-gold text-accent-foreground font-display font-bold py-3 rounded-lg text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
+                    className="w-full bg-gradient-gold text-accent-foreground font-display font-semibold py-3 rounded-lg text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
                   >
                     Mark as delivered
                   </button>

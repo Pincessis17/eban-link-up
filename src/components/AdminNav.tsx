@@ -24,33 +24,32 @@ export const AdminNav = () => {
   const { pathname } = useLocation();
 
   const linkClasses = (path: string) =>
-    `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-body font-semibold transition-all ${
+    `flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-[13px] font-body font-medium transition-all ${
       pathname === path
-        ? "bg-gold/15 text-gold-light border border-gold/30 shadow-sm"
-        : "text-gray-400 hover:text-white hover:bg-white/5"
+        ? "bg-ink-2 text-paper border border-white/5"
+        : "text-paper/60 hover:text-paper hover:bg-white/5"
     }`;
 
   return (
     <>
       {/* Desktop: fixed vertical sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-30 hidden md:flex w-64 flex-col bg-charcoal border-r border-gold/15 px-5 py-6 text-white shadow-2xl">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden md:flex w-64 flex-col bg-ink border-r border-white/5 px-5 pb-6 pt-0 text-paper overflow-y-auto">
+        <div className="kente-rail -mx-5 mb-6" />
         <Link to="/admin/bookings" className="flex items-center gap-3 px-2 mb-8 group">
-          <div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/30 flex items-center justify-center group-hover:border-gold transition-colors">
-            <img src={ebanSymbol} alt="EBAN" className="w-6 h-6 object-contain" />
-          </div>
+          <img src={ebanSymbol} alt="EBAN" className="w-8 h-8 object-contain" />
           <div>
-            <span className="font-display text-xl font-bold tracking-[0.18em] text-white block leading-tight">EBAN</span>
-            <span className="text-[10px] font-body font-semibold uppercase tracking-widest text-gold-light">Admin Command Suite</span>
+            <span className="font-display text-xl tracking-[0.04em] text-paper block leading-tight">EBAN</span>
+            <span className="text-[10px] font-body font-semibold uppercase tracking-widest text-brass">Admin</span>
           </div>
         </Link>
 
         <nav className="flex flex-col gap-1.5 flex-1">
-          <div className="px-3 text-[10px] font-body uppercase tracking-widest text-gray-500 font-semibold mb-1">Navigation</div>
+          <div className="px-3 text-[10px] font-body uppercase tracking-widest text-paper/40 font-semibold mb-1">Navigation</div>
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon;
             return (
               <Link key={item.to} to={item.to} className={linkClasses(item.to)}>
-                <Icon className="w-4 h-4 text-gold-light" />
+                <Icon className="w-4 h-4 text-brass" />
                 <span>{item.label}</span>
               </Link>
             );
@@ -58,23 +57,23 @@ export const AdminNav = () => {
         </nav>
 
         <div className="flex flex-col gap-1.5 pt-4 border-t border-white/10">
-          <div className="px-3 text-[10px] font-body uppercase tracking-widest text-gray-500 font-semibold mb-1">Preview as</div>
-          <Link to="/sender/requests" className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-body font-semibold text-gray-400 hover:text-white hover:bg-white/5 transition-colors">
-            <Eye className="w-4 h-4 text-gold-light" /><span>Sender view</span>
+          <div className="px-3 text-[10px] font-body uppercase tracking-widest text-paper/40 font-semibold mb-1">Preview as</div>
+          <Link to="/sender/requests" className="flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-[13px] font-body font-medium text-paper/60 hover:text-paper hover:bg-white/5 transition-colors">
+            <Eye className="w-4 h-4 text-brass" /><span>Sender view</span>
           </Link>
-          <Link to="/traveler" className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-body font-semibold text-gray-400 hover:text-white hover:bg-white/5 transition-colors">
-            <Plane className="w-4 h-4 text-gold-light" /><span>Traveler view</span>
+          <Link to="/traveler" className="flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-[13px] font-body font-medium text-paper/60 hover:text-paper hover:bg-white/5 transition-colors">
+            <Plane className="w-4 h-4 text-brass" /><span>Traveler view</span>
           </Link>
           <Link
             to="/?view=site"
-            className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-body font-semibold text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+            className="flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-[13px] font-body font-medium text-paper/60 hover:text-paper hover:bg-white/5 transition-colors"
           >
-            <Globe className="w-4 h-4 text-gold-light" />
+            <Globe className="w-4 h-4 text-brass" />
             <span>Public Site</span>
           </Link>
           <button
             onClick={signOut}
-            className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-body font-semibold text-gray-400 hover:text-rose-400 hover:bg-rose-950/30 transition-colors text-left"
+            className="flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-[13px] font-body font-medium text-paper/60 hover:text-[#E07A6E] hover:bg-white/5 transition-colors text-left"
           >
             <LogOut className="w-4 h-4" />
             <span>Sign Out</span>
@@ -83,14 +82,14 @@ export const AdminNav = () => {
       </aside>
 
       {/* Mobile: compact top bar with horizontal navigation */}
-      <nav className="md:hidden bg-charcoal border-b border-gold/15 px-4 py-3 text-white sticky top-0 z-30">
+      <nav className="md:hidden bg-ink border-b border-white/5 px-4 py-3 text-paper sticky top-0 z-30">
         <div className="flex items-center justify-between mb-3">
           <Link to="/admin/bookings" className="flex items-center gap-2">
             <img src={ebanSymbol} alt="EBAN" className="w-7 h-7" />
-            <span className="font-display text-lg font-bold text-white">EBAN</span>
-            <span className="text-gold-light font-body text-xs">Admin</span>
+            <span className="font-display text-lg font-bold text-paper">EBAN</span>
+            <span className="text-brass font-body text-xs">Admin</span>
           </Link>
-          <button onClick={signOut} className="flex items-center gap-1 text-xs font-body text-gray-400 hover:text-white">
+          <button onClick={signOut} className="flex items-center gap-1 text-xs font-body text-paper/60 hover:text-paper">
             <LogOut className="w-4 h-4" />
           </button>
         </div>
@@ -100,19 +99,19 @@ export const AdminNav = () => {
               key={item.to}
               to={item.to}
               className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-body font-semibold transition-colors ${
-                pathname === item.to ? "bg-gold/20 text-gold-light border border-gold/30" : "text-gray-400 hover:text-white"
+                pathname === item.to ? "bg-ink-2 text-paper border border-white/5" : "text-paper/60 hover:text-paper"
               }`}
             >
               {item.label}
             </Link>
           ))}
-          <Link to="/sender/requests" className="shrink-0 px-3 py-1.5 rounded-lg text-xs font-body font-semibold text-gray-400 hover:text-white">
+          <Link to="/sender/requests" className="shrink-0 px-3 py-1.5 rounded-lg text-xs font-body font-semibold text-paper/60 hover:text-paper">
             Sender view
           </Link>
-          <Link to="/traveler" className="shrink-0 px-3 py-1.5 rounded-lg text-xs font-body font-semibold text-gray-400 hover:text-white">
+          <Link to="/traveler" className="shrink-0 px-3 py-1.5 rounded-lg text-xs font-body font-semibold text-paper/60 hover:text-paper">
             Traveler view
           </Link>
-          <Link to="/?view=site" className="shrink-0 px-3 py-1.5 rounded-lg text-xs font-body font-semibold text-gray-400 hover:text-white">
+          <Link to="/?view=site" className="shrink-0 px-3 py-1.5 rounded-lg text-xs font-body font-semibold text-paper/60 hover:text-paper">
             Site
           </Link>
         </div>

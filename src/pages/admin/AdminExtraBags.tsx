@@ -114,7 +114,7 @@ const AdminExtraBags = () => {
       <AdminNav />
       <div className={ADMIN_SIDEBAR_OFFSET_CLASS}>
         <div className="container mx-auto px-6 py-10 max-w-3xl">
-          <h1 className="font-display text-2xl font-bold text-foreground mb-2">Extra bags</h1>
+          <h1 className="font-display text-3xl md:text-[34px] leading-tight text-ink mb-2">Extra bags</h1>
           <p className="font-body text-sm text-muted-foreground mb-8">
             Optional extra baggage, planned with the traveler. The sender pays the bag cost, the traveler's compensation and your percentage on the compensation into escrow. You send half the bag cost early and the rest after delivery.
           </p>
@@ -131,7 +131,7 @@ const AdminExtraBags = () => {
                   {items.map((b) => (
                     <div key={b.id} className="p-5 rounded-xl border border-border bg-card">
                       <p className="font-display text-sm font-bold text-foreground">{b.route} · sender pays {money(b.total)}</p>
-                      <p className="font-body text-xs text-muted-foreground mt-1">
+                      <p className="font-body text-sm text-slate mt-2">
                         {b.sender} (sender) with {b.traveller} (traveler) · reference <span className="font-mono font-semibold text-foreground">{paymentReference(b.request_id)}-BAG</span>
                       </p>
                       <p className="font-body text-xs text-muted-foreground mt-2">

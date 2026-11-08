@@ -51,7 +51,7 @@ const AdminFees = () => {
       <AdminNav />
       <div className={ADMIN_SIDEBAR_OFFSET_CLASS}>
         <div className="container mx-auto px-6 py-10 max-w-2xl">
-          <h1 className="font-display text-2xl font-bold text-foreground mb-2">Eban service fee</h1>
+          <h1 className="font-display text-3xl md:text-[34px] leading-tight text-ink mb-2">Eban service fee</h1>
           <p className="font-body text-sm text-muted-foreground mb-8">
             Added on top of the traveler's price and paid by the sender. The traveler always receives their full price.
             The fee is the larger of the percentage and the minimum.
@@ -80,7 +80,7 @@ const AdminFees = () => {
                   <button
                     onClick={save}
                     disabled={!valid || saving}
-                    className="bg-gradient-gold text-accent-foreground font-body text-sm font-bold px-6 py-3 rounded-xl hover:opacity-90 disabled:opacity-50"
+                    className="bg-gradient-gold text-accent-foreground font-body text-sm font-semibold px-6 py-3 rounded-xl hover:opacity-90 disabled:opacity-50"
                   >
                     {saving ? "Saving..." : "Save fee"}
                   </button>

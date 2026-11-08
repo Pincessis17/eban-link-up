@@ -91,8 +91,8 @@ const SenderBrowseTrips = () => {
       <SenderNav />
       <div className="container mx-auto px-6 py-10 max-w-5xl">
         <div className="mb-8">
-          <h1 className="font-display text-3xl md:text-4xl font-light text-foreground">Browse trips</h1>
-          <p className="font-body text-xs text-muted-foreground mt-1">
+          <h1 className="font-display text-3xl md:text-[34px] leading-tight text-ink">Browse trips</h1>
+          <p className="font-body text-sm text-slate mt-2">
             Pick a traveler already flying your route and book space for your item. You pay into escrow once they accept.
           </p>
         </div>
@@ -111,7 +111,7 @@ const SenderBrowseTrips = () => {
         {loading && <div className="text-center py-16 font-body text-muted-foreground">Loading trips...</div>}
 
         {!loading && visible.length === 0 && (
-          <div className="text-center py-16 bg-card rounded-3xl border border-border/80 shadow-[var(--shadow-card)]">
+          <div className="text-center py-16 bg-card rounded-2xl border border-border/80">
             <EmptyIllustration kind="plane" />
             <p className="font-display text-xl font-semibold text-foreground mb-1">No trips on that route yet</p>
             <p className="font-body text-sm text-muted-foreground mb-5">
@@ -119,7 +119,7 @@ const SenderBrowseTrips = () => {
             </p>
             <Link
               to="/sender/new-request"
-              className="inline-flex bg-gradient-gold text-accent-foreground font-body font-bold text-xs uppercase tracking-wider px-6 py-3 rounded-xl hover:opacity-90"
+              className="inline-flex bg-gradient-gold text-accent-foreground font-body font-semibold text-xs px-6 py-3 rounded-xl hover:opacity-90"
             >
               Post a request
             </Link>
@@ -130,7 +130,7 @@ const SenderBrowseTrips = () => {
           {visible.map((t) => {
             const blocked = blockedReason(t);
             return (
-              <div key={t.id} className="bg-card rounded-2xl border border-border/80 shadow-[var(--shadow-card)] overflow-hidden flex flex-col">
+              <div key={t.id} className="bg-card rounded-2xl border border-border/80 overflow-hidden flex flex-col">
                 <div className="bg-charcoal px-5 py-3 flex items-center justify-between text-xs">
                   <span className="flex items-center gap-2 text-gold-light uppercase tracking-widest font-medium">
                     <Calendar className="w-3.5 h-3.5 text-gold" /> {formatDate(t.departure_date)}
@@ -175,7 +175,7 @@ const SenderBrowseTrips = () => {
                   <button
                     disabled={!!blocked}
                     onClick={() => setBooking(t)}
-                    className="w-full bg-gradient-gold text-accent-foreground font-body text-xs font-bold uppercase tracking-wider py-3 rounded-xl hover:opacity-95 shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full bg-gradient-gold text-accent-foreground font-body text-xs font-semibold py-3 rounded-xl hover:opacity-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {blocked ?? "Book space"}
                   </button>
@@ -262,7 +262,7 @@ const SenderBrowseTrips = () => {
             <button
               type="submit"
               disabled={saving}
-              className="w-full bg-gradient-gold text-accent-foreground font-body font-bold text-xs uppercase tracking-wider py-3.5 rounded-xl hover:opacity-90 disabled:opacity-50"
+              className="w-full bg-gradient-gold text-accent-foreground font-body font-semibold text-xs py-3.5 rounded-xl hover:opacity-90 disabled:opacity-50"
             >
               {saving ? "Sending..." : "Send booking request"}
             </button>

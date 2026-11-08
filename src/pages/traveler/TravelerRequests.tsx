@@ -73,7 +73,7 @@ const TravelerRequests = () => {
     <div className="min-h-screen bg-background">
       <TravelerNav />
       <div className="container mx-auto px-6 py-10 max-w-2xl">
-        <h1 className="font-display text-2xl font-bold text-foreground mb-6">My bookings</h1>
+        <h1 className="font-display text-3xl md:text-[34px] leading-tight text-ink mb-6">Your bookings</h1>
 
         {loading && <div className="text-center py-10 font-body text-muted-foreground">Loading...</div>}
 
@@ -99,7 +99,7 @@ const TravelerRequests = () => {
                   <p className="font-display text-sm font-bold text-foreground">
                     {m.delivery_requests?.origin_city} &rarr; {m.delivery_requests?.destination_city}
                   </p>
-                  <p className="font-body text-xs text-muted-foreground mt-1">
+                  <p className="font-body text-sm text-slate mt-2">
                     {m.delivery_requests?.item_type} &middot; {m.delivery_requests?.weight_kg}kg
                   </p>
                 </div>

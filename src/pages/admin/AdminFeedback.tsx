@@ -62,7 +62,7 @@ const AdminFeedback = () => {
       <AdminNav />
       <div className={ADMIN_SIDEBAR_OFFSET_CLASS}>
         <div className="container mx-auto px-6 py-10 max-w-3xl">
-          <h1 className="font-display text-2xl font-bold text-foreground mb-2">Feedback &amp; reviews</h1>
+          <h1 className="font-display text-3xl md:text-[34px] leading-tight text-ink mb-2">Feedback &amp; reviews</h1>
           <p className="font-body text-sm text-muted-foreground mb-6">Reviews go live as soon as they are posted. Hide any that break the rules.</p>
           <div className="flex gap-2 mb-6">
             {(["approved", "hidden", "all"] as const).map((f) => (
@@ -92,7 +92,7 @@ const AdminFeedback = () => {
                         <Star key={n} className={`w-3.5 h-3.5 ${n <= r.rating ? "fill-gold text-gold" : "text-border"}`} />
                       ))}
                     </span>
-                    <p className="font-body text-xs text-muted-foreground mt-1">
+                    <p className="font-body text-sm text-slate mt-2">
                       {r.profiles?.full_name ?? "Unknown"} · {r.profiles?.role ?? "-"} · {new Date(r.created_at).toLocaleDateString()}
                     </p>
                   </div>

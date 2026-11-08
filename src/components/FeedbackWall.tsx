@@ -69,13 +69,13 @@ export const FeedbackWall = () => {
   };
 
   return (
-    <section id="feedback" className="py-24 bg-background border-t border-gold/10">
-      <div className="container mx-auto px-6">
+    <section id="feedback" className="py-20 md:py-24 bg-background border-t border-line">
+      <div className="container mx-auto">
         <div className="grid lg:grid-cols-[minmax(0,340px)_1fr] gap-14">
           <div>
-            <p className="font-body text-[11px] font-semibold uppercase tracking-[0.2em] text-gold-dark mb-4">Community feedback</p>
-            <h2 className="font-display text-4xl md:text-5xl font-light leading-tight text-foreground">
-              Straight from <em className="italic text-gold-dark">our members</em>
+            <p className="eyebrow mb-3">Community feedback</p>
+            <h2 className="font-display text-3xl md:text-[40px] leading-tight text-ink">
+              Straight from the people using it.
             </h2>
             <p className="font-body text-sm text-muted-foreground leading-relaxed mt-5">
               Every review here is written by a real Eban account. No edits, no invented quotes.
@@ -106,14 +106,14 @@ export const FeedbackWall = () => {
                   setMsg(null);
                   setOpen(true);
                 }}
-                className="mt-8 inline-flex items-center gap-2 bg-gradient-gold text-accent-foreground px-5 py-3 rounded-xl text-xs font-body font-bold tracking-wider uppercase hover:opacity-90 shadow-sm"
+                className="mt-8 inline-flex items-center gap-2 bg-gradient-gold text-accent-foreground h-11 px-5 rounded-lg text-sm font-body font-semibold hover:opacity-90"
               >
                 <MessageSquarePlus className="w-4 h-4" /> Share your experience
               </button>
             ) : (
               <Link
                 to="/login"
-                className="mt-8 inline-flex items-center gap-2 border border-gold/40 text-gold-dark px-5 py-3 rounded-xl text-xs font-body font-bold tracking-wider uppercase hover:bg-gold/10"
+                className="mt-8 inline-flex items-center gap-2 border border-line bg-white text-ink h-11 px-5 rounded-lg text-sm font-body font-semibold hover:bg-paper-2"
               >
                 Sign in to leave a review
               </Link>
@@ -187,7 +187,7 @@ export const FeedbackWall = () => {
             <button
               onClick={submit}
               disabled={busy || msg?.ok}
-              className="w-full bg-gradient-gold text-accent-foreground py-3 rounded-xl text-xs font-body font-bold tracking-wider uppercase disabled:opacity-50"
+              className="w-full bg-gradient-gold text-accent-foreground py-3 rounded-xl text-xs font-body font-semibold disabled:opacity-50"
             >
               {busy ? "Sending..." : "Submit feedback"}
             </button>

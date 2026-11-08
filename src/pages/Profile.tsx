@@ -93,11 +93,11 @@ const Profile = () => {
 
         {data && (
           <>
-            <div className="bg-card rounded-3xl border border-border/80 p-8 shadow-[var(--shadow-card)]">
+            <div className="bg-card rounded-2xl border border-border/80 p-8">
               <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div>
                   <p className="font-body text-[10px] uppercase font-semibold tracking-widest text-gold-dark">{own ? "Your profile" : "Profile"}</p>
-                  <h1 className="font-display text-3xl font-medium text-foreground">{own ? data.full_name ?? data.first_name : data.first_name}</h1>
+                  <h1 className="font-display text-2xl md:text-[28px] leading-tight text-ink">{own ? data.full_name ?? data.first_name : data.first_name}</h1>
                   <p className="font-body text-xs text-muted-foreground mt-1 flex items-center gap-3 flex-wrap">
                     {data.member_since && (
                       <span className="inline-flex items-center gap-1">
@@ -119,7 +119,7 @@ const Profile = () => {
                     <>
                       <p className="font-display text-4xl font-medium text-foreground leading-none">{Number(data.avg_rating).toFixed(1)}</p>
                       <Stars value={Number(data.avg_rating)} />
-                      <p className="font-body text-xs text-muted-foreground mt-1">{data.rating_count} review{data.rating_count === 1 ? "" : "s"}</p>
+                      <p className="font-body text-sm text-slate mt-2">{data.rating_count} review{data.rating_count === 1 ? "" : "s"}</p>
                     </>
                   ) : (
                     <p className="font-body text-sm text-muted-foreground">No reviews yet</p>
@@ -169,7 +169,7 @@ const Profile = () => {
             )}
 
             {own && (
-              <form onSubmit={save} className="bg-card rounded-3xl border border-border/80 p-8 shadow-[var(--shadow-card)] mt-6 space-y-4">
+              <form onSubmit={save} className="bg-card rounded-2xl border border-border/80 p-8 mt-6 space-y-4">
                 <h2 className="font-display text-xl font-medium text-foreground">Your details</h2>
                 <p className="font-body text-xs text-muted-foreground">
                   Other people only see your first name. Your phone number is shared with the other person only after a request is paid, for the handover.
@@ -184,7 +184,7 @@ const Profile = () => {
                 </div>
                 <div className="flex items-center justify-between gap-4 flex-wrap">
                   <p className="font-body text-xs text-muted-foreground">Signed in as {user?.email}</p>
-                  <button disabled={saving} className="bg-gradient-gold text-accent-foreground font-body font-bold text-xs uppercase tracking-wider px-6 py-3 rounded-xl hover:opacity-90 disabled:opacity-50">
+                  <button disabled={saving} className="bg-gradient-gold text-accent-foreground font-body font-semibold text-xs px-6 py-3 rounded-xl hover:opacity-90 disabled:opacity-50">
                     {saving ? "Saving..." : "Save"}
                   </button>
                 </div>

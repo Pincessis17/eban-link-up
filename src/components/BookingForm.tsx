@@ -77,7 +77,7 @@ const BookingForm = () => {
     return (
       <section id="book" className="py-24 bg-background border-t border-gold/10">
         <div className="container mx-auto px-6">
-          <div className="max-w-2xl mx-auto text-center bg-card rounded-3xl p-12 border border-gold/30 shadow-gold-glow">
+          <div className="max-w-2xl mx-auto text-center bg-card rounded-2xl p-12 border border-gold/30 shadow-gold-glow">
             <div className="w-20 h-20 rounded-full bg-gradient-gold flex items-center justify-center mx-auto mb-6 glow-gold">
               <CheckCircle2 className="w-10 h-10 text-accent-foreground" />
             </div>
@@ -87,7 +87,7 @@ const BookingForm = () => {
             </p>
             <Link
               to="/sender/requests"
-              className="inline-flex items-center gap-2 bg-gradient-gold text-accent-foreground font-body font-bold uppercase tracking-wider px-8 py-4 rounded-xl text-xs hover:opacity-90 shadow-md transition-all"
+              className="inline-flex items-center gap-2 bg-gradient-gold text-accent-foreground font-body font-semibold px-8 py-4 rounded-xl text-xs hover:opacity-90 transition-all"
             >
               View my requests <ChevronRight className="w-4 h-4" />
             </Link>
@@ -104,14 +104,9 @@ const BookingForm = () => {
     <section id="book" className="py-24 bg-background relative overflow-hidden border-t border-gold/10">
       <div className="container mx-auto px-6">
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 bg-gold/10 border border-gold/25 px-3 py-1 rounded-full mb-3">
-            <Sparkles className="w-3.5 h-3.5 text-gold-dark" />
-            <span className="font-body text-xs font-semibold tracking-[0.2em] uppercase text-gold-dark">
-              Open Request Board
-            </span>
-          </div>
-          <h2 className="font-display text-4xl md:text-5xl font-light text-foreground">
-            Post a <em className="italic text-gold-dark font-normal">Request</em>
+          <p className="eyebrow mb-3">Open request board</p>
+          <h2 className="font-display text-3xl md:text-[40px] leading-tight text-ink">
+            Post a request.
           </h2>
           <p className="font-body text-muted-foreground mt-3 max-w-xl mx-auto text-base">
             Describe what you need carried. Travelers on your route can claim it, and your payment is held in escrow until you confirm delivery.
@@ -119,7 +114,7 @@ const BookingForm = () => {
         </div>
 
         {/* Wizard Form Container */}
-        <div className="max-w-3xl mx-auto bg-card rounded-3xl border border-border/80 shadow-[var(--shadow-elevated)] overflow-hidden">
+        <div className="max-w-3xl mx-auto bg-card rounded-2xl border border-border/80 shadow-[var(--shadow-elevated)] overflow-hidden">
           {/* Step Stepper Navigation Header */}
           <div className="bg-charcoal px-8 py-6 border-b border-gold/15 flex items-center justify-between">
             <div className="flex items-center gap-2 text-xs font-body uppercase tracking-wider text-primary-foreground">
@@ -193,7 +188,7 @@ const BookingForm = () => {
                       }
                       setStep(2);
                     }}
-                    className="bg-gradient-gold text-accent-foreground font-body font-bold text-xs uppercase tracking-wider px-8 py-3.5 rounded-xl hover:opacity-90 transition-opacity flex items-center gap-2 shadow-sm"
+                    className="bg-gradient-gold text-accent-foreground font-body font-semibold text-xs px-8 py-3.5 rounded-xl hover:opacity-90 transition-opacity flex items-center gap-2"
                   >
                     Next: Item Specifications <ChevronRight className="w-4 h-4" />
                   </button>
@@ -217,7 +212,7 @@ const BookingForm = () => {
                         type="button"
                         className={`px-4 py-2.5 rounded-xl font-body text-xs font-semibold transition-all border ${
                           form.itemType === type
-                            ? "bg-gradient-gold text-accent-foreground border-transparent shadow-sm"
+                            ? "bg-gradient-gold text-accent-foreground border-transparent"
                             : "bg-card border-border text-muted-foreground hover:border-gold/50"
                         }`}
                         onClick={() => setForm({ ...form, itemType: type })}
@@ -260,7 +255,7 @@ const BookingForm = () => {
                         type="button"
                         className={`py-3 rounded-xl font-body text-xs font-semibold capitalize transition-all border ${
                           form.urgencyLevel === level
-                            ? "bg-gradient-gold text-accent-foreground border-transparent shadow-sm"
+                            ? "bg-gradient-gold text-accent-foreground border-transparent"
                             : "bg-card border-border text-muted-foreground hover:border-gold/50"
                         }`}
                         onClick={() => setForm({ ...form, urgencyLevel: level })}
@@ -280,7 +275,7 @@ const BookingForm = () => {
                         type="button"
                         className={`px-4 py-2 rounded-xl font-body text-xs font-semibold capitalize border transition-all ${
                           form.flags.includes(flag)
-                            ? "bg-earth text-gold-light border-gold/40 shadow-sm"
+                            ? "bg-earth text-gold-light border-gold/40"
                             : "bg-card border-border text-muted-foreground hover:border-gold/40"
                         }`}
                         onClick={() => toggleFlag(flag)}
@@ -308,7 +303,7 @@ const BookingForm = () => {
                       }
                       setStep(3);
                     }}
-                    className="bg-gradient-gold text-accent-foreground font-body font-bold text-xs uppercase tracking-wider px-8 py-3.5 rounded-xl hover:opacity-90 transition-opacity flex items-center gap-2 shadow-sm"
+                    className="bg-gradient-gold text-accent-foreground font-body font-semibold text-xs px-8 py-3.5 rounded-xl hover:opacity-90 transition-opacity flex items-center gap-2"
                   >
                     Review &amp; Estimate <ChevronRight className="w-4 h-4" />
                   </button>
@@ -365,7 +360,7 @@ const BookingForm = () => {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="bg-gradient-gold text-accent-foreground font-body font-bold text-xs uppercase tracking-widest px-10 py-4 rounded-xl hover:opacity-90 transition-opacity flex items-center gap-2 shadow-lg glow-gold disabled:opacity-50"
+                    className="bg-gradient-gold text-accent-foreground font-body font-semibold text-xs px-10 py-4 rounded-xl hover:opacity-90 transition-opacity flex items-center gap-2 glow-gold disabled:opacity-50"
                   >
                     {loading ? "Posting..." : "Post request"} <Send className="w-4 h-4" />
                   </button>

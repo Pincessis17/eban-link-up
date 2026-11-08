@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import ebanSymbol from "@/assets/eban-symbol.png";
-import { ArrowRight, CheckCircle2, User, Plane, Send } from "lucide-react";
+import { ArrowRight, CheckCircle2, Plane, Send } from "lucide-react";
+import { AuthShell, authInput, authLabel } from "@/components/AuthShell";
 
 const Signup = () => {
   const { signUp } = useAuth();
@@ -46,139 +46,81 @@ const Signup = () => {
 
   if (needsConfirmation) {
     return (
-      <div className="min-h-screen bg-gradient-hero flex items-center justify-center px-6 py-12 text-white">
-        <div className="w-full max-w-md bg-charcoal/90 backdrop-blur-2xl rounded-3xl p-10 border border-gold/20 shadow-2xl text-center">
-          <div className="w-16 h-16 rounded-full bg-gradient-gold flex items-center justify-center mx-auto mb-6 glow-gold">
-            <CheckCircle2 className="w-8 h-8 text-charcoal" />
-          </div>
-          <h1 className="font-display text-3xl font-light text-white mb-3">Verification Sent</h1>
-          <p className="font-body text-xs text-gray-300 mb-8 max-w-xs mx-auto leading-relaxed">
-            We sent an activation link to <strong className="text-gold-light">{email}</strong>. Please confirm your email to sign in.
-          </p>
-          <Link
-            to="/login"
-            className="inline-flex items-center gap-2 bg-gradient-gold text-charcoal font-body font-bold text-xs uppercase tracking-widest px-8 py-4 rounded-xl hover:opacity-90 shadow-lg glow-gold transition-all"
-          >
-            Go to Login Portal <ArrowRight className="w-4 h-4" />
-          </Link>
+      <AuthShell headline="One account. Send or carry.">
+        <div className="w-12 h-12 rounded-full bg-forest/10 flex items-center justify-center mb-6">
+          <CheckCircle2 className="w-6 h-6 text-forest" />
         </div>
-      </div>
+        <h1 className="font-display text-3xl md:text-[34px] leading-tight text-ink">Check your email.</h1>
+        <p className="font-body text-sm text-slate mt-3 mb-8 leading-relaxed">
+          We sent an activation link to <strong className="text-ink">{email}</strong>. Confirm it, then sign in.
+        </p>
+        <Link to="/login" className="w-full h-11 bg-brass text-ink font-body font-semibold text-sm rounded-lg hover:bg-[#CB9A22] flex items-center justify-center gap-2">
+          Go to sign in <ArrowRight className="w-4 h-4" />
+        </Link>
+      </AuthShell>
     );
   }
 
+  const roleBtn = (r: "Sender" | "Traveller", label: string, Icon: typeof Send) => (
+    <button
+      type="button"
+      onClick={() => setRole(r)}
+      aria-pressed={role === r}
+      className={`h-10 rounded-md font-body text-[13px] font-semibold flex items-center justify-center gap-2 transition-colors ${
+        role === r ? "bg-ink text-paper" : "text-slate hover:text-ink"
+      }`}
+    >
+      <Icon className="w-3.5 h-3.5" /> {label}
+    </button>
+  );
+
   return (
-    <div className="min-h-screen bg-gradient-hero flex items-center justify-center px-6 py-12 relative overflow-hidden">
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-gold/10 rounded-full blur-3xl pointer-events-none" />
+    <AuthShell headline="One account. Send or carry.">
+      <h1 className="font-display text-3xl md:text-[34px] leading-tight text-ink">Create your account.</h1>
+      <p className="font-body text-sm text-slate mt-2 mb-7">You can switch between sending and travelling any time.</p>
 
-      <div className="w-full max-w-md bg-charcoal/90 backdrop-blur-2xl rounded-3xl p-8 md:p-10 border border-gold/20 shadow-2xl relative z-10 text-white">
-        <Link to="/" className="flex items-center gap-3 mb-8 justify-center group">
-          <div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/30 flex items-center justify-center group-hover:border-gold transition-colors">
-            <img src={ebanSymbol} alt="EBAN" className="w-6 h-6 object-contain" />
-          </div>
-          <div>
-            <span className="font-display text-2xl font-bold tracking-[0.18em] text-white block leading-tight">EBAN</span>
-            <span className="font-body text-[9px] uppercase tracking-widest text-gold-light">Join the Network</span>
-          </div>
-        </Link>
-
-        <h1 className="font-display text-3xl font-light text-white mb-2 text-center">Create an Account</h1>
-
-        {routeOrigin && routeDestination && (
-          <p className="font-body text-xs text-center text-gold-light mb-6">
-            Pre-filling request for: <strong>{routeOrigin}</strong> &rarr; <strong>{routeDestination}</strong>
-          </p>
-        )}
-
-        {error && (
-          <div className="bg-destructive/20 border border-destructive/40 text-rose-300 rounded-xl p-3.5 mb-6 text-xs font-body text-center">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label className="font-body text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2 block">Start as a</label>
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => setRole("Sender")}
-                className={`py-3.5 rounded-xl font-body text-xs font-bold uppercase tracking-wider transition-all border flex items-center justify-center gap-2 ${
-                  role === "Sender"
-                    ? "bg-gradient-gold text-charcoal border-transparent shadow-md"
-                    : "bg-white/5 border-white/10 text-gray-400 hover:border-gold/40"
-                }`}
-              >
-                <Send className="w-3.5 h-3.5" /> Sender
-              </button>
-              <button
-                type="button"
-                onClick={() => setRole("Traveller")}
-                className={`py-3.5 rounded-xl font-body text-xs font-bold uppercase tracking-wider transition-all border flex items-center justify-center gap-2 ${
-                  role === "Traveller"
-                    ? "bg-gradient-gold text-charcoal border-transparent shadow-md"
-                    : "bg-white/5 border-white/10 text-gray-400 hover:border-gold/40"
-                }`}
-              >
-                <Plane className="w-3.5 h-3.5" /> Traveler
-              </button>
-            </div>
-            <p className="font-body text-xs text-gray-400 mt-2">One account does both. You can switch between sending and travelling any time.</p>
-          </div>
-
-          <div>
-            <label className="font-body text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2 block">Full Legal Name</label>
-            <input
-              type="text"
-              required
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 font-body text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all"
-              placeholder="e.g. Kwame Mensah"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label className="font-body text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2 block">Email Address</label>
-            <input
-              type="email"
-              required
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 font-body text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all"
-              placeholder="name@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label className="font-body text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2 block">Password</label>
-            <input
-              type="password"
-              required
-              minLength={6}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 font-body text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all"
-              placeholder="Minimum 6 characters"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-gradient-gold text-charcoal font-body font-bold text-xs uppercase tracking-widest py-4 rounded-xl hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg glow-gold mt-2"
-          >
-            {loading ? "Creating Account..." : "Complete Registration"} <ArrowRight className="w-4 h-4" />
-          </button>
-        </form>
-
-        <p className="font-body text-xs text-gray-400 text-center mt-8">
-          Already registered?{" "}
-          <Link to="/login" className="text-gold-light font-semibold hover:underline">
-            Log In
-          </Link>
+      {routeOrigin && routeDestination && (
+        <p className="font-body text-sm text-brass-deep bg-brass/10 border border-brass/30 rounded-lg px-3 py-2 mb-5">
+          Your request will start with <strong>{routeOrigin}</strong> → <strong>{routeDestination}</strong>.
         </p>
-      </div>
-    </div>
+      )}
+
+      {error && (
+        <div className="bg-kente/10 border border-kente/30 text-kente rounded-lg p-3 mb-5 text-sm font-body">{error}</div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <span className={authLabel}>Start as</span>
+          <div className="grid grid-cols-2 gap-1 p-1 rounded-lg bg-paper-2 border border-line">
+            {roleBtn("Sender", "Sending", Send)}
+            {roleBtn("Traveller", "Travelling", Plane)}
+          </div>
+        </div>
+        <div>
+          <label className={authLabel} htmlFor="name">Full legal name</label>
+          <input id="name" type="text" required autoComplete="name" className={authInput} placeholder="As it appears on your ID" value={fullName} onChange={(e) => setFullName(e.target.value)} />
+        </div>
+        <div>
+          <label className={authLabel} htmlFor="email">Email address</label>
+          <input id="email" type="email" required autoComplete="email" className={authInput} placeholder="name@example.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+        </div>
+        <div>
+          <label className={authLabel} htmlFor="password">Password</label>
+          <input id="password" type="password" required minLength={6} autoComplete="new-password" className={authInput} placeholder="Minimum 6 characters" value={password} onChange={(e) => setPassword(e.target.value)} />
+        </div>
+        <button type="submit" disabled={loading} className="w-full h-11 bg-brass text-ink font-body font-semibold text-sm rounded-lg hover:bg-[#CB9A22] disabled:opacity-60 flex items-center justify-center gap-2 mt-2">
+          {loading ? "Creating account..." : "Create account"} <ArrowRight className="w-4 h-4" />
+        </button>
+      </form>
+
+      <p className="font-body text-xs text-slate mt-5 leading-relaxed">
+        By continuing you agree to the marketplace rules. Senders and travellers are responsible for what they send and carry.
+      </p>
+      <p className="font-body text-sm text-slate mt-4">
+        Already have an account? <Link to="/login" className="font-semibold text-brass-deep hover:underline">Sign in</Link>
+      </p>
+    </AuthShell>
   );
 };
 

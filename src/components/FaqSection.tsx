@@ -65,13 +65,13 @@ export const FaqSection = () => {
   const [tab, setTab] = useState(tabs[0]);
 
   return (
-    <section id="faq" className="py-24 bg-background border-t border-gold/10">
-      <div className="container mx-auto px-6">
+    <section id="faq" className="py-20 md:py-24 bg-background border-t border-line">
+      <div className="container mx-auto">
         <div className="grid lg:grid-cols-[minmax(0,380px)_1fr] gap-14">
           <div className="flex flex-col">
-            <p className="font-body text-[11px] font-semibold uppercase tracking-[0.2em] text-gold-dark mb-4">FAQ</p>
-            <h2 className="font-display text-4xl md:text-5xl font-light leading-tight text-foreground">
-              Questions, <em className="italic text-gold-dark">answered</em>
+            <p className="eyebrow mb-3">FAQ</p>
+            <h2 className="font-display text-3xl md:text-[40px] leading-tight text-ink">
+              Questions, answered.
             </h2>
             <p className="font-body text-sm text-muted-foreground leading-relaxed mt-5">
               The basics of sending with Eban, how travelers are checked, and how payments work.
@@ -81,7 +81,7 @@ export const FaqSection = () => {
                 href={SUPPORT_WHATSAPP_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-8 self-start inline-flex items-center gap-2 bg-gradient-gold text-accent-foreground px-5 py-3 rounded-xl text-xs font-body font-bold tracking-wider uppercase hover:opacity-90 shadow-sm"
+                className="mt-8 self-start inline-flex items-center gap-2 bg-gradient-gold text-accent-foreground h-11 px-5 rounded-lg text-sm font-body font-semibold hover:opacity-90"
               >
                 Contact support <ArrowUpRight className="w-4 h-4" />
               </a>
@@ -97,7 +97,7 @@ export const FaqSection = () => {
                   aria-selected={tab === t}
                   onClick={() => setTab(t)}
                   className={`px-4 py-2 rounded-full text-xs font-body font-semibold transition-colors border ${
-                    tab === t ? "bg-charcoal text-gold-light border-charcoal" : "bg-card text-muted-foreground border-border hover:border-gold/50"
+                    tab === t ? "bg-ink text-paper border-ink" : "bg-card text-muted-foreground border-border hover:border-gold/50"
                   }`}
                 >
                   {t}

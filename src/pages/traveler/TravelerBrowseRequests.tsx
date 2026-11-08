@@ -118,8 +118,8 @@ const TravelerBrowseRequests = () => {
       <TravelerNav />
       <div className="container mx-auto px-6 py-10 max-w-5xl">
         <div className="mb-8">
-          <h1 className="font-display text-3xl md:text-4xl font-light text-foreground">Browse requests</h1>
-          <p className="font-body text-xs text-muted-foreground mt-1">
+          <h1 className="font-display text-3xl md:text-[34px] leading-tight text-ink">Browse requests</h1>
+          <p className="font-body text-sm text-slate mt-2">
             Senders looking for someone on their route. Claim one with a trip you've posted and you're paid when they confirm delivery.
           </p>
         </div>
@@ -130,7 +130,7 @@ const TravelerBrowseRequests = () => {
               <ShieldAlert className="w-5 h-5 text-gold-dark shrink-0" />
               You can browse now, but you need to finish ID verification before claiming a request.
             </div>
-            <Link to="/traveler/verification" className="bg-earth text-gold-light font-body text-xs font-semibold px-4 py-2.5 rounded-xl uppercase tracking-wider shrink-0">
+            <Link to="/traveler/verification" className="bg-earth text-gold-light font-body text-xs font-semibold px-4 py-2.5 rounded-xl shrink-0">
               Verify
             </Link>
           </div>
@@ -144,7 +144,7 @@ const TravelerBrowseRequests = () => {
         {loading && <div className="text-center py-16 font-body text-muted-foreground">Loading requests...</div>}
 
         {!loading && visible.length === 0 && (
-          <div className="text-center py-16 bg-card rounded-3xl border border-border/80 shadow-[var(--shadow-card)]">
+          <div className="text-center py-16 bg-card rounded-2xl border border-border/80">
             <EmptyIllustration kind="package" />
             <p className="font-display text-xl font-semibold text-foreground mb-1">No open requests right now</p>
             <p className="font-body text-sm text-muted-foreground">Post a trip so senders can find and book you directly.</p>
@@ -155,7 +155,7 @@ const TravelerBrowseRequests = () => {
           {visible.map((r) => {
             const options = tripsFor(r);
             return (
-              <div key={r.id} className="bg-card rounded-2xl border border-border/80 shadow-[var(--shadow-card)] p-5 flex flex-col">
+              <div key={r.id} className="bg-card rounded-2xl border border-border/80 p-5 flex flex-col">
                 <div className="flex items-center justify-between mb-3">
                   <span className="bg-secondary px-2.5 py-1 rounded-md text-xs font-body font-medium text-foreground">{r.item_type}</span>
                   <span className="font-body text-xs text-muted-foreground flex items-center gap-1">
@@ -197,7 +197,7 @@ const TravelerBrowseRequests = () => {
                     <button
                       onClick={() => openClaim(r)}
                       disabled={!verified}
-                      className="w-full bg-gradient-gold text-accent-foreground font-body text-xs font-bold uppercase tracking-wider py-3 rounded-xl hover:opacity-95 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full bg-gradient-gold text-accent-foreground font-body text-xs font-semibold py-3 rounded-xl hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {verified ? "Claim with my trip" : "Verify to claim"}
                     </button>
@@ -251,7 +251,7 @@ const TravelerBrowseRequests = () => {
               <button
                 onClick={confirmClaim}
                 disabled={busy || earning == null}
-                className="w-full bg-gradient-gold text-accent-foreground font-body font-bold text-xs uppercase tracking-wider py-3.5 rounded-xl hover:opacity-90 disabled:opacity-50"
+                className="w-full bg-gradient-gold text-accent-foreground font-body font-semibold text-xs py-3.5 rounded-xl hover:opacity-90 disabled:opacity-50"
               >
                 {busy ? "Claiming..." : "Confirm claim"}
               </button>

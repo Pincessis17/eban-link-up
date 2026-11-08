@@ -138,7 +138,7 @@ const VerifyIdentity = () => {
     <div className="min-h-screen bg-background">
       <Nav />
       <div className="container mx-auto px-6 py-10 max-w-xl">
-        <h1 className="font-display text-3xl font-medium text-foreground flex items-center gap-3">
+        <h1 className="font-display text-3xl md:text-[34px] leading-tight text-ink flex items-center gap-3">
           <Video className="w-7 h-7 text-gold-dark" /> Face check
         </h1>
         <p className="font-body text-sm text-muted-foreground mt-2">
@@ -162,7 +162,7 @@ const VerifyIdentity = () => {
         )}
 
         {canStart && phase !== "done" && (
-          <div className="mt-6 bg-card rounded-3xl border border-border/80 p-6 shadow-[var(--shadow-card)]">
+          <div className="mt-6 bg-card rounded-2xl border border-border/80 p-6">
             {phase === "idle" && (
               <>
                 <ol className="font-body text-sm text-foreground list-decimal pl-5 space-y-1.5 mb-5">
@@ -174,7 +174,7 @@ const VerifyIdentity = () => {
                   <input id="kyc-consent" type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-0.5" />
                   <span>I agree to record a short video of my face. Only the EBAN team can watch it, and it is used only to check that I am a real person.</span>
                 </label>
-                <button disabled={!consent} onClick={openCamera} className="bg-gradient-gold text-accent-foreground font-body font-bold text-xs uppercase tracking-wider px-6 py-3 rounded-xl disabled:opacity-50">
+                <button disabled={!consent} onClick={openCamera} className="bg-gradient-gold text-accent-foreground font-body font-semibold text-xs px-6 py-3 rounded-xl disabled:opacity-50">
                   Open camera
                 </button>
               </>
@@ -182,7 +182,7 @@ const VerifyIdentity = () => {
 
             {(phase === "ready" || phase === "recording") && (
               <>
-                <div className="relative mx-auto w-full max-w-sm aspect-[3/4] rounded-3xl overflow-hidden bg-black">
+                <div className="relative mx-auto w-full max-w-sm aspect-[3/4] rounded-2xl overflow-hidden bg-black">
                   <video ref={liveRef} muted playsInline className="w-full h-full object-cover" style={{ transform: "scaleX(-1)" }} />
                   <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 46% 38% at 50% 46%, transparent 98%, rgba(0,0,0,.55) 100%)" }} />
                   <div className="absolute left-1/2 top-[46%] -translate-x-1/2 -translate-y-1/2 w-[72%] h-[60%] rounded-[50%] border-4 border-white/80 pointer-events-none" />
@@ -206,11 +206,11 @@ const VerifyIdentity = () => {
 
             {(phase === "review" || phase === "uploading") && clipUrl && (
               <>
-                <video src={clipUrl} controls playsInline className="mx-auto w-full max-w-sm rounded-3xl bg-black" style={{ aspectRatio: "3 / 4" }} />
+                <video src={clipUrl} controls playsInline className="mx-auto w-full max-w-sm rounded-2xl bg-black" style={{ aspectRatio: "3 / 4" }} />
                 <p className="font-body text-xs text-muted-foreground mt-3 text-center">Check that your face is clear and you can hear yourself.</p>
                 <div className="flex justify-center gap-3 mt-4">
                   <button disabled={phase === "uploading"} onClick={retake} className="inline-flex items-center gap-1.5 border border-border text-xs font-body font-semibold px-5 py-3 rounded-xl text-muted-foreground disabled:opacity-50"><RotateCcw className="w-3.5 h-3.5" /> Retake</button>
-                  <button disabled={phase === "uploading"} onClick={submit} className="bg-gradient-gold text-accent-foreground font-body font-bold text-xs uppercase tracking-wider px-6 py-3 rounded-xl disabled:opacity-50">
+                  <button disabled={phase === "uploading"} onClick={submit} className="bg-gradient-gold text-accent-foreground font-body font-semibold text-xs px-6 py-3 rounded-xl disabled:opacity-50">
                     {phase === "uploading" ? "Uploading..." : "Submit for review"}
                   </button>
                 </div>
@@ -221,7 +221,7 @@ const VerifyIdentity = () => {
         )}
 
         {phase === "done" && (
-          <div className="mt-6 bg-card rounded-3xl border border-border/80 p-6 text-center font-body text-sm">
+          <div className="mt-6 bg-card rounded-2xl border border-border/80 p-6 text-center font-body text-sm">
             <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto mb-2" />
             <p className="font-semibold text-foreground">Video submitted</p>
             <p className="text-muted-foreground text-xs mt-1">The EBAN team will review it, usually within a day.</p>

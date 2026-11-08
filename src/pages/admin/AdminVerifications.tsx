@@ -107,7 +107,7 @@ const AdminVerifications = () => {
     <div className={`min-h-screen bg-background ${ADMIN_SIDEBAR_OFFSET_CLASS}`}>
       <AdminNav />
       <div className="container mx-auto px-6 py-10">
-        <h1 className="font-display text-2xl font-bold text-foreground mb-8">ID verifications</h1>
+        <h1 className="font-display text-3xl md:text-[34px] leading-tight text-ink mb-8">ID verifications</h1>
 
         {loading && <div className="font-body text-sm text-muted-foreground">Loading...</div>}
         {!loading && rows.length === 0 && ids.length === 0 && (
@@ -121,7 +121,7 @@ const AdminVerifications = () => {
             <div key={r.id} className="p-5 rounded-xl border border-border bg-card flex items-center justify-between gap-4">
               <div>
                 <p className="font-display text-sm font-bold text-foreground">{r.profiles?.full_name ?? r.profiles?.email ?? "User"}</p>
-                <p className="font-body text-xs text-muted-foreground mt-1">
+                <p className="font-body text-sm text-slate mt-2">
                   {r.id_document_type} &middot; {r.profiles?.role ?? "-"} &middot; {new Date(r.created_at).toLocaleDateString()}
                 </p>
               </div>
@@ -145,7 +145,7 @@ const AdminVerifications = () => {
             <div key={r.id} className="p-5 rounded-xl border border-border bg-card flex items-center justify-between gap-4">
               <div>
                 <p className="font-display text-sm font-bold text-foreground">{r.traveller_profiles?.name ?? "Traveler"}</p>
-                <p className="font-body text-xs text-muted-foreground mt-1">
+                <p className="font-body text-sm text-slate mt-2">
                   {r.id_document_type} &middot; {r.traveller_profiles?.school_affiliation ?? "-"} &middot; {new Date(r.created_at).toLocaleDateString()}
                 </p>
               </div>

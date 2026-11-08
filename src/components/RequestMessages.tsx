@@ -104,7 +104,7 @@ export const RequestMessages = ({ requestId, status, otherName }: { requestId: s
       onClick={() => setExpanded((v) => !v)}
       aria-expanded={expanded}
       aria-label={expanded ? "Close chat" : chatOpen ? "Open chat" : "Chat not available"}
-      className="relative h-14 w-14 rounded-full bg-gradient-gold text-accent-foreground shadow-lg flex items-center justify-center hover:opacity-90 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="relative h-14 w-14 rounded-full bg-gradient-gold text-accent-foreground flex items-center justify-center hover:opacity-90 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       {expanded ? <ChevronDown className="w-6 h-6" /> : chatOpen ? <MessageCircle className="w-6 h-6" /> : <Lock className="w-6 h-6" />}
       {!expanded && unread > 0 && (

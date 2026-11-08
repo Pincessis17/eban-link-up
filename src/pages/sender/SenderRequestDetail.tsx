@@ -241,7 +241,7 @@ const SenderRequestDetail = () => {
         </Link>
 
         {/* Flight-Style Route Card */}
-        <div className="bg-charcoal text-white rounded-3xl p-8 mb-8 border border-gold/20 shadow-2xl relative overflow-hidden">
+        <div className="bg-charcoal text-white rounded-2xl p-8 mb-8 border border-gold/20 shadow-2xl relative overflow-hidden">
           <div className="flex items-center justify-between pb-6 border-b border-white/10 mb-6">
             <div>
               <span className="font-body text-[10px] uppercase tracking-widest text-gold-light">Tracking Reference</span>
@@ -304,7 +304,7 @@ const SenderRequestDetail = () => {
 
         {/* Status Tracker Line */}
         {!isCancelled && !isDisputed && (
-          <div className="bg-card rounded-3xl border border-border/80 p-8 shadow-[var(--shadow-card)] mb-8">
+          <div className="bg-card rounded-2xl border border-border/80 p-8 mb-8">
             <h3 className="font-display text-xl font-medium text-foreground mb-6">Delivery progress</h3>
             <div className="flex items-center justify-between relative overflow-x-auto pb-4">
               {REQUEST_STEPS.map((step, idx) => {
@@ -313,9 +313,9 @@ const SenderRequestDetail = () => {
                 return (
                   <div key={step.key} className="flex-1 text-center min-w-[70px]">
                     <div
-                      className={`w-7 h-7 rounded-full mx-auto mb-2 flex items-center justify-center font-body text-xs font-bold transition-all ${
+                      className={`w-7 h-7 rounded-full mx-auto mb-2 flex items-center justify-center font-body text-xs font-semibold transition-all ${
                         done
-                          ? "bg-gradient-gold text-accent-foreground shadow-sm"
+                          ? "bg-gradient-gold text-accent-foreground"
                           : "bg-muted text-muted-foreground border border-border"
                       } ${isCurrent ? "ring-4 ring-gold/20 scale-110" : ""}`}
                     >
@@ -336,9 +336,9 @@ const SenderRequestDetail = () => {
           <div className="bg-gold/10 border border-gold/30 rounded-2xl p-6 mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
               <h4 className="font-display text-lg font-semibold text-foreground">Your request is on the open board</h4>
-              <p className="font-body text-xs text-muted-foreground mt-1">Travelers on your route can claim it. You can also pick a traveler yourself.</p>
+              <p className="font-body text-sm text-slate mt-2">Travelers on your route can claim it. You can also pick a traveler yourself.</p>
             </div>
-            <Link to="/sender/trips" className="bg-earth text-gold-light font-body font-bold text-xs uppercase tracking-wider py-3 px-6 rounded-xl hover:opacity-90 whitespace-nowrap">
+            <Link to="/sender/trips" className="bg-earth text-gold-light font-body font-semibold text-xs py-3 px-6 rounded-xl hover:opacity-90 whitespace-nowrap">
               Browse trips
             </Link>
           </div>
@@ -347,14 +347,14 @@ const SenderRequestDetail = () => {
         {request.status === "matched" && (
           <div className="bg-blue-500/10 border border-blue-500/30 rounded-2xl p-6 mb-8">
             <h4 className="font-display text-lg font-semibold text-foreground">Waiting for {counterparty?.first_name ?? "the traveler"} to accept</h4>
-            <p className="font-body text-xs text-muted-foreground mt-1">You'll be asked to pay into escrow as soon as they confirm.</p>
+            <p className="font-body text-sm text-slate mt-2">You'll be asked to pay into escrow as soon as they confirm.</p>
           </div>
         )}
 
         {request.status === "accepted_by_traveller" && payment?.status === "pending" && (
           <div className="bg-gold/10 border border-gold/30 rounded-2xl p-6 mb-8">
             <h4 className="font-display text-lg font-semibold text-foreground">Payment reported. Waiting for EBAN to confirm it arrived.</h4>
-            <p className="font-body text-xs text-muted-foreground mt-1">
+            <p className="font-body text-sm text-slate mt-2">
               Reference <span className="font-mono font-semibold text-foreground">{paymentReference(request.id)}</span> · {money(payment.amount)}. Once confirmed, the traveler can collect your item.
             </p>
           </div>
@@ -366,13 +366,13 @@ const SenderRequestDetail = () => {
               <h4 className="font-display text-lg font-semibold text-foreground">
                 {counterparty?.first_name ?? "The traveler"} accepted. Pay to lock it in.
               </h4>
-              <p className="font-body text-xs text-muted-foreground mt-1">
+              <p className="font-body text-sm text-slate mt-2">
                 EBAN holds your payment and only releases it to the traveler after you confirm you received the item. Chat and the handover contact unlock once payment is confirmed. Unpaid matches are released after 48 hours.
               </p>
             </div>
             <button
               onClick={() => setPayOpen(true)}
-              className="bg-gradient-gold text-accent-foreground font-body font-bold text-xs uppercase tracking-wider py-3 px-6 rounded-xl hover:opacity-90 shadow-sm whitespace-nowrap"
+              className="bg-gradient-gold text-accent-foreground font-body font-semibold text-xs py-3 px-6 rounded-xl hover:opacity-90 whitespace-nowrap"
             >
               {`Pay ${money(total)}`}
             </button>
@@ -382,7 +382,7 @@ const SenderRequestDetail = () => {
         {["paid", "dropped_off", "handed_to_traveller", "in_transit"].includes(request.status) && (
           <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-6 mb-8">
             <h4 className="font-display text-lg font-semibold text-emerald-700">{money(payment?.amount ?? price)} is held by EBAN</h4>
-            <p className="font-body text-xs text-muted-foreground mt-1">
+            <p className="font-body text-sm text-slate mt-2">
               It stays safe until you confirm receipt. Agree the handover with the traveler in Messages below.
             </p>
           </div>
@@ -392,7 +392,7 @@ const SenderRequestDetail = () => {
           <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-6 mb-8 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
             <div>
               <h4 className="font-display text-lg font-semibold text-emerald-700">The traveler says it's delivered</h4>
-              <p className="font-body text-xs text-muted-foreground mt-1">
+              <p className="font-body text-sm text-slate mt-2">
                 Check the item. Confirming releases {money(price)} to the traveler. If it hasn't reached you, say so and your payment stays safe in escrow while EBAN looks into it.
               </p>
             </div>
@@ -412,12 +412,12 @@ const SenderRequestDetail = () => {
         {isDisputed && (
           <div className="bg-destructive/10 border border-destructive/30 rounded-2xl p-6 mb-8">
             <h4 className="font-display text-lg font-semibold text-destructive">Dispute open</h4>
-            <p className="font-body text-xs text-muted-foreground mt-1">Payment stays in escrow while EBAN reviews what happened.</p>
+            <p className="font-body text-sm text-slate mt-2">Payment stays in escrow while EBAN reviews what happened.</p>
           </div>
         )}
 
         {hasTraveler && counterparty && counterparty.counterparty_role === "traveller" && (
-          <div className="bg-card rounded-2xl border border-border/80 p-5 mb-8 flex items-center justify-between gap-4 shadow-[var(--shadow-card)]">
+          <div className="bg-card rounded-2xl border border-border/80 p-5 mb-8 flex items-center justify-between gap-4">
             <div>
               <p className="font-body text-[10px] uppercase font-semibold text-muted-foreground">Your traveler</p>
               <p className="font-display text-lg font-semibold text-foreground">{counterparty.first_name}</p>
@@ -438,7 +438,7 @@ const SenderRequestDetail = () => {
         {hasTraveler && <ExtraBagCard requestId={request.id} role="sender" requestStatus={request.status} />}
 
         {/* Package Specifications Container */}
-        <div className="bg-card rounded-3xl border border-border/80 p-8 shadow-[var(--shadow-card)]">
+        <div className="bg-card rounded-2xl border border-border/80 p-8">
           {editing && form ? (
             <form onSubmit={handleSave} className="space-y-5">
               <h3 className="font-display text-2xl font-normal text-foreground">Edit Package Details</h3>
@@ -519,7 +519,7 @@ const SenderRequestDetail = () => {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex-1 bg-gradient-gold text-accent-foreground font-body font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider hover:opacity-90 shadow-md transition-all"
+                  className="flex-1 bg-gradient-gold text-accent-foreground font-body font-semibold py-3.5 rounded-xl text-xs hover:opacity-90 transition-all"
                 >
                   {saving ? "Saving Changes..." : "Save Changes"}
                 </button>
@@ -643,7 +643,7 @@ const SenderRequestDetail = () => {
             <button
               onClick={reportPayment}
               disabled={acting || PAYMENT_METHODS.every((m) => m.details.length === 0)}
-              className="w-full bg-gradient-gold text-accent-foreground font-bold text-xs uppercase tracking-wider py-3 rounded-xl disabled:opacity-50"
+              className="w-full bg-gradient-gold text-accent-foreground font-semibold text-xs py-3 rounded-xl disabled:opacity-50"
             >
               {acting ? "Saving..." : "I've sent the payment"}
             </button>

@@ -63,12 +63,12 @@ const VerifyId = () => {
       <Nav />
       <div className="container mx-auto px-4 sm:px-6 py-10 max-w-2xl">
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-gold flex items-center justify-center shadow-md">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-gold flex items-center justify-center">
             <Icon className="w-6 h-6 text-accent-foreground" />
           </div>
           <div>
-            <h1 className="font-display text-3xl font-light text-foreground">Upload your ID</h1>
-            <p className="font-body text-xs text-muted-foreground mt-0.5">
+            <h1 className="font-display text-3xl md:text-[34px] leading-tight text-ink">Upload your ID</h1>
+            <p className="font-body text-sm text-slate mt-2">
               Everyone on Eban, senders and travellers, shows an ID. Only the Eban team can see it.
             </p>
           </div>
@@ -87,7 +87,7 @@ const VerifyId = () => {
         )}
 
         {!blocked && (
-          <form onSubmit={submit} className="bg-card rounded-3xl p-6 sm:p-8 border border-border/80 shadow-[var(--shadow-card)] space-y-6">
+          <form onSubmit={submit} className="bg-card rounded-2xl p-6 sm:p-8 border border-border/80 space-y-6">
             <div>
               <label className="font-body text-xs font-semibold uppercase tracking-wider text-foreground mb-2 block">Document type</label>
               <select value={docType} onChange={(e) => setDocType(e.target.value)}
@@ -101,11 +101,11 @@ const VerifyId = () => {
                 <input type="file" accept="image/*,.pdf" required onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
                 <Upload className="w-9 h-9 text-gold-dark/60 mx-auto mb-3" />
                 <p className="font-body text-sm font-semibold text-foreground break-all">{file ? file.name : "Tap to choose a photo or PDF"}</p>
-                <p className="font-body text-xs text-muted-foreground mt-1">PNG, JPG or PDF, up to 10MB. All four corners visible.</p>
+                <p className="font-body text-sm text-slate mt-2">PNG, JPG or PDF, up to 10MB. All four corners visible.</p>
               </div>
             </div>
             <button type="submit" disabled={uploading || !file}
-              className="w-full bg-gradient-gold text-accent-foreground font-body font-bold text-xs uppercase tracking-widest py-4 rounded-xl hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2 shadow-md">
+              className="w-full bg-gradient-gold text-accent-foreground font-body font-semibold text-xs py-4 rounded-xl hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2">
               <Upload className="w-4 h-4" /> {uploading ? "Submitting..." : "Submit ID for review"}
             </button>
           </form>

@@ -80,7 +80,7 @@ const AdminPayments = () => {
         <p className="font-display text-sm font-bold text-foreground">
           {money(r.amount)}{Number(r.service_fee) > 0 ? ` (incl. ${money(r.service_fee)} Eban fee)` : ""} · {r.delivery_requests?.origin_city} → {r.delivery_requests?.destination_city}
         </p>
-        <p className="font-body text-xs text-muted-foreground mt-1">
+        <p className="font-body text-sm text-slate mt-2">
           From {r.profiles?.full_name ?? "sender"} ({r.profiles?.email ?? "-"}) · reference{" "}
           <span className="font-mono font-semibold text-foreground">{paymentReference(r.request_id)}</span> · {new Date(r.created_at).toLocaleString()}
         </p>
@@ -111,7 +111,7 @@ const AdminPayments = () => {
       <AdminNav />
       <div className={ADMIN_SIDEBAR_OFFSET_CLASS}>
         <div className="container mx-auto px-6 py-10 max-w-3xl">
-          <h1 className="font-display text-2xl font-bold text-foreground mb-2">Payments</h1>
+          <h1 className="font-display text-3xl md:text-[34px] leading-tight text-ink mb-2">Payments</h1>
           <p className="font-body text-sm text-muted-foreground mb-8">
             Senders pay EBAN directly and tap "I've sent the payment". Check your mobile money or bank account for the reference and amount, then confirm.
           </p>
@@ -143,7 +143,7 @@ const AdminPayments = () => {
                 <div key={w.id} className="p-4 rounded-xl border border-border bg-card flex items-center justify-between gap-4">
                   <div>
                     <p className="font-display text-sm font-bold text-foreground">{w.origin_city} → {w.destination_city}</p>
-                    <p className="font-body text-xs text-muted-foreground mt-1">{w.sender} with {w.traveller} · {w.status === "matched" ? "waiting for traveler" : "accepted, waiting for payment"}</p>
+                    <p className="font-body text-sm text-slate mt-2">{w.sender} with {w.traveller} · {w.status === "matched" ? "waiting for traveler" : "accepted, waiting for payment"}</p>
                   </div>
                   <span className={`font-body text-xs font-semibold px-3 py-1 rounded-full ${hrs >= 24 ? "bg-red-100 text-red-700" : "bg-secondary text-muted-foreground"}`}>
                     {hrs}h ago

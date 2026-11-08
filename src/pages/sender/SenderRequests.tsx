@@ -68,15 +68,15 @@ const SenderRequests = () => {
       <div className="container mx-auto px-6 py-10 max-w-4xl">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="font-display text-3xl md:text-4xl font-light text-foreground">Package Requests</h1>
-            <p className="font-body text-xs text-muted-foreground mt-1">Track your active requests and coordinate with your matched traveler.</p>
+            <h1 className="font-display text-3xl md:text-[34px] leading-tight text-ink">Your requests</h1>
+            <p className="font-body text-sm text-slate mt-2">Track your active requests and coordinate with your matched traveler.</p>
           </div>
 
           <Link
             to="/sender/new-request"
-            className="inline-flex items-center gap-2 bg-gradient-gold text-accent-foreground font-body font-bold text-xs uppercase tracking-wider px-6 py-3 rounded-xl hover:opacity-90 shadow-md transition-all"
+            className="inline-flex items-center gap-2 bg-gradient-gold text-accent-foreground font-body font-semibold text-xs px-6 py-3 rounded-xl hover:opacity-90 transition-all"
           >
-            <Plus className="w-4 h-4" /> New Package Request
+            <Plus className="w-4 h-4" /> Post a request
           </Link>
         </div>
 
@@ -84,24 +84,24 @@ const SenderRequests = () => {
         <div className="flex items-center gap-2 mb-6 border-b border-border/80 pb-3">
           <button
             onClick={() => setFilter("all")}
-            className={`px-4 py-2 rounded-xl text-xs font-body font-semibold uppercase tracking-wider transition-all ${
-              filter === "all" ? "bg-earth text-gold-light shadow-sm" : "text-muted-foreground hover:text-foreground"
+            className={`px-4 py-2 rounded-xl text-xs font-body font-semibold transition-all ${
+              filter === "all" ? "bg-earth text-gold-light" : "text-muted-foreground hover:text-foreground"
             }`}
           >
             All Requests ({requests.length})
           </button>
           <button
             onClick={() => setFilter("active")}
-            className={`px-4 py-2 rounded-xl text-xs font-body font-semibold uppercase tracking-wider transition-all ${
-              filter === "active" ? "bg-earth text-gold-light shadow-sm" : "text-muted-foreground hover:text-foreground"
+            className={`px-4 py-2 rounded-xl text-xs font-body font-semibold transition-all ${
+              filter === "active" ? "bg-earth text-gold-light" : "text-muted-foreground hover:text-foreground"
             }`}
           >
             Active ({requests.filter((r) => !["delivered", "completed", "cancelled"].includes(r.status)).length})
           </button>
           <button
             onClick={() => setFilter("delivered")}
-            className={`px-4 py-2 rounded-xl text-xs font-body font-semibold uppercase tracking-wider transition-all ${
-              filter === "delivered" ? "bg-earth text-gold-light shadow-sm" : "text-muted-foreground hover:text-foreground"
+            className={`px-4 py-2 rounded-xl text-xs font-body font-semibold transition-all ${
+              filter === "delivered" ? "bg-earth text-gold-light" : "text-muted-foreground hover:text-foreground"
             }`}
           >
             Delivered ({requests.filter((r) => ["delivered", "completed"].includes(r.status)).length})
@@ -116,7 +116,7 @@ const SenderRequests = () => {
         )}
 
         {!loading && filteredRequests.length === 0 && (
-          <div className="text-center py-20 bg-card rounded-3xl border border-border/80 p-10 shadow-[var(--shadow-card)] max-w-lg mx-auto">
+          <div className="text-center py-20 bg-card rounded-2xl border border-border/80 p-10 max-w-lg mx-auto">
             <EmptyIllustration kind="package" />
             <h3 className="font-display text-2xl font-semibold text-foreground mb-2">No package requests found</h3>
             <p className="font-body text-sm text-muted-foreground mb-6">
@@ -124,9 +124,9 @@ const SenderRequests = () => {
             </p>
             <Link
               to="/sender/trips"
-              className="inline-flex items-center gap-2 bg-gradient-gold text-accent-foreground font-body font-bold text-xs uppercase tracking-wider px-8 py-3.5 rounded-xl hover:opacity-90 transition-all shadow-md"
+              className="inline-flex items-center gap-2 bg-gradient-gold text-accent-foreground font-body font-semibold text-xs px-8 py-3.5 rounded-xl hover:opacity-90 transition-all"
             >
-              Browse Trips <ChevronRight className="w-4 h-4" />
+              Browse trips <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
         )}
@@ -135,7 +135,7 @@ const SenderRequests = () => {
           {filteredRequests.map((r) => (
             <div
               key={r.id}
-              className="group bg-card rounded-2xl border border-border/80 hover:border-gold/50 shadow-[var(--shadow-card)] hover:shadow-gold-glow transition-all duration-300 flex items-center gap-3 pr-4"
+              className="group bg-card rounded-2xl border border-border/80 hover:border-gold/50 hover:shadow-gold-glow transition-all duration-300 flex items-center gap-3 pr-4"
             >
             <Link
               to={`/sender/requests/${r.id}`}

@@ -84,7 +84,7 @@ const AdminPayouts = () => {
     <div className={`min-h-screen bg-background ${ADMIN_SIDEBAR_OFFSET_CLASS}`}>
       <AdminNav />
       <div className="container mx-auto px-6 py-10">
-        <h1 className="font-display text-2xl font-bold text-foreground mb-8">Traveler payouts</h1>
+        <h1 className="font-display text-3xl md:text-[34px] leading-tight text-ink mb-8">Traveller payouts</h1>
 
         {loading && <div className="font-body text-sm text-muted-foreground">Loading...</div>}
         {!loading && rows.length === 0 && (
@@ -100,7 +100,7 @@ const AdminPayouts = () => {
                 <p className="font-display text-sm font-bold text-foreground">
                   {r.origin_city} &rarr; {r.destination_city}
                 </p>
-                <p className="font-body text-xs text-muted-foreground mt-1">
+                <p className="font-body text-sm text-slate mt-2">
                   Traveler: {r.traveller_profiles?.name ?? "-"} &middot; Declared value ${r.item_value}
                 </p>
                 <p className="font-body text-xs text-foreground mt-1">
