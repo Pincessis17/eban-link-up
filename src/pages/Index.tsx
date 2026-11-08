@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, Navigate, useSearchParams } from "react-router-dom";
 import { ArrowRight, Check, X, ShieldCheck, Lock, FileSignature, Menu } from "lucide-react";
 import ebanSymbol from "@/assets/eban-symbol.png";
+import studentsPhoto from "@/assets/hero-students.jpg";
 import { SUPPORT_WHATSAPP_URL } from "@/lib/siteConfig";
 import BookingForm from "@/components/BookingForm";
 import { AvailableTrips, RouteCodes, codeOf, shortDate, useOpenRoutes } from "@/components/AvailableTrips";
@@ -234,8 +235,17 @@ const Escrow = () => (
 const Fence = () => (
   <section id="safety" className="py-20 md:py-24 bg-paper-2">
     <div className="container mx-auto grid md:grid-cols-2 gap-12 items-center">
-      <div className="relative rounded-3xl overflow-hidden aspect-[5/4] bg-paper border border-line eban-weave flex items-center justify-center">
-        <img src={ebanSymbol} alt="The Eban Adinkra symbol" className="w-36 h-36 object-contain" />
+      <div className="relative">
+        <div className="rounded-3xl overflow-hidden aspect-[5/4] bg-ink-2">
+          <img src={studentsPhoto} alt="Students walking together on campus" loading="lazy" className="w-full h-full object-cover" />
+        </div>
+        <div className="absolute -bottom-6 left-4 sm:left-6 flex items-center gap-3 bg-white rounded-2xl border border-line px-4 py-3 shadow-[var(--shadow-elevated)]">
+          <img src={ebanSymbol} alt="" className="w-10 h-10 object-contain scale-150" />
+          <div>
+            <p className="font-display text-lg leading-none text-ink">Eban</p>
+            <p className="font-body text-xs text-slate mt-1">Adinkra for “fence”: safety and home</p>
+          </div>
+        </div>
       </div>
       <div>
         <p className="eyebrow mb-3">Why “Eban”</p>
