@@ -2,7 +2,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
+import { lazy, Suspense } from "react";
 import InstallPrompt from "@/components/InstallPrompt";
+import { TestSiteBanner } from "@/components/TestSiteBanner";
+import { IS_TEST_SITE, SIM_STORAGE_KEY } from "@/lib/env";
 import Profile from "./pages/Profile";
 import AdminDisputes from "./pages/admin/AdminDisputes";
 import AdminExtraBags from "./pages/admin/AdminExtraBags";
@@ -36,15 +39,18 @@ import SenderBrowseTrips from "./pages/sender/SenderBrowseTrips.tsx";
 import TravelerBrowseRequests from "./pages/traveler/TravelerBrowseRequests.tsx";
 
 const queryClient = new QueryClient();
+// Test site only: kept out of the real site's download.
+const Simulator = lazy(() => import("./pages/Simulator"));
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
-      <InstallPrompt />
+      {!SIM_STORAGE_KEY && <InstallPrompt />}
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
+          <TestSiteBanner />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
@@ -209,6 +215,9 @@ const App = () => (
               }
             />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            {IS_TEST_SITE && (
+              <Route path="/simulator" element={<Suspense fallback={null}><Simulator /></Suspense>} />
+            )}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
