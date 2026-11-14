@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Send, MessageCircle, Lock, Phone, ShieldCheck, X, ChevronDown } from "lucide-react";
+import { Send, MessageCircle, MessageCircleMore, UserRound, Lock, Phone, ShieldCheck, X, ChevronDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
@@ -39,6 +39,7 @@ export const RequestMessages = ({ requestId, status, otherName }: { requestId: s
   const [body, setBody] = useState("");
   const [sending, setSending] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
+  const availabilityNotified = useRef<string | null>(null);
 
   const load = useCallback(async () => {
     if (!chatOpen) return;
@@ -54,6 +55,28 @@ export const RequestMessages = ({ requestId, status, otherName }: { requestId: s
     if (!chatOpen) return;
     supabase.rpc("get_handover_contact", { p_request_id: requestId }).then(({ data }) => setContact(data?.[0] ?? null));
   }, [requestId, chatOpen]);
+
+  useEffect(() => {
+    if (!chatOpen || !user) return;
+
+    const key = `eban-chat-available-${user.id}-${requestId}`;
+    if (availabilityNotified.current === key) return;
+    try {
+      if (localStorage.getItem(key)) {
+        availabilityNotified.current = key;
+        return;
+      }
+      localStorage.setItem(key, "1");
+    } catch {
+      // The in-app notification should still work when storage is unavailable.
+    }
+
+    availabilityNotified.current = key;
+    toast({
+      title: "Chat is available",
+      description: `You can now message ${otherName ?? "the other person"} about this delivery.`,
+    });
+  }, [chatOpen, otherName, requestId, user]);
 
   useEffect(() => {
     load();
@@ -106,7 +129,20 @@ export const RequestMessages = ({ requestId, status, otherName }: { requestId: s
       aria-label={expanded ? "Close chat" : chatOpen ? "Open chat" : "Chat not available"}
       className="relative h-14 w-14 rounded-full bg-gradient-gold text-accent-foreground flex items-center justify-center hover:opacity-90 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
-      {expanded ? <ChevronDown className="w-6 h-6" /> : chatOpen ? <MessageCircle className="w-6 h-6" /> : <Lock className="w-6 h-6" />}
+      {expanded ? (
+        <ChevronDown className="w-6 h-6" />
+      ) : chatOpen ? (
+        <>
+          <span className="h-10 w-10 rounded-full bg-background flex items-center justify-center shadow-inner">
+            <UserRound className="w-7 h-7 text-foreground" strokeWidth={1.7} />
+          </span>
+          <span aria-hidden="true" className="absolute bottom-0 right-0 h-7 w-7 rounded-full bg-ink text-gold-light border-2 border-background flex items-center justify-center shadow-md">
+            <MessageCircleMore className="w-4 h-4" />
+          </span>
+        </>
+      ) : (
+        <Lock className="w-6 h-6" />
+      )}
       {!expanded && unread > 0 && (
         <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-destructive text-white text-[11px] font-bold flex items-center justify-center">
           {unread > 9 ? "9+" : unread}
