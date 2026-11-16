@@ -87,21 +87,24 @@ Deno.serve(async (req) => {
   if (error) return Response.json({ error: error.message }, { status: 500 });
 
   let sent = 0;
+  let rejected = 0;
   const failed: string[] = [];
   for (const r of (data ?? []) as Row[]) {
-    if (sent + failed.length > 0) await new Promise((ok) => setTimeout(ok, 600)); // stay under the provider's per-second limit
+    if (sent + failed.length + rejected > 0) await new Promise((ok) => setTimeout(ok, 600)); // stay under the provider's per-second limit
     const res = await send(r);
     if (res.ok) {
       sent++;
     } else {
-      failed.push(r.id);
       console.error("Email provider error", res.status, await res.text());
+      // Only temporary problems (rate limit, provider down) are worth another try.
+      if (res.status === 429 || res.status >= 500) failed.push(r.id);
+      else rejected++;
     }
   }
 
-  // Put failures back in the queue; they are retried for up to a day.
+  // Put temporary failures back in the queue; they are retried for up to a day.
   if (failed.length) {
     await db.from("notifications").update({ email_sent_at: null }).in("id", failed);
   }
-  return Response.json({ sent, failed: failed.length });
+  return Response.json({ sent, retrying: failed.length, rejected });
 });

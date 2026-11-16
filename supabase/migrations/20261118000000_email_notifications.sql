@@ -39,7 +39,10 @@ begin
   )
   select m.id, p.email, p.full_name, m.title, m.message, m.link, m.type
   from marked m join public.profiles p on p.id = m.user_id
-  where p.email_notifications and p.email is not null and p.email not like '%@blockaid-scan.invalid';
+  where p.email_notifications
+    and p.email is not null
+    -- addresses that can never receive mail (test accounts, scanners)
+    and p.email !~* '@(example\.(com|org|net)|[^@]*\.invalid|[^@]*\.test|[^@]*\.example)$';
 end;
 $function$;
 
