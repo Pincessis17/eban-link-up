@@ -54,19 +54,26 @@ export const NotificationBell = ({ dark = false }: { dark?: boolean }) => {
   useEffect(() => {
     if (!user) return;
     load();
-    const channel = supabase
-      .channel(`notifications-${user.id}`)
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
-        () => load(),
-      )
-      .subscribe();
+    // Each bell gets its own channel: a page can show more than one bell (e.g. the admin sidebar and mobile bar),
+    // and reusing one channel name makes the second bell crash the page.
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    try {
+      channel = supabase
+        .channel(`notifications-${user.id}-${Math.random().toString(36).slice(2, 10)}`)
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
+          () => load(),
+        )
+        .subscribe();
+    } catch (e) {
+      console.warn("Live notifications unavailable; falling back to polling", e);
+    }
     // Fallback for networks that block live updates
     const t = window.setInterval(load, 60_000);
     return () => {
       window.clearInterval(t);
-      supabase.removeChannel(channel);
+      if (channel) supabase.removeChannel(channel);
     };
   }, [user, load]);
 
