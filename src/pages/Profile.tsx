@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { Star, ShieldCheck, Package, Plane, CalendarDays, ScanFace } from "lucide-react";
+import { Star, ShieldCheck, Package, Plane, CalendarDays, ScanFace, Mail } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
@@ -35,6 +36,7 @@ const Profile = () => {
   const [saving, setSaving] = useState(false);
   const [idStatus, setIdStatus] = useState<string | null>(null);
   const [faceStatus, setFaceStatus] = useState<string | null>(null);
+  const [emailOn, setEmailOn] = useState<boolean | null>(null);
 
   const load = useCallback(async () => {
     if (!id) return;
@@ -58,7 +60,21 @@ const Profile = () => {
       .then(({ data: d }: { data: { status: string } | null }) => setIdStatus(d?.status ?? "none"));
     (supabase as any).from("identity_checks").select("status").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1).maybeSingle()
       .then(({ data: d }: { data: { status: string } | null }) => setFaceStatus(d?.status ?? "none"));
+    supabase.from("profiles").select("email_notifications").eq("id", user.id).maybeSingle()
+      .then(({ data: d }) => setEmailOn(d?.email_notifications ?? true));
   }, [user, userId]);
+
+  const toggleEmail = async (on: boolean) => {
+    if (!user) return;
+    setEmailOn(on);
+    const { error } = await supabase.from("profiles").update({ email_notifications: on }).eq("id", user.id);
+    if (error) {
+      setEmailOn(!on);
+      toast({ title: "Couldn't save", description: errMsg(error), variant: "destructive" });
+    } else {
+      toast({ title: on ? "Emails on" : "Emails off", description: on ? "We'll email you about your deliveries." : "You'll still see everything under the bell." });
+    }
+  };
 
   useEffect(() => {
     if (data?.is_self) {
@@ -148,6 +164,25 @@ const Profile = () => {
                 </div>
               </div>
             </div>
+
+            {isMine && (
+              <div className="bg-card rounded-2xl border border-line p-6 md:p-8 mt-6 flex items-start gap-4">
+                <Mail className="w-5 h-5 text-brass-deep mt-1 shrink-0" />
+                <div className="flex-1">
+                  <h2 className="font-display text-xl text-ink">Email updates</h2>
+                  <p className="font-body text-sm text-slate mt-1">
+                    Get an email when something happens on your deliveries: bookings, payments, hand-overs, messages and reminders.
+                  </p>
+                </div>
+                <Switch
+                  checked={emailOn ?? true}
+                  disabled={emailOn === null}
+                  onCheckedChange={toggleEmail}
+                  aria-label="Email updates"
+                  className="mt-1"
+                />
+              </div>
+            )}
 
             {isMine && (
               <div className="bg-card rounded-2xl border border-line p-6 md:p-8 mt-6">
