@@ -157,9 +157,12 @@ begin
       'A problem was reported on the ' || v_what || '.', '/admin/disputes', new.id);
 
   when 'cancelled' then
-    perform public.notify(new.sender_id, 'cancelled', 'Request cancelled',
-      'The ' || v_what || ' was cancelled.', v_s_link, new.id);
-    if tg_op = 'UPDATE' and old.status in ('matched', 'accepted_by_traveller', 'paid', 'dropped_off', 'handed_to_traveller', 'in_transit') then
+    -- After a dispute the sender hears about the refund and the outcome instead.
+    if not (tg_op = 'UPDATE' and old.status = 'disputed') then
+      perform public.notify(new.sender_id, 'cancelled', 'Request cancelled',
+        'The ' || v_what || ' was cancelled.', v_s_link, new.id);
+    end if;
+    if tg_op = 'UPDATE' and old.status in ('matched', 'accepted_by_traveller', 'paid', 'dropped_off', 'handed_to_traveller', 'in_transit', 'delivered', 'disputed') then
       perform public.notify(v_trav, 'cancelled', 'Request cancelled',
         'The ' || v_what || ' was cancelled.', v_t_link, new.id);
     end if;
@@ -361,7 +364,12 @@ begin
                  else public.traveller_request_link(r.id, r.matched_traveller_id) end;
   perform public.notify(new.raised_by, 'dispute_closed',
     case when new.status = 'resolved' then 'Your report was resolved' else 'Your report was closed' end,
-    coalesce(nullif(new.resolution, ''), nullif(new.admin_note, ''), 'Open the request to see the outcome.'), v_link, r.id);
+    coalesce(nullif(trim(new.admin_note), ''),
+      case new.resolution
+        when 'release' then 'Eban released the payment to the traveller.'
+        when 'refund' then 'Eban refunded the sender.'
+        when 'back_to_delivered' then 'The delivery is back to "delivered". You can confirm it arrived or report again.'
+        else 'Open the request to see the outcome.' end), v_link, r.id);
   return new;
 end;
 $function$;
