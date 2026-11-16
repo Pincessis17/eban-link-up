@@ -1,9 +1,11 @@
-// Eban: email copies of in-app notifications, sent through Brevo.
+// Eban: email copies of in-app notifications, sent through Resend or Brevo.
 // Called every 5 minutes by the database timer (public.trigger_email_send).
 // Secrets this function reads (set in Supabase > Edge Functions > Secrets):
+//   RESEND_API_KEY – from Resend > API Keys            (use this one, or BREVO_API_KEY)
 //   BREVO_API_KEY  – from Brevo > SMTP & API > API keys
-//   EMAIL_FROM     – the sender address you verified in Brevo
+//   EMAIL_FROM     – e.g. notifications@ebancompany.com (an address on your verified domain)
 //   SITE_URL       – e.g. https://eban-link-up.vercel.app (no trailing slash)
+// If both keys are set, Resend is used.
 // SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are provided by Supabase automatically.
 import { createClient } from "npm:@supabase/supabase-js@2.45.4";
 
@@ -42,37 +44,58 @@ Deno.serve(async (req) => {
   const { data: ok } = await db.rpc("email_cron_secret_ok", { p_secret: secret });
   if (!ok) return new Response("Forbidden", { status: 403 });
 
-  const key = Deno.env.get("BREVO_API_KEY");
+  const resendKey = Deno.env.get("RESEND_API_KEY");
+  const brevoKey = Deno.env.get("BREVO_API_KEY");
   const from = Deno.env.get("EMAIL_FROM");
   const site = (Deno.env.get("SITE_URL") ?? "").replace(/\/$/, "");
-  if (!key || !from || !site) {
-    return Response.json({ skipped: "BREVO_API_KEY, EMAIL_FROM or SITE_URL not set yet" });
+  if ((!resendKey && !brevoKey) || !from || !site) {
+    return Response.json({ skipped: "RESEND_API_KEY (or BREVO_API_KEY), EMAIL_FROM or SITE_URL not set yet" });
   }
 
-  await db.rpc("skip_stale_emails");
-  const { data, error } = await db.rpc("claim_email_batch", { p_limit: 50 });
-  if (error) return Response.json({ error: error.message }, { status: 500 });
-
-  let sent = 0;
-  const failed: string[] = [];
-  for (const r of (data ?? []) as Row[]) {
-    const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+  const send = (r: Row) => {
+    const subject = r.title ? `${r.title} · Eban` : "Update from Eban";
+    if (resendKey) {
+      return fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: { authorization: `Bearer ${resendKey}`, "content-type": "application/json" },
+        body: JSON.stringify({
+          from: `Eban <${from}>`,
+          to: [r.email],
+          subject,
+          html: html(r, site),
+          text: text(r, site),
+          tags: [{ name: "type", value: r.type.replace(/[^A-Za-z0-9_-]/g, "_") }],
+        }),
+      });
+    }
+    return fetch("https://api.brevo.com/v3/smtp/email", {
       method: "POST",
-      headers: { "api-key": key, "content-type": "application/json", accept: "application/json" },
+      headers: { "api-key": brevoKey!, "content-type": "application/json", accept: "application/json" },
       body: JSON.stringify({
         sender: { email: from, name: "Eban" },
         to: [{ email: r.email, ...(r.full_name ? { name: r.full_name } : {}) }],
-        subject: r.title ? `${r.title} · Eban` : "Update from Eban",
+        subject,
         htmlContent: html(r, site),
         textContent: text(r, site),
         tags: [r.type],
       }),
     });
+  };
+
+  await db.rpc("skip_stale_emails");
+  const { data, error } = await db.rpc("claim_email_batch", { p_limit: 20 });
+  if (error) return Response.json({ error: error.message }, { status: 500 });
+
+  let sent = 0;
+  const failed: string[] = [];
+  for (const r of (data ?? []) as Row[]) {
+    if (sent + failed.length > 0) await new Promise((ok) => setTimeout(ok, 600)); // stay under the provider's per-second limit
+    const res = await send(r);
     if (res.ok) {
       sent++;
     } else {
       failed.push(r.id);
-      console.error("Brevo error", res.status, await res.text());
+      console.error("Email provider error", res.status, await res.text());
     }
   }
 
