@@ -10,10 +10,11 @@ import { ExtraBagCard } from "@/components/ExtraBagCard";
 import { RequestMessages } from "@/components/RequestMessages";
 import { RateCounterparty } from "@/components/RateCounterparty";
 import { ReportIssueButton } from "@/components/ReportIssueButton";
-import { IN_FLIGHT, errMsg, money } from "@/lib/marketplace";
+import { IN_FLIGHT, errMsg, money, autoReleaseDate } from "@/lib/marketplace";
 
 interface DeliveryRequest {
   id: string;
+  delivered_at?: string | null;
   origin_country: string;
   origin_city: string;
   destination_country: string;
@@ -359,6 +360,7 @@ const TravelerRequestDetail = () => {
               {request.status === "delivered" && (
                 <p className="font-body text-sm text-muted-foreground text-center py-4">
                   Delivered. Waiting for the sender to confirm receipt, then {money(request.agreed_price ?? request.offered_price)} is released to you.
+                  {autoReleaseDate(request.delivered_at) && <> If they don't respond, it is released automatically on {autoReleaseDate(request.delivered_at)}.</>}
                 </p>
               )}
               {request.status === "completed" && (

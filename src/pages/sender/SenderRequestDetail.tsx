@@ -14,7 +14,7 @@ import { ExtraBagCard } from "@/components/ExtraBagCard";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { PAYMENT_METHODS, paymentReference } from "@/lib/paymentConfig";
 import { calcServiceFee, usePlatformFee } from "@/lib/fees";
-import { REQUEST_STEPS, stepIndex, SENDER_DELETABLE, IN_FLIGHT, errMsg, money } from "@/lib/marketplace";
+import { REQUEST_STEPS, stepIndex, SENDER_DELETABLE, IN_FLIGHT, errMsg, money, autoReleaseDate } from "@/lib/marketplace";
 
 interface DeliveryRequest {
   id: string;
@@ -395,6 +395,11 @@ const SenderRequestDetail = () => {
               <p className="font-body text-sm text-slate mt-2">
                 Check the item. Confirming releases {money(price)} to the traveler. If it hasn't reached you, say so and your payment stays safe in escrow while EBAN looks into it.
               </p>
+              {autoReleaseDate(request.delivered_at) && (
+                <p className="font-body text-xs text-slate mt-2">
+                  If you do nothing, the payment is released automatically on <strong className="text-ink">{autoReleaseDate(request.delivered_at)}</strong>.
+                </p>
+              )}
             </div>
             <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
               <ReportNotReceivedButton requestId={request.id} onDone={load} />
@@ -572,7 +577,7 @@ const SenderRequestDetail = () => {
 
               <div className="bg-gold/10 border border-gold/20 text-gold-dark rounded-xl p-4 font-body text-xs flex items-center gap-3">
                 <ShieldCheck className="w-5 h-5 text-gold shrink-0" />
-                <span>EBAN is a marketplace: you and the traveler are responsible for the item and its handover. Your payment is protected by escrow, and only released when you confirm receipt.</span>
+                <span>EBAN is a marketplace: you and the traveler are responsible for the item and its handover. Your payment is protected by escrow and released when you confirm receipt, or automatically 72 hours after delivery unless you report a problem.</span>
               </div>
               {price != null && (
                 <p className="font-body text-xs text-muted-foreground mt-4">

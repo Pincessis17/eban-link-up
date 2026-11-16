@@ -257,7 +257,7 @@ const SenderBrowseTrips = () => {
               </div>
             )}
             <p className="font-body text-xs text-muted-foreground">
-              Nothing is charged yet. You pay into escrow after the traveler accepts, and the money is released only when you confirm you received the item.
+              Nothing is charged yet. You pay into escrow after the traveler accepts, and the money is released when you confirm you received the item, or automatically 72 hours after delivery if you report no problem.
             </p>
             <button
               type="submit"

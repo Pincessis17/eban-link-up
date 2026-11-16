@@ -96,3 +96,11 @@ export const CHAT_OPEN_STATUSES = [
 
 /** Hours a match can wait for payment before it is released. */
 export const PAYMENT_WINDOW_HOURS = 48;
+
+/** Escrow pays the traveller automatically this many hours after "delivered", unless the sender reports a problem. */
+export const AUTO_RELEASE_HOURS = 72;
+export const autoReleaseDate = (deliveredAt: string | null | undefined) => {
+  if (!deliveredAt) return null;
+  const d = new Date(new Date(deliveredAt).getTime() + AUTO_RELEASE_HOURS * 3600 * 1000);
+  return d.toLocaleString(undefined, { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+};

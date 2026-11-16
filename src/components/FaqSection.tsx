@@ -37,7 +37,7 @@ const FAQS: Record<string, { q: string; a: string }[]> = {
     },
     {
       q: "Is my payment safe?",
-      a: "Your payment is held by Eban and only released to the traveler after you confirm you received your item.",
+      a: "Your payment is held by Eban and released to the traveler when you confirm you received your item. If you don't respond within 72 hours of delivery and haven't reported a problem, it is released automatically.",
     },
   ],
   "Pricing & Payments": [

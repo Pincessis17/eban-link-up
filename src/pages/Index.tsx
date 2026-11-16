@@ -218,7 +218,7 @@ const Escrow = () => (
           {[
             { n: "01", t: "You pay Eban", d: "With your request reference, after the traveller accepts." },
             { n: "02", t: "We hold it", d: "The money sits in escrow while the parcel travels." },
-            { n: "03", t: "Released on receipt", d: "You confirm it arrived. If not, report it and the payment stays frozen." },
+            { n: "03", t: "Released on receipt", d: "You confirm it arrived, or it releases itself 72 hours after delivery. If something is wrong, report it and the payment stays frozen." },
           ].map((s) => (
             <div key={s.n} className="border-t border-white/15 pt-5">
               <span className="font-display text-2xl text-brass">{s.n}</span>

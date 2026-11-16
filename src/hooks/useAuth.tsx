@@ -35,7 +35,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const loadProfile = async (userId: string) => {
-    const { data } = await supabase.from("profiles").select("*").eq("id", userId).maybeSingle();
+    let { data } = await supabase.from("profiles").select("*").eq("id", userId).maybeSingle();
+    if (!data) {
+      // Self-repair: the login exists but its profile row is missing (for example it was deleted
+      // in the dashboard). Rebuild it from what the person chose at sign-up, then load it again.
+      const { error } = await (supabase as any).rpc("ensure_my_profile");
+      if (!error) ({ data } = await supabase.from("profiles").select("*").eq("id", userId).maybeSingle());
+    }
     setProfile(data ?? null);
   };
 
