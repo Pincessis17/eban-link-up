@@ -107,7 +107,12 @@ const Signup = () => {
         </div>
         <div>
           <label className={authLabel} htmlFor="password">Password</label>
-          <input id="password" type="password" required minLength={6} autoComplete="new-password" className={authInput} placeholder="Minimum 6 characters" value={password} onChange={(e) => setPassword(e.target.value)} />
+          <input
+            id="password" type="password" required minLength={8} autoComplete="new-password" className={authInput}
+            placeholder="At least 8 characters" value={password} onChange={(e) => setPassword(e.target.value)}
+            pattern="(?=.*[A-Za-z])(?=.*\d).{8,}" title="At least 8 characters, with at least one letter and one number"
+          />
+          <p className="font-body text-xs text-slate mt-1.5">At least 8 characters, with letters and numbers.</p>
         </div>
         <button type="submit" disabled={loading} className="w-full h-11 bg-brass text-ink font-body font-semibold text-sm rounded-lg hover:bg-[#CB9A22] disabled:opacity-60 flex items-center justify-center gap-2 mt-2">
           {loading ? "Creating account..." : "Create account"} <ArrowRight className="w-4 h-4" />
