@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { LogOut, Package, Users, GitMerge, ShieldCheck, DollarSign, Globe, Eye, Plane, MessageSquare, Percent, AlertTriangle, Luggage, Video } from "lucide-react";
 import ebanSymbol from "@/assets/eban-symbol.png";
 import { useAuth } from "@/hooks/useAuth";
+import { NotificationBell } from "@/components/NotificationBell";
 
 const NAV_ITEMS = [
   { to: "/admin/bookings", label: "Requests Desk", icon: Package },
@@ -35,13 +36,16 @@ export const AdminNav = () => {
       {/* Desktop: fixed vertical sidebar */}
       <aside className="fixed inset-y-0 left-0 z-30 hidden md:flex w-64 flex-col bg-ink border-r border-white/5 px-5 pb-6 pt-0 text-paper overflow-y-auto">
         <div className="kente-rail -mx-5 mb-6" />
-        <Link to="/admin/bookings" className="flex items-center gap-3 px-2 mb-8 group">
+        <div className="flex items-center justify-between mb-8">
+        <Link to="/admin/bookings" className="flex items-center gap-3 px-2 group">
           <img src={ebanSymbol} alt="EBAN" className="w-8 h-8 object-contain" />
           <div>
             <span className="font-display text-xl tracking-[0.04em] text-paper block leading-tight">EBAN</span>
             <span className="text-[10px] font-body font-semibold uppercase tracking-widest text-brass">Admin</span>
           </div>
         </Link>
+        <NotificationBell dark />
+        </div>
 
         <nav className="flex flex-col gap-1.5 flex-1">
           <div className="px-3 text-[10px] font-body uppercase tracking-widest text-paper/40 font-semibold mb-1">Navigation</div>
@@ -89,9 +93,12 @@ export const AdminNav = () => {
             <span className="font-display text-lg font-bold text-paper">EBAN</span>
             <span className="text-brass font-body text-xs">Admin</span>
           </Link>
-          <button onClick={signOut} className="flex items-center gap-1 text-xs font-body text-paper/60 hover:text-paper">
-            <LogOut className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-1">
+            <NotificationBell dark />
+            <button onClick={signOut} className="flex items-center gap-1 text-xs font-body text-paper/60 hover:text-paper">
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
         </div>
         <div className="flex items-center gap-2 overflow-x-auto pb-1">
           {NAV_ITEMS.map((item) => (

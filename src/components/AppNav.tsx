@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { AdminViewSwitcher } from "@/components/AdminViewSwitcher";
 import { ModeSwitcher } from "@/components/ModeSwitcher";
 import { useExpireStale } from "@/hooks/useExpireStale";
+import { NotificationBell } from "@/components/NotificationBell";
 
 export type NavItem = { to: string; label: string; match?: (path: string) => boolean };
 
@@ -54,6 +55,7 @@ export const AppNav = ({ home, sub, items }: { home: string; sub: string; items:
           <nav className="hidden lg:flex items-center gap-6" aria-label="Main">{items.map(link)}</nav>
           <div className="flex items-center gap-2 sm:gap-3">
             <ModeSwitcher />
+            <NotificationBell />
             <Link
               to="/profile"
               title="Your profile"
