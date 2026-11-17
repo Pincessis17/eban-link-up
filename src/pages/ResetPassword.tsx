@@ -21,6 +21,7 @@ const ResetPassword = () => {
       setReady("expired");
       return;
     }
+    try { sessionStorage.removeItem("eban-recovery"); } catch { /* ignore */ }
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "PASSWORD_RECOVERY" || (session && event === "SIGNED_IN")) setReady("yes");
     });

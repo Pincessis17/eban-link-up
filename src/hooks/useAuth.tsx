@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { confirmRedirect, friendlyAuthError } from "@/lib/authEmails";
 
@@ -30,6 +31,7 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -54,9 +56,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false);
     });
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
+      // Arrived from a password-reset email: always go to the "choose a new password" page.
+      let recovering = event === "PASSWORD_RECOVERY";
+      try { recovering = recovering || sessionStorage.getItem("eban-recovery") === "1"; } catch { /* ignore */ }
+      if (recovering && session && window.location.pathname !== "/reset-password") {
+        try { sessionStorage.removeItem("eban-recovery"); } catch { /* ignore */ }
+        navigate("/reset-password", { replace: true });
+      }
       if (session?.user) {
         loadProfile(session.user.id);
       } else {
