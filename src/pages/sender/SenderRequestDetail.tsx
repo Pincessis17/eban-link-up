@@ -6,6 +6,8 @@ import { toast } from "@/hooks/use-toast";
 import { SenderNav } from "@/components/SenderNav";
 import { DeleteButton } from "@/components/AdminDeleteButton";
 import { ProfileLink } from "@/components/ProfileLink";
+import { EvidencePicker } from "@/components/EvidencePicker";
+import { EvidenceGallery } from "@/components/EvidenceGallery";
 import { RequestMessages } from "@/components/RequestMessages";
 import { RateCounterparty } from "@/components/RateCounterparty";
 import { ReportIssueButton } from "@/components/ReportIssueButton";
@@ -591,6 +593,7 @@ const SenderRequestDetail = () => {
 
         {hasTraveler && (
           <div className="mt-8 space-y-6">
+            <EvidenceGallery requestId={request.id} refreshKey={request.status} />
             <RequestMessages requestId={request.id} status={request.status} otherName={counterparty?.first_name} />
             {request.status === "completed" && (
               <RateCounterparty
@@ -642,16 +645,20 @@ const SenderRequestDetail = () => {
             )}
             <ol className="list-decimal pl-5 text-xs text-muted-foreground space-y-1">
               <li>Send exactly {money(total)} and put the reference in the note.</li>
-              <li>Tap the button below once you've sent it.</li>
-              <li>EBAN confirms it arrived, usually within a few hours.</li>
+              <li>Attach a screenshot or receipt of the transfer below.</li>
+              <li>EBAN checks it against the money received, usually within a few hours.</li>
             </ol>
-            <button
-              onClick={reportPayment}
-              disabled={acting || PAYMENT_METHODS.every((m) => m.details.length === 0)}
-              className="w-full bg-gradient-gold text-accent-foreground font-semibold text-xs py-3 rounded-xl disabled:opacity-50"
-            >
-              {acting ? "Saving..." : "I've sent the payment"}
-            </button>
+            {request && PAYMENT_METHODS.some((m) => m.details.length > 0) && (
+              <EvidencePicker
+                requestId={request.id}
+                kind="payment_proof"
+                title="Proof of payment"
+                hint="A screenshot of the mobile money or bank confirmation showing the amount, date and reference. Only you and the Eban team can see it."
+                buttonLabel={acting ? "Saving..." : "Send proof and confirm I've paid"}
+                withNote
+                onUploaded={reportPayment}
+              />
+            )}
           </div>
         </DialogContent>
       </Dialog>

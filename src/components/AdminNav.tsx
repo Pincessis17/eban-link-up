@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { LogOut, Package, Users, GitMerge, ShieldCheck, DollarSign, Globe, Eye, Plane, MessageSquare, Percent, AlertTriangle, Luggage, Video } from "lucide-react";
+import { LogOut, Package, Users, GitMerge, ShieldCheck, DollarSign, Globe, Eye, Plane, MessageSquare, Percent, AlertTriangle, Luggage, Video, History, Lock } from "lucide-react";
 import ebanSymbol from "@/assets/eban-symbol.png";
 import { useAuth } from "@/hooks/useAuth";
 import { NotificationBell } from "@/components/NotificationBell";
@@ -16,6 +16,8 @@ const NAV_ITEMS = [
   { to: "/admin/disputes", label: "Disputes", icon: AlertTriangle },
   { to: "/admin/fees", label: "Fees", icon: Percent },
   { to: "/admin/feedback", label: "Feedback", icon: MessageSquare },
+  { to: "/admin/audit", label: "Audit Log", icon: History },
+  { to: "/admin/security", label: "Security", icon: Lock },
 ];
 
 export const ADMIN_SIDEBAR_OFFSET_CLASS = "md:pl-64";

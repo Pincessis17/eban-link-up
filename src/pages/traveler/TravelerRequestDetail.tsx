@@ -8,6 +8,8 @@ import { SignaturePad } from "@/components/SignaturePad";
 import { ProfileLink } from "@/components/ProfileLink";
 import { ExtraBagCard } from "@/components/ExtraBagCard";
 import { RequestMessages } from "@/components/RequestMessages";
+import { EvidencePicker } from "@/components/EvidencePicker";
+import { EvidenceGallery } from "@/components/EvidenceGallery";
 import { RateCounterparty } from "@/components/RateCounterparty";
 import { ReportIssueButton } from "@/components/ReportIssueButton";
 import { IN_FLIGHT, errMsg, money, autoReleaseDate } from "@/lib/marketplace";
@@ -77,6 +79,7 @@ const TravelerRequestDetail = () => {
   const [customLocation, setCustomLocation] = useState("");
   const [showSignature, setShowSignature] = useState(false);
   const [counterparty, setCounterparty] = useState<Counterparty | null>(null);
+  const [photoKinds, setPhotoKinds] = useState<string[]>([]);
 
   const load = useCallback(async () => {
     if (!id) return;
@@ -99,6 +102,11 @@ const TravelerRequestDetail = () => {
         p_request_id: (matchData.delivery_requests as unknown as DeliveryRequest).id,
       });
       setCounterparty(cp?.[0] ?? null);
+      const { data: ev } = await (supabase as any)
+        .from("request_evidence")
+        .select("kind")
+        .eq("request_id", (matchData.delivery_requests as unknown as DeliveryRequest).id);
+      setPhotoKinds(((ev ?? []) as { kind: string }[]).map((e) => e.kind));
     }
     setLoading(false);
   }, [id]);
@@ -158,7 +166,7 @@ const TravelerRequestDetail = () => {
     const { error } = await supabase.from("delivery_requests").update({ status: nextStatus, ...extra }).eq("id", request.id);
     setBusy(false);
     if (error) {
-      toast({ title: "Error", description: "Couldn't update the status. Try again.", variant: "destructive" });
+      toast({ title: "Error", description: errMsg(error, "Couldn't update the status. Try again."), variant: "destructive" });
       return;
     }
     load();
@@ -330,12 +338,22 @@ const TravelerRequestDetail = () => {
                   Waiting for the sender to pay into escrow. Don't take the item until the payment shows as funded.
                 </p>
               )}
-              {["paid", "dropped_off"].includes(request.status) && !showSignature && (
+              {["paid", "dropped_off"].includes(request.status) && !photoKinds.includes("handover_photo") && (
+                <EvidencePicker
+                  requestId={request.id}
+                  kind="handover_photo"
+                  title="Step 1: photo of the parcel"
+                  hint="When the sender hands it over, take a clear photo of the parcel showing its condition. The sender and Eban get a copy, which protects you both."
+                  buttonLabel="Save photo"
+                  onUploaded={load}
+                />
+              )}
+              {["paid", "dropped_off"].includes(request.status) && photoKinds.includes("handover_photo") && !showSignature && (
                 <button onClick={() => setShowSignature(true)} disabled={busy} className="w-full border border-border text-foreground font-display font-bold py-3 rounded-lg text-sm hover:bg-secondary transition-colors disabled:opacity-50">
-                  I've received the item (sign to confirm)
+                  Step 2: sign to confirm you have it
                 </button>
               )}
-              {["paid", "dropped_off"].includes(request.status) && showSignature && (
+              {["paid", "dropped_off"].includes(request.status) && photoKinds.includes("handover_photo") && showSignature && (
                 <SignaturePad onCapture={handleSignatureCapture} onCancel={() => setShowSignature(false)} />
               )}
               {request.status === "handed_to_traveller" && (
@@ -348,13 +366,24 @@ const TravelerRequestDetail = () => {
                   <p className="font-body text-sm text-muted-foreground text-center">
                     Once you land, hand the item to the sender's recipient at the place you agreed in Messages, then mark it delivered.
                   </p>
-                  <button
-                    onClick={() => advanceStatus("delivered", { delivered_at: new Date().toISOString() })}
-                    disabled={busy}
-                    className="w-full bg-gradient-gold text-accent-foreground font-display font-semibold py-3 rounded-lg text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
-                  >
-                    Mark as delivered
-                  </button>
+                  {!photoKinds.includes("delivery_photo") ? (
+                    <EvidencePicker
+                      requestId={request.id}
+                      kind="delivery_photo"
+                      title="Photo at delivery"
+                      hint="Take a photo of the parcel at the hand-over, ideally with the recipient or the place you left it. It is your proof of delivery."
+                      buttonLabel="Save photo"
+                      onUploaded={load}
+                    />
+                  ) : (
+                    <button
+                      onClick={() => advanceStatus("delivered")}
+                      disabled={busy}
+                      className="w-full bg-gradient-gold text-accent-foreground font-display font-semibold py-3 rounded-lg text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
+                    >
+                      Mark as delivered
+                    </button>
+                  )}
                 </div>
               )}
               {request.status === "delivered" && (
@@ -377,6 +406,7 @@ const TravelerRequestDetail = () => {
 
         {(match.status === "accepted" || match.status === "pending") && (
           <div className="mt-6 space-y-6">
+            {match.status === "accepted" && <EvidenceGallery requestId={request.id} refreshKey={photoKinds.join(",")} />}
             {match.status === "accepted" && <ExtraBagCard requestId={request.id} role="traveller" requestStatus={request.status} />}
             <RequestMessages requestId={request.id} status={request.status} otherName={counterparty?.first_name} />
             {request.status === "completed" && (

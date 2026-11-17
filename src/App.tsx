@@ -8,6 +8,8 @@ import { TestSiteBanner } from "@/components/TestSiteBanner";
 import { IS_TEST_SITE, SIM_STORAGE_KEY } from "@/lib/env";
 import Profile from "./pages/Profile";
 import AdminDisputes from "./pages/admin/AdminDisputes";
+import AdminAudit from "./pages/admin/AdminAudit";
+import AdminSecurity from "./pages/admin/AdminSecurity";
 import AdminExtraBags from "./pages/admin/AdminExtraBags";
 import AdminIdentity from "./pages/admin/AdminIdentity";
 import VerifyIdentity from "./pages/VerifyIdentity";
@@ -92,6 +94,8 @@ const App = () => (
             <Route path="/verify-identity" element={<ProtectedRoute><VerifyIdentity /></ProtectedRoute>} />
             <Route path="/admin/extra-bags" element={<ProtectedRoute requireRole="Admin"><AdminExtraBags /></ProtectedRoute>} />
             <Route path="/admin/disputes" element={<ProtectedRoute requireRole="Admin"><AdminDisputes /></ProtectedRoute>} />
+            <Route path="/admin/audit" element={<ProtectedRoute requireRole="Admin"><AdminAudit /></ProtectedRoute>} />
+            <Route path="/admin/security" element={<ProtectedRoute requireRole="Admin" skipAdminGate><AdminSecurity /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/profile/:userId" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route

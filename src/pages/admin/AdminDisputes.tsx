@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { AdminNav, ADMIN_SIDEBAR_OFFSET_CLASS } from "@/components/AdminNav";
 import { errMsg, money } from "@/lib/marketplace";
+import { EvidenceGallery } from "@/components/EvidenceGallery";
 
 type Row = {
   id: string; request_id: string; reason: string; kind: string; status: string; resolution: string | null; admin_note: string | null; created_at: string;
@@ -109,6 +110,9 @@ const AdminDisputes = () => {
                   Held: <strong className="text-foreground">{r.held != null ? money(r.held) : "-"}</strong> · Traveler's price: <strong className="text-foreground">{r.price != null ? money(r.price) : "-"}</strong>
                 </p>
                 <p className="font-body text-sm text-slate mt-2">Pay traveler to: {r.payout}</p>
+                <div className="mt-3">
+                  <EvidenceGallery requestId={r.request_id} compact />
+                </div>
                 <textarea
                   rows={2}
                   value={notes[r.id] ?? ""}

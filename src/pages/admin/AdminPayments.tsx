@@ -4,6 +4,7 @@ import { toast } from "@/hooks/use-toast";
 import { AdminNav, ADMIN_SIDEBAR_OFFSET_CLASS } from "@/components/AdminNav";
 import { errMsg, money } from "@/lib/marketplace";
 import { paymentReference } from "@/lib/paymentConfig";
+import { EvidenceGallery } from "@/components/EvidenceGallery";
 
 interface PaymentRow {
   id: string;
@@ -84,6 +85,12 @@ const AdminPayments = () => {
           From {r.profiles?.full_name ?? "sender"} ({r.profiles?.email ?? "-"}) · reference{" "}
           <span className="font-mono font-semibold text-foreground">{paymentReference(r.request_id)}</span> · {new Date(r.created_at).toLocaleString()}
         </p>
+        {actions && (
+          <div className="mt-3 max-w-sm">
+            <EvidenceGallery requestId={r.request_id} compact />
+            <p className="font-body text-[11px] text-slate mt-1">Check the receipt against the money that actually arrived before confirming.</p>
+          </div>
+        )}
       </div>
       {actions && (
         <div className="flex gap-2">

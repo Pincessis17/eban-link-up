@@ -47,6 +47,27 @@ const must = async (p: PromiseLike<any>): Promise<unknown> => {
   return data;
 };
 
+/** Draws a small labelled picture and records it as a receipt/photo, the way the real upload does. */
+const simEvidence = async (db: any, userId: string, requestId: string, kind: string, label: string, color: string) => {
+  const canvas = document.createElement("canvas");
+  canvas.width = 480;
+  canvas.height = 320;
+  const g = canvas.getContext("2d")!;
+  g.fillStyle = color;
+  g.fillRect(0, 0, 480, 320);
+  g.fillStyle = "#FBF8F1";
+  g.font = "bold 28px Georgia";
+  g.fillText("EBAN SIMULATOR", 24, 60);
+  g.font = "22px Arial";
+  g.fillText(label, 24, 120);
+  g.fillText(new Date().toLocaleString(), 24, 160);
+  const blob = await new Promise<Blob>((ok) => canvas.toBlob((b) => ok(b!), "image/png"));
+  const path = `${userId}/${requestId}/${kind}-${Date.now()}.png`;
+  await must(db.storage.from("request-evidence").upload(path, blob, { contentType: "image/png" }));
+  await must(db.rpc("add_request_evidence", { p_request: requestId, p_kind: kind, p_path: path, p_note: kind === "payment_proof" ? "SIM-MOMO-0001" : null }));
+};
+
+
 const inDays = (n: number) => {
   const d = new Date();
   d.setDate(d.getDate() + n);
@@ -118,8 +139,9 @@ const opening: Step[] = [
   {
     who: "sender",
     title: "Kwame pays Eban",
-    say: "Kwame sends $25 to Eban ($20 for Ama + $5 Eban fee) with his EBAN reference and taps \"I've sent the payment\".",
+    say: "Kwame sends $25 to Eban ($20 for Ama + $5 Eban fee) with his EBAN reference, attaches the mobile money screenshot and confirms he's paid.",
     run: async (c) => {
+      await simEvidence(c.db.sender, c.ids.sender, c.requestId, "payment_proof", "Mobile money receipt: $25", "#2F5D3A");
       await must(c.db.sender.rpc("report_payment_sent", { p_request_id: c.requestId }));
     },
     show: (c) => ({ sender: `/sender/requests/${c.requestId}`, admin: "/admin/payments" }),
@@ -136,8 +158,9 @@ const opening: Step[] = [
   {
     who: "traveller",
     title: "Ama collects the parcel",
-    say: "At the airport Ama takes the parcel and marks it collected.",
+    say: "At the airport Ama photographs the parcel, signs, and marks it collected. Kwame gets the photo.",
     run: async (c) => {
+      await simEvidence(c.db.traveller, c.ids.traveller, c.requestId, "handover_photo", "Parcel at collection", "#B07D22");
       await must(c.db.traveller.from("delivery_requests").update({ status: "handed_to_traveller", handed_to_traveller_at: new Date().toISOString() }).eq("id", c.requestId));
     },
     show: (c) => ({ traveller: `/traveler/requests/${c.matchId}`, sender: `/sender/requests/${c.requestId}` }),
@@ -154,9 +177,10 @@ const opening: Step[] = [
   {
     who: "traveller",
     title: "Ama delivers",
-    say: "In London, Ama hands the parcel to Kwame's cousin and marks it delivered.",
+    say: "In London, Ama photographs the hand-over to Kwame's cousin and marks it delivered.",
     run: async (c) => {
-      await must(c.db.traveller.from("delivery_requests").update({ status: "delivered", delivered_at: new Date().toISOString() }).eq("id", c.requestId));
+      await simEvidence(c.db.traveller, c.ids.traveller, c.requestId, "delivery_photo", "Parcel at delivery", "#B5432F");
+      await must(c.db.traveller.from("delivery_requests").update({ status: "delivered" }).eq("id", c.requestId));
     },
     show: (c) => ({ traveller: `/traveler/requests/${c.matchId}`, sender: `/sender/requests/${c.requestId}` }),
   },
