@@ -1,12 +1,28 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { ArrowRight } from "lucide-react";
 import { AuthShell, authInput, authLabel } from "@/components/AuthShell";
+import { resendConfirmation } from "@/lib/authEmails";
 
 const Login = () => {
-  const { signIn } = useAuth();
+  const { signIn, user, profile } = useAuth();
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const justConfirmed = params.get("confirmed") === "1";
+  const [resent, setResent] = useState(false);
+
+  // Coming back from the "confirm your email" link signs the person in: take them straight to their pages.
+  useEffect(() => {
+    if (!justConfirmed || !user || !profile) return;
+    navigate(profile.role === "Admin" ? "/admin/bookings" : profile.role === "Traveller" ? "/traveler" : "/sender/requests", { replace: true });
+  }, [justConfirmed, user, profile, navigate]);
+
+  const resend = async () => {
+    const err = await resendConfirmation(email);
+    if (err) setError(err);
+    else setResent(true);
+  };
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -32,8 +48,20 @@ const Login = () => {
       <h1 className="font-display text-3xl md:text-[34px] leading-tight text-ink">Welcome back.</h1>
       <p className="font-body text-sm text-slate mt-2 mb-8">Sign in to manage requests, trips and payouts.</p>
 
+      {justConfirmed && !error && (
+        <div className="bg-forest/10 border border-forest/30 text-forest rounded-lg p-3 mb-5 text-sm font-body">Email confirmed. Welcome to Eban.</div>
+      )}
       {error && (
-        <div className="bg-kente/10 border border-kente/30 text-kente rounded-lg p-3 mb-5 text-sm font-body">{error}</div>
+        <div className="bg-kente/10 border border-kente/30 text-kente rounded-lg p-3 mb-5 text-sm font-body">
+          {error}
+          {error.startsWith("Please confirm your email") && email && (
+            resent ? (
+              <span className="block mt-2 text-forest">New link sent. Check your inbox.</span>
+            ) : (
+              <button type="button" onClick={resend} className="block mt-2 underline font-semibold">Send the link again</button>
+            )
+          )}
+        </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -42,7 +70,10 @@ const Login = () => {
           <input id="email" type="email" required autoComplete="email" className={authInput} placeholder="name@example.com" value={email} onChange={(e) => setEmail(e.target.value)} />
         </div>
         <div>
-          <label className={authLabel} htmlFor="password">Password</label>
+          <div className="flex items-baseline justify-between">
+            <label className={authLabel} htmlFor="password">Password</label>
+            <Link to="/forgot-password" className="font-body text-xs text-slate hover:text-ink">Forgot password?</Link>
+          </div>
           <input id="password" type="password" required autoComplete="current-password" className={authInput} placeholder="Your password" value={password} onChange={(e) => setPassword(e.target.value)} />
         </div>
         <button type="submit" disabled={loading} className="w-full h-11 bg-brass text-ink font-body font-semibold text-sm rounded-lg hover:bg-[#CB9A22] disabled:opacity-60 flex items-center justify-center gap-2 mt-2">

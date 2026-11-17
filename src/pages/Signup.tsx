@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { ArrowRight, CheckCircle2, Plane, Send } from "lucide-react";
 import { AuthShell, authInput, authLabel } from "@/components/AuthShell";
+import { resendConfirmation } from "@/lib/authEmails";
 
 const Signup = () => {
   const { signUp } = useAuth();
@@ -18,6 +19,7 @@ const Signup = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [needsConfirmation, setNeedsConfirmation] = useState(false);
+  const [resendMsg, setResendMsg] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,8 +54,17 @@ const Signup = () => {
         </div>
         <h1 className="font-display text-3xl md:text-[34px] leading-tight text-ink">Check your email.</h1>
         <p className="font-body text-sm text-slate mt-3 mb-8 leading-relaxed">
-          We sent an activation link to <strong className="text-ink">{email}</strong>. Confirm it, then sign in.
+          We sent a link to <strong className="text-ink">{email}</strong> from <strong className="text-ink">Eban</strong>. Tap it to confirm your email and you're in.
+          Not there after a few minutes? Check your spam folder.
         </p>
+        <button
+          type="button"
+          onClick={async () => setResendMsg((await resendConfirmation(email)) ?? "Sent again. Check your inbox.")}
+          className="font-body text-sm text-brass-deep hover:text-ink underline mb-6"
+        >
+          Send the link again
+        </button>
+        {resendMsg && <p className="font-body text-xs text-slate -mt-4 mb-6">{resendMsg}</p>}
         <Link to="/login" className="w-full h-11 bg-brass text-ink font-body font-semibold text-sm rounded-lg hover:bg-[#CB9A22] flex items-center justify-center gap-2">
           Go to sign in <ArrowRight className="w-4 h-4" />
         </Link>

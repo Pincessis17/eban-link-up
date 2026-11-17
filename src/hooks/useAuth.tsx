@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { confirmRedirect, friendlyAuthError } from "@/lib/authEmails";
 
 export type Profile = {
   id: string;
@@ -75,9 +76,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { full_name: fullName, role } },
+      options: { data: { full_name: fullName, role }, emailRedirectTo: confirmRedirect() },
     });
-    if (error) return { error: error.message, needsConfirmation: false };
+    if (error) return { error: friendlyAuthError(error.message), needsConfirmation: false };
     if (!data.user) return { error: "Something went wrong creating your account.", needsConfirmation: false };
 
     return { error: null, needsConfirmation: !data.session };
@@ -85,7 +86,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn: AuthContextType["signIn"] = async (email, password) => {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) return { error: error.message, role: null };
+    if (error) return { error: friendlyAuthError(error.message), role: null };
 
     // Fetch role directly rather than reading it off context state, since the
     // context's profile hasn't necessarily finished loading yet at this point.

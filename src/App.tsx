@@ -25,6 +25,8 @@ import AdminPayments from "./pages/admin/AdminPayments";
 import AdminFees from "./pages/admin/AdminFees";
 import Login from "./pages/Login.tsx";
 import Signup from "./pages/Signup.tsx";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import TravelerHome from "./pages/traveler/TravelerHome.tsx";
 import TravelerNewTrip from "./pages/traveler/TravelerNewTrip.tsx";
 import TravelerRequests from "./pages/traveler/TravelerRequests.tsx";
@@ -81,6 +83,8 @@ const App = () => (
               }
             />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route
               path="/admin/bookings"
               element={
