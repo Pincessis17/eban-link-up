@@ -4,6 +4,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { ArrowRight, CheckCircle2, Plane, Send } from "lucide-react";
 import { AuthShell, authInput, authLabel } from "@/components/AuthShell";
 import { resendConfirmation } from "@/lib/authEmails";
+import { AgreeLabel, CountrySelect } from "@/components/LegalGate";
+import { PRIVACY_VERSION, TERMS_VERSION } from "@/lib/legal";
 
 const Signup = () => {
   const { signUp } = useAuth();
@@ -20,12 +22,18 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
   const [needsConfirmation, setNeedsConfirmation] = useState(false);
   const [resendMsg, setResendMsg] = useState<string | null>(null);
+  const [country, setCountry] = useState("");
+  const [agree, setAgree] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    const { error, needsConfirmation } = await signUp(email, password, fullName, role);
+    const { error, needsConfirmation } = await signUp(email, password, fullName, role, {
+      country,
+      termsVersion: TERMS_VERSION,
+      privacyVersion: PRIVACY_VERSION,
+    });
     setLoading(false);
     if (error) {
       setError(error);
@@ -125,13 +133,21 @@ const Signup = () => {
           />
           <p className="font-body text-xs text-slate mt-1.5">At least 8 characters, with letters and numbers.</p>
         </div>
-        <button type="submit" disabled={loading} className="w-full h-11 bg-brass text-ink font-body font-semibold text-sm rounded-lg hover:bg-[#CB9A22] disabled:opacity-60 flex items-center justify-center gap-2 mt-2">
+        <div>
+          <label className={authLabel} htmlFor="country">Country you live in</label>
+          <CountrySelect id="country" value={country} onChange={setCountry} />
+        </div>
+        <label className="flex items-start gap-3 font-body text-sm text-ink">
+          <input type="checkbox" required checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-1 h-4 w-4 accent-[#B07D22]" />
+          <span><AgreeLabel /></span>
+        </label>
+        <button type="submit" disabled={loading || !agree || !country} className="w-full h-11 bg-brass text-ink font-body font-semibold text-sm rounded-lg hover:bg-[#CB9A22] disabled:opacity-60 flex items-center justify-center gap-2 mt-2">
           {loading ? "Creating account..." : "Create account"} <ArrowRight className="w-4 h-4" />
         </button>
       </form>
 
       <p className="font-body text-xs text-slate mt-5 leading-relaxed">
-        By continuing you agree to the marketplace rules. Senders and travellers are responsible for what they send and carry.
+        Eban is a marketplace: senders and travellers are responsible for what they send and carry.
       </p>
       <p className="font-body text-sm text-slate mt-4">
         Already have an account? <Link to="/login" className="font-semibold text-brass-deep hover:underline">Sign in</Link>

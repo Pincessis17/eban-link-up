@@ -21,7 +21,8 @@ type AuthContextType = {
     email: string,
     password: string,
     fullName: string,
-    role: "Sender" | "Traveller"
+    role: "Sender" | "Traveller",
+    extra?: { country: string; termsVersion: string; privacyVersion: string }
   ) => Promise<{ error: string | null; needsConfirmation: boolean }>;
   signIn: (email: string, password: string) => Promise<{ error: string | null; role: string | null }>;
   signOut: () => Promise<void>;
@@ -76,7 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => listener.subscription.unsubscribe();
   }, []);
 
-  const signUp: AuthContextType["signUp"] = async (email, password, fullName, role) => {
+  const signUp: AuthContextType["signUp"] = async (email, password, fullName, role, extra) => {
     // Profile creation (profiles + sender_profiles/traveller_profiles) happens
     // server-side via the on_auth_user_created trigger, reading full_name/role
     // from this metadata. Doing it client-side right after signUp() breaks
@@ -85,7 +86,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { full_name: fullName, role }, emailRedirectTo: confirmRedirect() },
+      options: {
+        data: {
+          full_name: fullName,
+          role,
+          ...(extra ? { country: extra.country, terms_version: extra.termsVersion, privacy_version: extra.privacyVersion } : {}),
+        },
+        emailRedirectTo: confirmRedirect(),
+      },
     });
     if (error) return { error: friendlyAuthError(error.message), needsConfirmation: false };
     if (!data.user) return { error: "Something went wrong creating your account.", needsConfirmation: false };

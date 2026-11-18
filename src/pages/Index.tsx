@@ -357,6 +357,8 @@ const Footer = () => (
           <a href="#faq" className="block text-paper/75 hover:text-paper">Questions</a>
           <a href={SUPPORT_WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="block text-paper/75 hover:text-paper">WhatsApp support</a>
           <Link to="/login" className="block text-paper/75 hover:text-paper">Log in</Link>
+          <Link to="/terms" className="block text-paper/75 hover:text-paper">Terms of Service</Link>
+          <Link to="/privacy" className="block text-paper/75 hover:text-paper">Privacy Policy</Link>
         </div>
       </div>
       <p className="pt-6 font-body text-xs text-paper/45">© {new Date().getFullYear()} Eban. A marketplace: senders and travellers are responsible for what they send and carry.</p>

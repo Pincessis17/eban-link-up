@@ -26,6 +26,8 @@ import AdminFees from "./pages/admin/AdminFees";
 import Login from "./pages/Login.tsx";
 import Signup from "./pages/Signup.tsx";
 import ForgotPassword from "./pages/ForgotPassword";
+import LegalPage from "./pages/LegalPage";
+import { LegalGate } from "@/components/LegalGate";
 import ResetPassword from "./pages/ResetPassword";
 import TravelerHome from "./pages/traveler/TravelerHome.tsx";
 import TravelerNewTrip from "./pages/traveler/TravelerNewTrip.tsx";
@@ -55,6 +57,7 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <TestSiteBanner />
+          <LegalGate>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
@@ -84,6 +87,8 @@ const App = () => (
             />
             <Route path="/signup" element={<Signup />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/terms" element={<LegalPage doc="terms" />} />
+            <Route path="/privacy" element={<LegalPage doc="privacy" />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route
               path="/admin/bookings"
@@ -228,6 +233,7 @@ const App = () => (
             )}
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </LegalGate>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
