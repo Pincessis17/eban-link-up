@@ -16,6 +16,7 @@ type Item = {
   detail: string;
   docType: string;
   documentUrl: string;
+  fileDeleted: boolean;
   status: string;
   note: string | null;
   createdAt: string;
@@ -34,12 +35,12 @@ const AdminVerifications = () => {
     const [{ data: idData }, { data: legacy }] = await Promise.all([
       (supabase as any)
         .from("id_documents")
-        .select("id, user_id, document_url, id_document_type, status, reviewer_note, created_at, profiles:user_id(full_name, email, role)")
+        .select("id, user_id, document_url, id_document_type, status, reviewer_note, created_at, file_deleted_at, profiles:user_id(full_name, email, role)")
         .order("created_at", { ascending: false })
         .limit(300),
       supabase
         .from("verifications")
-        .select("id, document_url, status, id_document_type, created_at, traveller_id, traveller_profiles(name, user_id)")
+        .select("id, document_url, status, id_document_type, created_at, traveller_id, file_deleted_at, traveller_profiles(name, user_id)")
         .eq("status", "pending")
         .order("created_at", { ascending: false }),
     ]);
@@ -51,6 +52,7 @@ const AdminVerifications = () => {
       detail: [r.profiles?.role, r.profiles?.email].filter(Boolean).join(" · "),
       docType: r.id_document_type,
       documentUrl: r.document_url,
+      fileDeleted: !!r.file_deleted_at,
       status: r.status,
       note: r.reviewer_note,
       createdAt: r.created_at,
@@ -63,6 +65,7 @@ const AdminVerifications = () => {
       detail: "Traveller (older upload)",
       docType: r.id_document_type ?? "ID",
       documentUrl: r.document_url,
+      fileDeleted: !!r.file_deleted_at,
       status: r.status,
       note: null,
       createdAt: r.created_at,
@@ -159,9 +162,15 @@ const AdminVerifications = () => {
                 {it.status === "rejected" && it.note && <p className="font-body text-sm text-kente mt-1">Reason: {it.note}</p>}
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                <button onClick={() => view(it.documentUrl)} className="h-9 px-3 inline-flex items-center gap-1.5 rounded-lg border border-line bg-white font-body text-sm font-semibold text-ink hover:bg-paper-2">
-                  <Eye className="w-4 h-4" /> View
-                </button>
+                {it.fileDeleted ? (
+                  <span className="font-body text-xs text-slate" title="Deleted automatically 30 days after review, as the Privacy Policy promises">
+                    File deleted after 30 days
+                  </span>
+                ) : (
+                  <button onClick={() => view(it.documentUrl)} className="h-9 px-3 inline-flex items-center gap-1.5 rounded-lg border border-line bg-white font-body text-sm font-semibold text-ink hover:bg-paper-2">
+                    <Eye className="w-4 h-4" /> View
+                  </button>
+                )}
                 {it.status === "pending" && (
                   <>
                     <button onClick={() => decide(it, true)} disabled={busy === it.key} className="h-9 px-3 inline-flex items-center gap-1.5 rounded-lg bg-forest text-white font-body text-sm font-semibold hover:opacity-90 disabled:opacity-50">

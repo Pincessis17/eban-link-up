@@ -7,7 +7,7 @@ import { AdminDeleteButton } from "@/components/AdminDeleteButton";
 import { ReviewBadge, ReviewTabs, type ReviewFilter } from "@/components/ReviewStatus";
 import { errMsg } from "@/lib/marketplace";
 
-type Row = { id: string; user_id: string; video_path: string; challenge_code: string | null; status: string; reviewer_note: string | null; created_at: string; name: string; role: string; email: string; url: string | null };
+type Row = { id: string; user_id: string; video_path: string; file_deleted_at: string | null; challenge_code: string | null; status: string; reviewer_note: string | null; created_at: string; name: string; role: string; email: string; url: string | null };
 
 const AdminIdentity = () => {
   const [rows, setRows] = useState<Row[]>([]);
@@ -33,7 +33,7 @@ const AdminIdentity = () => {
           name: p?.full_name ?? "Unknown",
           role: p?.role ?? "",
           email: p?.email ?? "",
-          url: c.status === "pending" ? await signed(c.video_path) : null,
+          url: c.status === "pending" && !c.file_deleted_at ? await signed(c.video_path) : null,
         } as Row;
       })
     );
@@ -115,7 +115,12 @@ const AdminIdentity = () => {
                     {r.status === "rejected" && r.reviewer_note && <p className="font-body text-sm text-kente mt-1">Reason: {r.reviewer_note}</p>}
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    {!r.url && (
+                    {r.file_deleted_at && (
+                      <span className="font-body text-xs text-slate" title="Deleted automatically 30 days after review, as the Privacy Policy promises">
+                        Video deleted after 30 days
+                      </span>
+                    )}
+                    {!r.url && !r.file_deleted_at && (
                       <button onClick={() => showVideo(r)} className="h-9 px-3 inline-flex items-center gap-1.5 rounded-lg border border-line bg-white font-body text-sm font-semibold text-ink hover:bg-paper-2">
                         <Play className="w-4 h-4" /> Watch
                       </button>
