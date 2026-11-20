@@ -7,7 +7,7 @@ export interface FeeSettings {
 }
 
 // Used until the real numbers load (or if they can't be read). Matches the database defaults.
-export const DEFAULT_FEE: FeeSettings = { percent: 15, minimum: 5 };
+export const DEFAULT_FEE: FeeSettings = { percent: 15, minimum: 3 };
 
 /** Eban's service fee on a traveler price: the larger of percent% and the minimum. */
 export const calcServiceFee = (price: number | null | undefined, fee: FeeSettings): number => {

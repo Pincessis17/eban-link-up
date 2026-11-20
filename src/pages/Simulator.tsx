@@ -139,7 +139,7 @@ const opening: Step[] = [
   {
     who: "sender",
     title: "Kwame pays Eban",
-    say: "Kwame sends $25 to Eban ($20 for Ama + $5 Eban fee) with his EBAN reference, attaches the mobile money screenshot and confirms he's paid.",
+    say: "Kwame sends $23 to Eban ($20 for Ama + $3 Eban fee) with his EBAN reference, attaches the mobile money screenshot and confirms he's paid.",
     run: async (c) => {
       await simEvidence(c.db.sender, c.ids.sender, c.requestId, "payment_proof", "Mobile money receipt: $25", "#2F5D3A");
       await must(c.db.sender.rpc("report_payment_sent", { p_request_id: c.requestId }));
@@ -209,7 +209,7 @@ const happyEnding: Step[] = [
   {
     who: "admin",
     title: "Eban pays Ama",
-    say: "Efua sends Ama her full $20 by mobile money and marks the payout paid. Eban keeps the $5 fee. Done!",
+    say: "Efua sends Ama her full $20 by mobile money and marks the payout paid. Eban keeps the $3 fee. Done!",
     run: async (c) => {
       await must(c.db.admin.from("payouts").update({ status: "paid" }).eq("request_id", c.requestId));
     },

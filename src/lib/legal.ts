@@ -3,13 +3,13 @@
  *
  * To publish a change:
  *   1. edit the text below,
- *   2. change TERMS_VERSION and/or PRIVACY_VERSION to today's date,
+ *   2. change TERMS_VERSION and/or PRIVACY_VERSION to today's date (add -2, -3 for a second change the same day),
  *   3. push. Everyone is asked to agree to the new version the next time they open Eban.
  *
  * Fill in LEGAL_DETAILS before going live: anything still in [square brackets] shows on the pages as it is.
  */
 
-export const TERMS_VERSION = "2026-11-20";
+export const TERMS_VERSION = "2026-11-20-2"; // fee minimum lowered to USD 3
 export const PRIVACY_VERSION = "2026-11-20";
 
 // Eban isn't registered as a business yet, so it is run by its founder personally.
@@ -29,7 +29,7 @@ const fill = (s: string) =>
     .replace(/\{privacy\}/g, `[${LEGAL_DETAILS.privacyEmail}](mailto:${LEGAL_DETAILS.privacyEmail})`);
 
 const longDate = (iso: string) =>
-  new Date(iso + "T00:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+  new Date(iso.slice(0, 10) + "T00:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
 
 export const TERMS_MD = fill(`*Last updated: ${longDate(TERMS_VERSION)}*
 
@@ -88,7 +88,7 @@ Travellers can also list items they won't carry, and can decline any request. Eb
 
 ### 7. Prices, fees and payment
 
-- Each traveller sets their own price. Eban adds a service fee of **15% of the traveller's price, with a minimum of USD 5**, shown before you pay. We will show any change to the fee before you book.
+- Each traveller sets their own price. Eban adds a service fee of **15% of the traveller's price, with a minimum of USD 3**, shown before you pay. We will show any change to the fee before you book.
 - The sender pays the full amount to Eban by the methods shown in the app, using the payment reference, and uploads proof of payment. Eban confirms the money arrived before the traveller collects the item.
 - Eban holds the payment until delivery is confirmed. The traveller's price is then paid to them; Eban keeps the service fee.
 - If the sender doesn't confirm or report a problem within **72 hours** of the traveller marking the item delivered, the payment is released to the traveller automatically.

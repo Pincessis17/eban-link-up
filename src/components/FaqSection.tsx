@@ -43,7 +43,7 @@ const FAQS: Record<string, { q: string; a: string }[]> = {
   "Pricing & Payments": [
     {
       q: "How much does it cost to send a package?",
-      a: "Each traveler sets their own price per kg, and you see it before you book. We show travelers suggested rates as a guide, but they can charge what they like. Eban adds a service fee (currently 15% of the traveller's price, minimum $5), always shown before you pay.",
+      a: "Each traveler sets their own price per kg, and you see it before you book. We show travelers suggested rates as a guide, but they can charge what they like. Eban adds a service fee (currently 15% of the traveller's price, minimum $3), always shown before you pay.",
     },
     {
       q: "How do I pay?",
