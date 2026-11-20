@@ -9,29 +9,31 @@
  * Fill in LEGAL_DETAILS before going live: anything still in [square brackets] shows on the pages as it is.
  */
 
-export const TERMS_VERSION = "2026-11-18";
-export const PRIVACY_VERSION = "2026-11-18";
+export const TERMS_VERSION = "2026-11-20";
+export const PRIVACY_VERSION = "2026-11-20";
 
+// Eban isn't registered as a business yet, so it is run by its founder personally.
+// When it's registered: put the business name and registered address here and change both versions above.
 export const LEGAL_DETAILS = {
-  entity: "[Eban legal entity name]",
-  address: "[registered address]",
-  supportEmail: "[support email]",
-  privacyEmail: "[privacy email]",
+  entity: "Princess Nhyira Addai, trading as Eban (business registration in progress)",
+  address: "Pamplemousses, Mauritius",
+  supportEmail: "support@ebancompany.com",
+  privacyEmail: "privacy@ebancompany.com",
 };
 
 const fill = (s: string) =>
   s
     .replace(/\{entity\}/g, LEGAL_DETAILS.entity)
     .replace(/\{address\}/g, LEGAL_DETAILS.address)
-    .replace(/\{support\}/g, LEGAL_DETAILS.supportEmail)
-    .replace(/\{privacy\}/g, LEGAL_DETAILS.privacyEmail);
+    .replace(/\{support\}/g, `[${LEGAL_DETAILS.supportEmail}](mailto:${LEGAL_DETAILS.supportEmail})`)
+    .replace(/\{privacy\}/g, `[${LEGAL_DETAILS.privacyEmail}](mailto:${LEGAL_DETAILS.privacyEmail})`);
 
 const longDate = (iso: string) =>
   new Date(iso + "T00:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
 
 export const TERMS_MD = fill(`*Last updated: ${longDate(TERMS_VERSION)}*
 
-These terms are the agreement between you and **{entity}** ("Eban", "we"), registered in Mauritius at **{address}**. By creating an account or using ebancompany.com you agree to them. If you don't agree, don't use Eban.
+These terms are the agreement between you and **{entity}** ("Eban", "we"), based in {address}. By creating an account or using ebancompany.com you agree to them. If you don't agree, don't use Eban.
 
 ### 1. What Eban is
 
@@ -41,7 +43,7 @@ Eban is a marketplace. It connects people who want to send items (**senders**) w
 
 - You must be at least 18 and able to enter a binding contract.
 - Give true information and keep it up to date. One person, one account.
-- Keep your password private. You are responsible for what happens on your account. Tell us at once at **{support}** if you think someone else has used it.
+- Keep your password private. You are responsible for what happens on your account. Tell us at once at {support} if you think someone else has used it.
 - Admin accounts must use two-step login.
 
 ### 3. Identity checks
@@ -136,7 +138,7 @@ These terms are governed by the laws of Mauritius. Disputes go to the courts of 
 
 export const PRIVACY_MD = fill(`*Last updated: ${longDate(PRIVACY_VERSION)}*
 
-This policy explains what personal information Eban collects, why, who sees it, how long we keep it, and your rights. **{entity}**, {address}, Mauritius, is responsible for your information (the "data controller"). Contact our data protection officer at **{privacy}**.
+This policy explains what personal information Eban collects, why, who sees it, how long we keep it, and your rights. **{entity}**, based in {address}, is responsible for your information (the "data controller"). Contact our data protection officer at {privacy}.
 
 Eban is used by people in many countries. Wherever you live, we apply the protections in this policy as a minimum, and you keep any extra rights your own country's data protection law gives you.
 
@@ -211,7 +213,7 @@ You can ask us to:
 - restrict or object to how we use it;
 - withdraw consent (for example to the face video), which may mean we can't keep your account active.
 
-Email **{privacy}**. We reply within one month. You can also complain to the data protection regulator in the country where you live. For the countries most of our users come from:
+Email {privacy}. We reply within one month. You can also complain to the data protection regulator in the country where you live. For the countries most of our users come from:
 
 | Where you live | Regulator | Main law |
 | --- | --- | --- |
@@ -234,5 +236,5 @@ If we change this policy in a way that matters, we will tell you in the app or b
 
 ### 10. Contact
 
-**{entity}**, {address}, Mauritius · {privacy}
+**{entity}**, {address} · {privacy}
 `);
