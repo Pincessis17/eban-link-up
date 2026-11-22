@@ -298,7 +298,14 @@ const SCENARIOS: Record<string, { name: string; steps: Step[] }> = {
 };
 
 type StepState = "todo" | "running" | "done" | "failed";
-const SPEEDS = { slow: 6000, normal: 3500, fast: 1500 } as const;
+// look = how long the acting person's screen is spotlighted before the action happens;
+// hold = how long the result stays on screen before the next step.
+const SPEEDS = {
+  slow: { look: 3500, hold: 10000 },
+  normal: { look: 2500, hold: 6500 },
+  fast: { look: 1000, hold: 3000 },
+} as const;
+const wait = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
 const SimulatorInner = () => {
   const url = import.meta.env.VITE_SUPABASE_URL as string;
@@ -322,10 +329,13 @@ const SimulatorInner = () => {
   const [signingIn, setSigningIn] = useState(false);
   const [scenario, setScenario] = useState<keyof typeof SCENARIOS>("happy");
   const [speed, setSpeed] = useState<keyof typeof SPEEDS>("normal");
+  const speedRef = useRef<keyof typeof SPEEDS>("normal");
+  useEffect(() => { speedRef.current = speed; }, [speed]);
   const [states, setStates] = useState<StepState[]>([]);
   const [cursor, setCursor] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [active, setActive] = useState<Role | "both" | null>(null);
+  const [caption, setCaption] = useState<{ who: Role | "both"; title: string; say: string; phase: "about" | "done" } | null>(null);
   const [paths, setPaths] = useState<Record<Role, string>>({ sender: PEOPLE.sender.home, traveller: PEOPLE.traveller.home, admin: PEOPLE.admin.home });
   const [log, setLog] = useState<{ t: string; text: string; bad?: boolean }[]>([]);
 
@@ -389,11 +399,15 @@ const SimulatorInner = () => {
     if (!step || !ctx.current) return false;
     setActive(step.who);
     setStates((s) => s.map((v, j) => (j === i ? "running" : v)));
+    setCaption({ who: step.who, title: step.title, say: step.say, phase: "about" });
     say(`${step.title}: ${step.say}`);
     try {
+      // Spotlight first, so you can see who is about to act before anything changes.
+      await wait(SPEEDS[speedRef.current].look);
       await step.run(ctx.current);
       const show = step.show(ctx.current);
       (Object.keys(show) as Role[]).forEach((r) => go(r, show[r]!));
+      setCaption({ who: step.who, title: step.title, say: step.say, phase: "done" });
       setStates((s) => s.map((v, j) => (j === i ? "done" : v)));
       setCursor(i + 1);
       return true;
@@ -415,12 +429,14 @@ const SimulatorInner = () => {
       const ok = await runStep(i);
       if (!ok) return;
       i += 1;
-      if (i < steps.length) await new Promise((res) => setTimeout(res, SPEEDS[speed]));
+      // Leave the result on screen long enough to see it.
+      await wait(SPEEDS[speedRef.current].hold);
     }
     if (i >= steps.length) say("Scenario finished. Pick another one or press Restart.");
     playing.current = false;
     setIsPlaying(false);
     setActive(null);
+    setCaption(null);
   };
 
   const pause = () => { playing.current = false; setIsPlaying(false); };
@@ -513,16 +529,29 @@ const SimulatorInner = () => {
         </aside>
 
         {/* Three live screens */}
-        <main className="grid md:grid-cols-3 gap-3 p-3 min-h-0">
+        <main className="flex flex-col gap-3 p-3 min-h-0">
+          {caption && (
+            <div className={`rounded-xl px-4 py-3 border-2 transition-colors ${caption.phase === "about" ? "border-brass bg-brass/15" : "border-[#5FBF8F]/60 bg-[#5FBF8F]/10"}`} aria-live="polite">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-brass">
+                {caption.phase === "about" ? "Now acting: " : "Done: "}
+                {caption.who === "both" ? `${PEOPLE.sender.name} and ${PEOPLE.traveller.name}` : `${PEOPLE[caption.who].name} (${PEOPLE[caption.who].label})`}
+              </p>
+              <p className="font-display text-xl text-paper mt-1">{caption.title}</p>
+              <p className="text-sm text-paper/75 mt-0.5">{caption.say}</p>
+            </div>
+          )}
+          <div className="grid md:grid-cols-3 gap-3 flex-1 min-h-0">
           {ROLES.map((r) => {
             const P = PEOPLE[r];
             const lit = active === r || (active === "both" && r !== "admin");
+            const dim = active !== null && !lit;
             return (
-              <section key={r} className={`flex flex-col rounded-xl overflow-hidden border-2 transition-colors ${lit ? "border-brass" : "border-white/10"}`}>
+              <section key={r} className={`flex flex-col rounded-xl overflow-hidden border-2 transition-all duration-500 ${lit ? "border-brass shadow-[0_0_0_4px_rgba(200,147,47,0.35)] scale-[1.01]" : "border-white/10"} ${dim ? "opacity-35" : "opacity-100"}`}>
                 <div className={`flex items-center gap-2 px-3 py-2 text-xs ${lit ? "bg-brass text-ink" : "bg-ink-2 text-paper/80"}`}>
                   <P.Icon className="w-3.5 h-3.5" />
                   <span className="font-semibold">{P.name}</span>
                   <span className="opacity-70">· {P.label}</span>
+                  {lit && <span className="ml-1 px-1.5 py-0.5 rounded bg-ink text-brass text-[10px] font-bold uppercase tracking-wider">Acting now</span>}
                   <span className="ml-auto truncate opacity-60 font-mono text-[10px]">{paths[r]}</span>
                 </div>
                 <iframe
@@ -535,6 +564,7 @@ const SimulatorInner = () => {
               </section>
             );
           })}
+          </div>
         </main>
       </div>
     </div>
