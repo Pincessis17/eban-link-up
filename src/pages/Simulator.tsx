@@ -375,6 +375,13 @@ const SimulatorInner = () => {
   const signIn = async () => {
     if (password.length < 8) return say("Type the test password you chose when you ran reset_and_seed.", true);
     setSigningIn(true);
+    // Screens stay blank while signing in, and any old sign-ins are cleared first. Otherwise a screen still holding
+    // a sign-in from before a reset can wipe the new one while it tries to refresh the old one.
+    ROLES.forEach((r) => {
+      const f = frames.current[r];
+      if (f) f.src = "about:blank";
+      try { localStorage.removeItem(frameName(r)); } catch { /* private mode */ }
+    });
     try {
       const ids = {} as Record<Role, string>;
       for (const r of ROLES) {
@@ -446,7 +453,11 @@ const SimulatorInner = () => {
     await Promise.all(ROLES.map((r) => db[r].auth.signOut()));
     ctx.current = null;
     setSignedIn(false);
-    ROLES.forEach((r) => go(r, "/login"));
+    ROLES.forEach((r) => {
+      const f = frames.current[r];
+      if (f) f.src = "about:blank";
+      setPaths((p) => ({ ...p, [r]: "signed out" }));
+    });
   };
 
   const done = states.filter((s) => s === "done").length;
@@ -558,7 +569,7 @@ const SimulatorInner = () => {
                   ref={(el) => (frames.current[r] = el)}
                   name={frameName(r)}
                   title={`${P.name}'s screen`}
-                  src={signedIn ? P.home : "/login"}
+                  src={signedIn ? P.home : "about:blank"}
                   className="flex-1 w-full min-h-[70vh] bg-paper"
                 />
               </section>
