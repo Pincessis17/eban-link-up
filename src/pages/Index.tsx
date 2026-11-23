@@ -177,27 +177,23 @@ const Showreel = () => {
     <section id="watch" className="py-16 md:py-24 bg-paper border-t border-line overflow-hidden">
       <div className="container mx-auto grid gap-10 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-14 items-center">
         <div className="max-w-md">
-          <p className="eyebrow mb-3">A smarter way to send</p>
-          <h2 className="font-display text-4xl md:text-[52px] leading-[1.05] text-ink">
-            Closer, no matter the distance.
-          </h2>
-          <p className="font-body text-slate text-[17px] mt-4">
-            Connect with travellers heading your way and get your items delivered across borders without the complexity and high costs of traditional shipping.
+          <p className="eyebrow mb-3">Watch how it works</p>
+          <h2 className="font-display text-4xl md:text-[60px] leading-[1.04] text-ink">See Eban in 20 seconds.</h2>
+          <p className="font-body text-slate text-[17px] md:text-[19px] leading-relaxed mt-5">
+            Press play to follow a parcel from booking a traveller to the photo at delivery.
           </p>
-          <div className="mt-7 flex flex-wrap gap-3">
+          <div className="mt-8 flex flex-wrap items-center gap-3">
             <button
               type="button"
               onClick={play}
-              className="inline-flex h-12 items-center gap-2 px-6 rounded-full bg-ink font-body text-[15px] font-semibold text-paper hover:bg-ink-2"
+              className="inline-flex h-[52px] items-center gap-2.5 px-6 rounded-full bg-ink font-body text-base font-semibold text-paper hover:bg-ink-2"
             >
-              Watch the video <ArrowRight className="h-4 w-4" />
+              <svg viewBox="0 0 24 24" className="h-4 w-4 fill-brass" aria-hidden>
+                <path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5Z" />
+              </svg>
+              Play the video
             </button>
-            <Link
-              to="/signup"
-              className="inline-flex h-12 items-center px-6 rounded-full border border-ink/20 font-body text-[15px] font-semibold text-ink hover:bg-ink/5"
-            >
-              Get started
-            </Link>
+            <span className="font-body text-[15px] text-slate">0:20 · sound on</span>
           </div>
         </div>
 
