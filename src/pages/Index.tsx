@@ -177,12 +177,12 @@ const Showreel = () => {
     <section id="watch" className="py-16 md:py-24 bg-paper border-t border-line overflow-hidden">
       <div className="container mx-auto grid gap-10 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-14 items-center">
         <div className="max-w-md">
-          <p className="eyebrow mb-3">See it in action</p>
+          <p className="eyebrow mb-3">A smarter way to send</p>
           <h2 className="font-display text-4xl md:text-[52px] leading-[1.05] text-ink">
-            Book, carry,<br />deliver.
+            Closer, no matter the distance.
           </h2>
           <p className="font-body text-slate text-[17px] mt-4">
-            Watch a parcel go from booking a traveller to the photo at delivery, with your money held safely the whole way.
+            Connect with travellers heading your way and get your items delivered across borders without the complexity and high costs of traditional shipping.
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
             <button
