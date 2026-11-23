@@ -164,29 +164,80 @@ const travellerSteps = [
   { title: "Get paid", desc: "Your full price is released when the sender confirms receipt." },
 ];
 
-/** The 20-second launch video. Plays only when tapped, with sound; never autoplays. */
-const Showreel = () => (
-  <section id="watch" className="py-16 md:py-20 bg-paper border-t border-line">
-    <div className="container mx-auto">
-      <div className="max-w-2xl mb-8">
-        <p className="eyebrow mb-3">See it in action</p>
-        <h2 className="font-display text-3xl md:text-[40px] leading-tight text-ink">Eban in 20 seconds.</h2>
-        <p className="font-body text-slate mt-3">From booking a traveller to the photo at delivery.</p>
+/** The 20-second launch video, in a split layout: words on the left, a video card on the right.
+ *  Plays only when tapped, with sound; never autoplays. */
+const Showreel = () => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [started, setStarted] = useState(false);
+  const play = () => {
+    setStarted(true);
+    videoRef.current?.play().catch(() => {});
+  };
+  return (
+    <section id="watch" className="py-16 md:py-24 bg-paper border-t border-line overflow-hidden">
+      <div className="container mx-auto grid gap-10 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-14 items-center">
+        <div className="max-w-md">
+          <p className="eyebrow mb-3">See it in action</p>
+          <h2 className="font-display text-4xl md:text-[52px] leading-[1.05] text-ink">
+            Book, carry,<br />deliver.
+          </h2>
+          <p className="font-body text-slate text-[17px] mt-4">
+            Watch a parcel go from booking a traveller to the photo at delivery, with your money held safely the whole way.
+          </p>
+          <div className="mt-7 flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={play}
+              className="inline-flex h-12 items-center gap-2 px-6 rounded-full bg-ink font-body text-[15px] font-semibold text-paper hover:bg-ink-2"
+            >
+              Watch the video <ArrowRight className="h-4 w-4" />
+            </button>
+            <Link
+              to="/signup"
+              className="inline-flex h-12 items-center px-6 rounded-full border border-ink/20 font-body text-[15px] font-semibold text-ink hover:bg-ink/5"
+            >
+              Get started
+            </Link>
+          </div>
+        </div>
+
+        <div className="relative">
+          <div aria-hidden className="absolute -inset-6 md:-inset-10 rounded-[40px] bg-brass/15 blur-3xl" />
+          <div className="relative rounded-[28px] overflow-hidden bg-ink shadow-[0_30px_80px_-30px_rgba(12,17,25,0.45)] ring-1 ring-ink/10">
+            <video
+              ref={videoRef}
+              className="w-full aspect-video block"
+              src="/videos/eban-in-20-seconds.mp4"
+              poster="/videos/eban-in-20-seconds.jpg"
+              controls={started}
+              playsInline
+              preload="none"
+              onPlay={() => setStarted(true)}
+              aria-label="Eban in 20 seconds: how sending a parcel with a traveller works"
+            />
+            {!started && (
+              <button
+                type="button"
+                onClick={play}
+                aria-label="Play the video"
+                className="group absolute inset-0 flex items-center justify-center bg-ink/20 hover:bg-ink/10 transition-colors"
+              >
+                <span className="absolute left-4 top-4 md:left-5 md:top-5 rounded-full bg-ink/75 backdrop-blur px-3 py-1 font-body text-[11px] font-semibold uppercase tracking-[0.14em] text-paper">
+                  Video · 0:20
+                </span>
+                <span className="flex h-16 w-16 md:h-20 md:w-20 items-center justify-center rounded-full bg-paper/90 shadow-lg transition-transform group-hover:scale-105">
+                  <svg viewBox="0 0 24 24" className="ml-1 h-7 w-7 md:h-8 md:w-8 fill-brass-deep" aria-hidden>
+                    <path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5Z" />
+                  </svg>
+                </span>
+              </button>
+            )}
+          </div>
+        </div>
       </div>
-      <div className="rounded-2xl overflow-hidden border border-line bg-ink shadow-[0_30px_80px_-30px_rgba(12,17,25,0.35)]">
-        <video
-          className="w-full aspect-video block"
-          src="/videos/eban-in-20-seconds.mp4"
-          poster="/videos/eban-in-20-seconds.jpg"
-          controls
-          playsInline
-          preload="none"
-          aria-label="Eban in 20 seconds: how sending a parcel with a traveller works"
-        />
-      </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 const HowItWorks = () => {
   const [role, setRole] = useState<"sender" | "traveller">("sender");
