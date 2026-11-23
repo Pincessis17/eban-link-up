@@ -164,6 +164,30 @@ const travellerSteps = [
   { title: "Get paid", desc: "Your full price is released when the sender confirms receipt." },
 ];
 
+/** The 20-second launch video. Plays only when tapped, with sound; never autoplays. */
+const Showreel = () => (
+  <section id="watch" className="py-16 md:py-20 bg-paper border-t border-line">
+    <div className="container mx-auto">
+      <div className="max-w-2xl mb-8">
+        <p className="eyebrow mb-3">See it in action</p>
+        <h2 className="font-display text-3xl md:text-[40px] leading-tight text-ink">Eban in 20 seconds.</h2>
+        <p className="font-body text-slate mt-3">From booking a traveller to the photo at delivery.</p>
+      </div>
+      <div className="rounded-2xl overflow-hidden border border-line bg-ink shadow-[0_30px_80px_-30px_rgba(12,17,25,0.35)]">
+        <video
+          className="w-full aspect-video block"
+          src="/videos/eban-in-20-seconds.mp4"
+          poster="/videos/eban-in-20-seconds.jpg"
+          controls
+          playsInline
+          preload="none"
+          aria-label="Eban in 20 seconds: how sending a parcel with a traveller works"
+        />
+      </div>
+    </div>
+  </section>
+);
+
 const HowItWorks = () => {
   const [role, setRole] = useState<"sender" | "traveller">("sender");
   const steps = role === "sender" ? senderSteps : travellerSteps;
@@ -388,6 +412,7 @@ const Index = () => {
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
       <Hero />
+      <Showreel />
       <AvailableTrips />
       <HowItWorks />
       <Escrow />
