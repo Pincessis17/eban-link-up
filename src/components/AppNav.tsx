@@ -16,8 +16,11 @@ const initials = (name?: string | null, email?: string | null) => {
   return ((parts[0]?.[0] ?? "") + (parts[1]?.[0] ?? "")).toUpperCase() || src[0].toUpperCase();
 };
 
-export const EbanLogo = ({ to = "/", sub, dark = false }: { to?: string; sub?: string; dark?: boolean }) => (
-  <Link to={to} className="flex items-center gap-2.5 shrink-0" aria-label="Eban home">
+/** The Eban symbol and name. Always opens the Eban homepage (signed-in users included, via ?view=site). */
+export const HOME_PAGE = "/?view=site";
+const toTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
+export const EbanLogo = ({ to = HOME_PAGE, sub, dark = false }: { to?: string; sub?: string; dark?: boolean }) => (
+  <Link to={to} onClick={toTop} className="flex items-center gap-2.5 shrink-0" aria-label="Eban homepage">
     <img src={ebanSymbol} alt="" className="w-9 h-9 object-contain scale-125" />
     <span className="leading-none">
       <span className={`block font-display text-[19px] tracking-[0.04em] ${dark ? "text-paper" : "text-ink"}`}>EBAN</span>
@@ -51,7 +54,7 @@ export const AppNav = ({ home, sub, items }: { home: string; sub: string; items:
       <AdminViewSwitcher />
       <header className="sticky top-0 z-40 bg-paper/95 backdrop-blur">
         <div className="container mx-auto flex h-16 items-center justify-between gap-4">
-          <EbanLogo to={home} sub={sub} />
+          <EbanLogo sub={sub} />
           <nav className="hidden lg:flex items-center gap-6" aria-label="Main">{items.map(link)}</nav>
           <div className="flex items-center gap-2 sm:gap-3">
             <ModeSwitcher />
