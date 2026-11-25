@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { Star, ShieldCheck, Package, Plane, CalendarDays, ScanFace, Mail } from "lucide-react";
-import { Switch } from "@/components/ui/switch";
+import { Star, ShieldCheck, Package, Plane, CalendarDays, ScanFace } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
@@ -9,6 +8,7 @@ import { errMsg } from "@/lib/marketplace";
 import { SenderNav } from "@/components/SenderNav";
 import { TravelerNav } from "@/components/TravelerNav";
 import { AdminNav } from "@/components/AdminNav";
+import { NotificationSettings } from "@/components/NotificationSettings";
 import { useLiveRefresh, useLiveTick } from "@/lib/liveRefresh";
 
 type ProfileData = {
@@ -74,7 +74,7 @@ const Profile = () => {
       setEmailOn(!on);
       toast({ title: "Couldn't save", description: errMsg(error), variant: "destructive" });
     } else {
-      toast({ title: on ? "Emails on" : "Emails off", description: on ? "We'll email you about your deliveries." : "You'll still see everything under the bell." });
+      toast({ title: on ? "Emails on" : "Emails off", description: on ? "We'll email you if you miss a notification." : "You'll still see everything under the bell." });
     }
   };
 
@@ -167,24 +167,7 @@ const Profile = () => {
               </div>
             </div>
 
-            {isMine && (
-              <div className="bg-card rounded-2xl border border-line p-6 md:p-8 mt-6 flex items-start gap-4">
-                <Mail className="w-5 h-5 text-brass-deep mt-1 shrink-0" />
-                <div className="flex-1">
-                  <h2 className="font-display text-xl text-ink">Email updates</h2>
-                  <p className="font-body text-sm text-slate mt-1">
-                    Get an email when something happens on your deliveries: bookings, payments, hand-overs, messages and reminders.
-                  </p>
-                </div>
-                <Switch
-                  checked={emailOn ?? true}
-                  disabled={emailOn === null}
-                  onCheckedChange={toggleEmail}
-                  aria-label="Email updates"
-                  className="mt-1"
-                />
-              </div>
-            )}
+            {isMine && <NotificationSettings emailOn={emailOn} onEmail={toggleEmail} />}
 
             {isMine && (
               <div className="bg-card rounded-2xl border border-line p-6 md:p-8 mt-6">

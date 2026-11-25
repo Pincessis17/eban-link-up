@@ -1,10 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Bell, Check } from "lucide-react";
+import { Bell, Check, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { emitLiveChange } from "@/lib/liveRefresh";
+import { toast as popup } from "sonner";
+import { playSound } from "@/lib/sounds";
+import ebanSymbol from "@/assets/eban-symbol.png";
+import { pushState, refreshPushRegistration, turnPushOn, PUSH_HELP, type PushState } from "@/lib/push";
+import { toast } from "@/hooks/use-toast";
 
 type Note = {
   id: string;
@@ -25,13 +30,40 @@ const ago = (iso: string) => {
   return new Date(iso).toLocaleDateString(undefined, { day: "numeric", month: "short" });
 };
 
-/** Bell with unread count. Live: new notifications appear without a refresh. */
+// A page can show two bells (admin sidebar and mobile bar); each notification pops up only once.
+const shown = new Set<string>();
+
+/** The popup shown at the top of the screen when a notification arrives while the app is open. */
+const NotePopup = ({ note, onOpen, onClose }: { note: Note; onOpen: () => void; onClose: () => void }) => (
+  <div className="w-[356px] max-w-[calc(100vw-24px)] rounded-2xl border border-line bg-paper shadow-[0_18px_50px_-18px_rgba(12,17,25,0.4)] overflow-hidden">
+    <div className="kente-rail" />
+    <div className="flex items-start gap-3 p-4">
+      <img src={ebanSymbol} alt="" className="w-9 h-9 shrink-0 object-contain" />
+      <button type="button" onClick={onOpen} className="min-w-0 flex-1 text-left">
+        <span className="block font-body text-[11px] font-semibold uppercase tracking-[0.14em] text-brass-deep">Eban · now</span>
+        <span className="block font-body text-[14px] font-semibold text-ink mt-0.5">{note.title ?? "Update"}</span>
+        <span className="block font-body text-[13px] leading-snug text-slate mt-0.5 line-clamp-3">{note.message}</span>
+      </button>
+      <button type="button" onClick={onClose} aria-label="Dismiss" className="shrink-0 rounded-md p-1 text-slate hover:text-ink">
+        <X className="w-4 h-4" />
+      </button>
+    </div>
+    {note.link && (
+      <div className="px-4 pb-3 -mt-1 flex justify-end">
+        <button type="button" onClick={onOpen} className="h-9 px-4 rounded-full bg-ink font-body text-[13px] font-semibold text-paper hover:bg-ink-2">View</button>
+      </div>
+    )}
+  </div>
+);
+
+/** Bell with unread count. Live: new notifications appear without a refresh, with a popup and a soft chime. */
 export const NotificationBell = ({ dark = false }: { dark?: boolean }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [notes, setNotes] = useState<Note[]>([]);
   const [unread, setUnread] = useState(0);
+  const [push, setPush] = useState<PushState | null>(null);
 
   const load = useCallback(async () => {
     if (!user) return;
@@ -64,7 +96,29 @@ export const NotificationBell = ({ dark = false }: { dark?: boolean }) => {
         .on(
           "postgres_changes",
           { event: "*", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
-          () => { load(); emitLiveChange(); },
+          (payload: { eventType: string; new: Partial<Note> }) => {
+            load();
+            emitLiveChange();
+            const n = payload.new as Note;
+            if (payload.eventType !== "INSERT" || !n?.id || shown.has(n.id)) return;
+            shown.add(n.id);
+            // When the app isn't on screen, the phone or computer notification plays its own sound.
+            if (document.visibilityState === "visible") playSound("notify");
+            popup.custom(
+              (id) => (
+                <NotePopup
+                  note={n}
+                  onClose={() => popup.dismiss(id)}
+                  onOpen={() => {
+                    popup.dismiss(id);
+                    supabase.from("notifications").update({ read_status: true }).eq("id", n.id).then(() => load());
+                    if (n.link) navigate(n.link);
+                  }}
+                />
+              ),
+              { duration: 7000 },
+            );
+          },
         )
         .subscribe();
     } catch (e) {
@@ -76,7 +130,25 @@ export const NotificationBell = ({ dark = false }: { dark?: boolean }) => {
       window.clearInterval(t);
       if (channel) supabase.removeChannel(channel);
     };
-  }, [user, load]);
+  }, [user, load, navigate]);
+
+  // Keep this device registered for notifications, and know whether to offer turning them on.
+  useEffect(() => {
+    if (!user) return;
+    refreshPushRegistration();
+    pushState().then(setPush).catch(() => setPush("unsupported"));
+  }, [user]);
+
+  const enablePush = async () => {
+    try {
+      const next = await turnPushOn();
+      setPush(next);
+      if (next === "on") toast({ title: "Notifications on", description: "You'll get a notification on this device when something happens." });
+      else toast({ title: "Notifications not turned on", description: PUSH_HELP[next], variant: "destructive" });
+    } catch {
+      toast({ title: "Couldn't turn on notifications", description: "Please try again from your profile.", variant: "destructive" });
+    }
+  };
 
   if (!user) return null;
 
@@ -120,6 +192,19 @@ export const NotificationBell = ({ dark = false }: { dark?: boolean }) => {
             </button>
           )}
         </div>
+        {(push === "off" || push === "install-first") && (
+          <div className="px-4 py-3 border-b border-line bg-brass/5">
+            <p className="font-body text-[13px] font-semibold text-ink">Never miss an update</p>
+            <p className="font-body text-[12px] text-slate leading-snug mt-0.5">
+              {push === "off" ? "Get a notification on this device, even when Eban is closed." : PUSH_HELP["install-first"]}
+            </p>
+            {push === "off" && (
+              <button onClick={enablePush} className="mt-2 h-8 px-3.5 rounded-full bg-ink font-body text-[12px] font-semibold text-paper hover:bg-ink-2">
+                Turn on notifications
+              </button>
+            )}
+          </div>
+        )}
         <div className="max-h-[420px] overflow-y-auto">
           {notes.length === 0 ? (
             <p className="px-4 py-10 text-center text-[13px] font-body text-slate">Nothing yet. Updates on your deliveries will show here.</p>

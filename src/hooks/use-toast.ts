@@ -1,3 +1,4 @@
+import { playSound } from "@/lib/sounds";
 import * as React from "react";
 
 import type { ToastActionElement, ToastProps } from "@/components/ui/toast";
@@ -136,6 +137,7 @@ type Toast = Omit<ToasterToast, "id">;
 
 function toast({ ...props }: Toast) {
   const id = genId();
+  playSound(props.variant === "destructive" ? "error" : "success");
 
   const update = (props: ToasterToast) =>
     dispatch({

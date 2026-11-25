@@ -3,6 +3,7 @@ import type { Session, User } from "@supabase/supabase-js";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { confirmRedirect, friendlyAuthError } from "@/lib/authEmails";
+import { forgetThisDevice } from "@/lib/push";
 
 export type Profile = {
   id: string;
@@ -112,6 +113,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
+    // This device stops getting notifications for this account.
+    await forgetThisDevice();
     await supabase.auth.signOut();
   };
 
