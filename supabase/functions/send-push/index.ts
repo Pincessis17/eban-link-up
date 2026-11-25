@@ -1,5 +1,6 @@
 // Eban: phone and computer notifications (web push).
-// Called by the database the moment a notification is created (public.trigger_push_send).
+// Called by the database the moment a notification is created (public.trigger_push_send),
+// and once more a day later if it is still unread (public.trigger_push_reminders).
 // Secrets this function reads (set in Supabase > Edge Functions > Secrets):
 //   VAPID_PUBLIC_KEY  – the "publicKey" from PRIVATE-eban-push-keys.json
 //   VAPID_PRIVATE_KEY – the "privateKey" from the same file (never share it)
@@ -25,17 +26,17 @@ Deno.serve(async (req) => {
   if (!pub || !priv) return new Response("push keys not set", { status: 200 });
   webpush.setVapidDetails(Deno.env.get("VAPID_SUBJECT") ?? "mailto:support@ebancompany.com", pub, priv);
 
-  const { id } = await req.json().catch(() => ({ id: null }));
+  const { id, reminder = false } = await req.json().catch(() => ({ id: null }));
   if (!id) return new Response("missing id", { status: 400 });
 
-  const { data, error } = await db.rpc("push_payload", { p_id: id });
+  const { data, error } = await db.rpc("push_payload", { p_id: id, p_reminder: reminder === true });
   if (error) return new Response(error.message, { status: 500 });
   const rows = (data ?? []) as Row[];
   if (!rows.length) return new Response("nothing to send", { status: 200 });
 
   const payload = JSON.stringify({
     id,
-    title: rows[0].title ?? "Eban",
+    title: (reminder ? "Reminder: " : "") + (rows[0].title ?? "Eban"),
     body: rows[0].message,
     url: rows[0].link ?? "/",
   });
@@ -60,6 +61,7 @@ Deno.serve(async (req) => {
     }),
   );
 
-  await db.rpc("push_done", { p_id: id, p_dead: dead, p_ok: sent });
+  if (reminder) await db.rpc("push_done", { p_id: null, p_dead: dead, p_ok: sent });
+  else await db.rpc("push_done", { p_id: id, p_dead: dead, p_ok: sent });
   return new Response(JSON.stringify({ sent: sent.length, removed: dead.length }), { headers: { "Content-Type": "application/json" } });
 });

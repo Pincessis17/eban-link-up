@@ -64,8 +64,8 @@ export const NotificationSettings = ({ emailOn, onEmail }: { emailOn: boolean | 
       <Row Icon={Volume2} title="Sounds" text="A soft chime for new notifications and when something you do goes through.">
         <Switch checked={sounds} onCheckedChange={toggleSounds} aria-label="Sounds" />
       </Row>
-      <Row Icon={Mail} title="Email if I miss something" text="We only email you if you haven't seen a notification within 30 minutes.">
-        <Switch checked={emailOn ?? true} disabled={emailOn === null} onCheckedChange={onEmail} aria-label="Email if I miss something" />
+      <Row Icon={Mail} title="Important emails" text="Only for important things: your ID and face check results, refunds, payouts and reported problems.">
+        <Switch checked={emailOn ?? true} disabled={emailOn === null} onCheckedChange={onEmail} aria-label="Important emails" />
       </Row>
     </div>
   );

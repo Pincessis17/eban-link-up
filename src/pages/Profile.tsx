@@ -74,7 +74,7 @@ const Profile = () => {
       setEmailOn(!on);
       toast({ title: "Couldn't save", description: errMsg(error), variant: "destructive" });
     } else {
-      toast({ title: on ? "Emails on" : "Emails off", description: on ? "We'll email you if you miss a notification." : "You'll still see everything under the bell." });
+      toast({ title: on ? "Emails on" : "Emails off", description: on ? "We'll email you about important things only." : "You'll still see everything under the bell." });
     }
   };
 
