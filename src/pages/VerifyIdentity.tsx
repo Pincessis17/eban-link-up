@@ -135,7 +135,8 @@ const VerifyIdentity = () => {
     navigate("/profile", { replace: true });
   };
 
-  const step = elapsed < 3 ? "Look straight at the camera" : elapsed < 6 ? `Slowly turn your head ${turnLeftFirst ? "left" : "right"}` : elapsed < 9 ? `Now turn ${turnLeftFirst ? "right" : "left"}` : `Say your full name and the numbers ${code.split("").join(" ")}`;
+  // Name and numbers first, while they are looking straight at the camera; then the head turns.
+  const step = elapsed < 6 ? `Look at the camera and say your full name and the numbers ${code.split("").join(" ")}` : elapsed < 9 ? `Slowly turn your head ${turnLeftFirst ? "left" : "right"}` : `Now turn ${turnLeftFirst ? "right" : "left"}`;
 
   const Nav = profile?.role === "Admin" ? AdminNav : profile?.role === "Traveller" ? TravelerNav : SenderNav;
   const canStart = !latest || latest.status === "rejected";
@@ -173,8 +174,8 @@ const VerifyIdentity = () => {
               <>
                 <ol className="font-body text-sm text-foreground list-decimal pl-5 space-y-1.5 mb-5">
                   <li>Find good light and take off glasses or a hat.</li>
-                  <li>Look at the camera, then slowly turn your head left and right.</li>
-                  <li>Say your full name and the 4 numbers we show you.</li>
+                  <li>Look at the camera and say your full name and the 4 numbers we show you.</li>
+                  <li>Then slowly turn your head left and right.</li>
                 </ol>
                 <label className="flex items-start gap-3 font-body text-xs text-muted-foreground mb-5 cursor-pointer">
                   <input id="kyc-consent" type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-0.5" />
@@ -203,7 +204,7 @@ const VerifyIdentity = () => {
                   </div>
                 ) : (
                   <div className="mt-4 text-center">
-                    <p className="font-body text-xs text-muted-foreground mb-3">Fit your face inside the oval, then start. Numbers to say: <strong className="text-foreground tracking-widest">{code.split("").join(" ")}</strong></p>
+                    <p className="font-body text-xs text-muted-foreground mb-3">Fit your face inside the oval, then start. Say your full name and these numbers first: <strong className="text-foreground tracking-widest">{code.split("").join(" ")}</strong></p>
                     <button onClick={startRecording} className="bg-destructive text-destructive-foreground font-body font-bold text-xs uppercase tracking-wider px-6 py-3 rounded-xl">Start recording</button>
                   </div>
                 )}
