@@ -4,6 +4,7 @@ import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useTravellerProfile } from "@/hooks/useTravellerProfile";
 import { TravelerNav } from "@/components/TravelerNav";
+import { useLiveRefresh } from "@/lib/liveRefresh";
 
 interface Payout {
   id: string;
@@ -46,7 +47,6 @@ const TravelerEarnings = () => {
       if (!profileLoading) setLoading(false);
       return;
     }
-    setLoading(true);
     const { data } = await supabase
       .from("payouts")
       .select("id, amount, status, created_at, delivery_requests(origin_city, destination_city)")
@@ -73,6 +73,7 @@ const TravelerEarnings = () => {
     });
     setLoading(false);
   }, [travellerProfile, profileLoading]);
+  useLiveRefresh(load);
 
   useEffect(() => {
     load();

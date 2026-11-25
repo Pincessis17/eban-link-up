@@ -5,6 +5,7 @@ import { AdminNav, ADMIN_SIDEBAR_OFFSET_CLASS } from "@/components/AdminNav";
 import { errMsg, money } from "@/lib/marketplace";
 import { paymentReference } from "@/lib/paymentConfig";
 import type { ExtraBag } from "@/components/ExtraBagCard";
+import { useLiveRefresh } from "@/lib/liveRefresh";
 
 type Row = ExtraBag & { route: string; sender: string; traveller: string; payout: string; requestStatus: string; created_at: string };
 
@@ -16,7 +17,6 @@ const AdminExtraBags = () => {
   const [busy, setBusy] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    setLoading(true);
     const { data } = await (supabase as any).from("extra_bags").select("*").not("status", "in", "(settled,cancelled)").order("created_at", { ascending: true });
     const list = (data ?? []) as any[];
     if (list.length === 0) {
@@ -43,6 +43,7 @@ const AdminExtraBags = () => {
     );
     setLoading(false);
   }, []);
+  useLiveRefresh(load);
 
   useEffect(() => {
     load();

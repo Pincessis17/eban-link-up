@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { AdminNav, ADMIN_SIDEBAR_OFFSET_CLASS } from "@/components/AdminNav";
+import { useLiveRefresh } from "@/lib/liveRefresh";
 
 interface PendingRequest {
   id: string;
@@ -34,7 +35,6 @@ const AdminMatch = () => {
   const [busy, setBusy] = useState(false);
 
   const loadRequests = useCallback(async () => {
-    setLoading(true);
     const { data } = await supabase
       .from("delivery_requests")
       .select("id, origin_country, origin_city, destination_country, destination_city, item_type, weight_kg, item_value, preferred_date")
@@ -44,6 +44,7 @@ const AdminMatch = () => {
     setRequests(data || []);
     setLoading(false);
   }, []);
+  useLiveRefresh(loadRequests);
 
   useEffect(() => {
     loadRequests();

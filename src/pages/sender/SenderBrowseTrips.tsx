@@ -9,6 +9,7 @@ import { SenderNav } from "@/components/SenderNav";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { errMsg, formatDate, money } from "@/lib/marketplace";
 import { allInRate, parcelQuote, usePlatformFee } from "@/lib/fees";
+import { useLiveTick } from "@/lib/liveRefresh";
 
 type OpenTrip = Database["public"]["Functions"]["browse_open_trips"]["Returns"][number];
 
@@ -29,6 +30,7 @@ const SenderBrowseTrips = () => {
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ itemType: "Gifts", description: "", weight: "1", value: "50", flags: [] as string[] });
 
+  const live = useLiveTick();
   useEffect(() => {
     const load = async () => {
       const { data, error } = await supabase.rpc("browse_open_trips");
@@ -37,7 +39,7 @@ const SenderBrowseTrips = () => {
       setLoading(false);
     };
     load();
-  }, []);
+  }, [live]);
 
   const visible = useMemo(() => {
     const f = from.trim().toLowerCase();

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Upload, ShieldCheck, CheckCircle2, Clock, XCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -7,12 +8,14 @@ import { errMsg } from "@/lib/marketplace";
 import { SenderNav } from "@/components/SenderNav";
 import { TravelerNav } from "@/components/TravelerNav";
 import { AdminNav } from "@/components/AdminNav";
+import { useLiveRefresh } from "@/lib/liveRefresh";
 
 const DOCUMENT_TYPES = ["Passport", "National ID", "Driver's License", "Student ID"];
 type Doc = { id: string; status: string; id_document_type: string; reviewer_note: string | null; created_at: string };
 
 const VerifyId = () => {
   const { user, profile } = useAuth();
+  const navigate = useNavigate();
   const [docs, setDocs] = useState<Doc[]>([]);
   const [docType, setDocType] = useState(DOCUMENT_TYPES[0]);
   const [file, setFile] = useState<File | null>(null);
@@ -25,6 +28,7 @@ const VerifyId = () => {
       .eq("user_id", user.id).order("created_at", { ascending: false });
     setDocs((data as Doc[]) ?? []);
   }, [user]);
+  useLiveRefresh(load);
   useEffect(() => { load(); }, [load]);
 
   const latest = docs[0];
@@ -45,9 +49,10 @@ const VerifyId = () => {
       if (up.error) throw up.error;
       const { error } = await (supabase as any).rpc("submit_id_document", { p_path: path, p_type: docType });
       if (error) throw error;
-      toast({ title: "ID submitted", description: "Our team will review it within 24 hours." });
+      toast({ title: "ID submitted", description: "Our team will review it within 24 hours. You'll get a notification when it's done." });
       setFile(null);
-      load();
+      // Back to the profile, where both checks show their up-to-date status.
+      navigate("/profile", { replace: true });
     } catch (err) {
       toast({ title: "Could not submit", description: errMsg(err), variant: "destructive" });
     } finally {

@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { AdminNav, ADMIN_SIDEBAR_OFFSET_CLASS } from "@/components/AdminNav";
+import { useLiveRefresh } from "@/lib/liveRefresh";
 
 interface PayoutRow {
   id: string;
@@ -34,7 +35,6 @@ const AdminPayouts = () => {
   const [busy, setBusy] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    setLoading(true);
     const { data } = await supabase
       .from("delivery_requests")
       .select(
@@ -46,6 +46,7 @@ const AdminPayouts = () => {
     setRows((data as unknown as DeliveredRequest[]) || []);
     setLoading(false);
   }, []);
+  useLiveRefresh(load);
 
   useEffect(() => {
     load();

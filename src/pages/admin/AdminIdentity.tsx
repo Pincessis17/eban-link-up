@@ -6,6 +6,7 @@ import { AdminNav, ADMIN_SIDEBAR_OFFSET_CLASS } from "@/components/AdminNav";
 import { AdminDeleteButton } from "@/components/AdminDeleteButton";
 import { ReviewBadge, ReviewTabs, type ReviewFilter } from "@/components/ReviewStatus";
 import { errMsg } from "@/lib/marketplace";
+import { useLiveRefresh } from "@/lib/liveRefresh";
 
 type Row = { id: string; user_id: string; video_path: string; file_deleted_at: string | null; challenge_code: string | null; status: string; reviewer_note: string | null; created_at: string; name: string; role: string; email: string; url: string | null };
 
@@ -19,7 +20,6 @@ const AdminIdentity = () => {
   const signed = async (path: string) => (await supabase.storage.from("kyc-videos").createSignedUrl(path, 900)).data?.signedUrl ?? null;
 
   const load = useCallback(async () => {
-    setLoading(true);
     const { data } = await (supabase as any).from("identity_checks").select("*").order("created_at", { ascending: false }).limit(300);
     const list = (data ?? []) as any[];
     const { data: people } = list.length
@@ -42,6 +42,7 @@ const AdminIdentity = () => {
     setRows(withUrls.sort((x, y) => rank(x.status) - rank(y.status)));
     setLoading(false);
   }, []);
+  useLiveRefresh(load);
 
   useEffect(() => {
     load();

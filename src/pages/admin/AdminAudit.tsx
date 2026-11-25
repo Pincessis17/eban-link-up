@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { History } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminNav, ADMIN_SIDEBAR_OFFSET_CLASS } from "@/components/AdminNav";
+import { useLiveRefresh } from "@/lib/liveRefresh";
 
 type Entry = {
   id: number;
@@ -79,7 +80,6 @@ const AdminAudit = () => {
   const [limit, setLimit] = useState(100);
 
   const load = useCallback(async () => {
-    setLoading(true);
     let q = (supabase as any).from("admin_audit_log").select("*").order("at", { ascending: false }).limit(limit);
     if (table !== "all") q = q.eq("table_name", table);
     if (who !== "all") q = q.eq("actor_kind", who);
@@ -87,6 +87,7 @@ const AdminAudit = () => {
     setEntries((data ?? []) as Entry[]);
     setLoading(false);
   }, [table, who, limit]);
+  useLiveRefresh(load);
   useEffect(() => { load(); }, [load]);
 
   const tables = useMemo(() => Object.keys(TABLE_LABEL).sort((a, b) => TABLE_LABEL[a].localeCompare(TABLE_LABEL[b])), []);

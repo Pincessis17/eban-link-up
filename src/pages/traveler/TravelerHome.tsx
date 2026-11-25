@@ -7,6 +7,7 @@ import { useTravellerProfile } from "@/hooks/useTravellerProfile";
 import { TravelerNav } from "@/components/TravelerNav";
 import { DeleteButton } from "@/components/AdminDeleteButton";
 import { errMsg, money } from "@/lib/marketplace";
+import { useLiveTick } from "@/lib/liveRefresh";
 
 interface Trip {
   id: string;
@@ -26,6 +27,7 @@ const TravelerHome = () => {
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const live = useLiveTick();
   useEffect(() => {
     if (!travellerProfile) {
       if (!profileLoading) setLoading(false);
@@ -33,7 +35,6 @@ const TravelerHome = () => {
     }
 
     const load = async () => {
-      setLoading(true);
       const { data: tripRows } = await supabase
         .from("trips")
         .select("*")
@@ -45,7 +46,7 @@ const TravelerHome = () => {
     };
 
     load();
-  }, [travellerProfile, profileLoading]);
+  }, [travellerProfile, profileLoading, live]);
 
   const deleteTrip = async (tripId: string): Promise<string | null> => {
     const { data, error } = await supabase.from("trips").delete().eq("id", tripId).select("id");

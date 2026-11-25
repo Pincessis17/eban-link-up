@@ -4,6 +4,7 @@ import { toast } from "@/hooks/use-toast";
 import { AdminNav, ADMIN_SIDEBAR_OFFSET_CLASS } from "@/components/AdminNav";
 import { errMsg, money } from "@/lib/marketplace";
 import { EvidenceGallery } from "@/components/EvidenceGallery";
+import { useLiveRefresh } from "@/lib/liveRefresh";
 
 type Row = {
   id: string; request_id: string; reason: string; kind: string; status: string; resolution: string | null; admin_note: string | null; created_at: string;
@@ -24,7 +25,6 @@ const AdminDisputes = () => {
   const [showResolved, setShowResolved] = useState(false);
 
   const load = useCallback(async () => {
-    setLoading(true);
     const { data: ds } = await (supabase as any).from("disputes").select("*").order("created_at", { ascending: false });
     const list = (ds ?? []) as any[];
     if (list.length === 0) {
@@ -61,6 +61,7 @@ const AdminDisputes = () => {
     );
     setLoading(false);
   }, []);
+  useLiveRefresh(load);
 
   useEffect(() => {
     load();

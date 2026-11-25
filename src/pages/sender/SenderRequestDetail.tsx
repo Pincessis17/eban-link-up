@@ -17,6 +17,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { PAYMENT_METHODS, paymentReference } from "@/lib/paymentConfig";
 import { calcServiceFee, usePlatformFee } from "@/lib/fees";
 import { REQUEST_STEPS, stepIndex, SENDER_DELETABLE, IN_FLIGHT, errMsg, money, autoReleaseDate } from "@/lib/marketplace";
+import { useLiveRefresh } from "@/lib/liveRefresh";
 
 interface DeliveryRequest {
   id: string;
@@ -103,7 +104,6 @@ const SenderRequestDetail = () => {
 
   const load = useCallback(async () => {
     if (!id) return;
-    setLoading(true);
     const { data } = await supabase.from("delivery_requests").select("*").eq("id", id).maybeSingle();
     setRequest(data as DeliveryRequest);
     const { data: pay } = await supabase.from("payments").select("status, amount, service_fee").eq("request_id", id).maybeSingle();
@@ -116,6 +116,7 @@ const SenderRequestDetail = () => {
     }
     setLoading(false);
   }, [id]);
+  useLiveRefresh(load);
 
   useEffect(() => {
     load();

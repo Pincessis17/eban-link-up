@@ -5,6 +5,7 @@ import { AdminNav, ADMIN_SIDEBAR_OFFSET_CLASS } from "@/components/AdminNav";
 import { errMsg, money } from "@/lib/marketplace";
 import { paymentReference } from "@/lib/paymentConfig";
 import { EvidenceGallery } from "@/components/EvidenceGallery";
+import { useLiveRefresh } from "@/lib/liveRefresh";
 
 interface PaymentRow {
   id: string;
@@ -24,7 +25,6 @@ const AdminPayments = () => {
   const [waiting, setWaiting] = useState<{ id: string; origin_city: string; destination_city: string; status: string; matched_at: string | null; sender: string; traveller: string }[]>([]);
 
   const load = useCallback(async () => {
-    setLoading(true);
     await supabase.rpc("expire_stale_matches");
     const { data } = await supabase
       .from("payments")
@@ -59,6 +59,7 @@ const AdminPayments = () => {
     }
     setLoading(false);
   }, []);
+  useLiveRefresh(load);
   useEffect(() => {
     load();
   }, [load]);

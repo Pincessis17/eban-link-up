@@ -4,6 +4,7 @@ import { Bell, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { emitLiveChange } from "@/lib/liveRefresh";
 
 type Note = {
   id: string;
@@ -63,7 +64,7 @@ export const NotificationBell = ({ dark = false }: { dark?: boolean }) => {
         .on(
           "postgres_changes",
           { event: "*", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
-          () => load(),
+          () => { load(); emitLiveChange(); },
         )
         .subscribe();
     } catch (e) {

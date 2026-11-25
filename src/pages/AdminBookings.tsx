@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Package, RefreshCw, ArrowRight, User, Mail, Phone, Calendar, Weight, DollarSign } from "lucide-react";
 import { AdminNav, ADMIN_SIDEBAR_OFFSET_CLASS } from "@/components/AdminNav";
 import { AdminDeleteButton } from "@/components/AdminDeleteButton";
+import { useLiveRefresh } from "@/lib/liveRefresh";
 
 interface DeliveryRequest {
   id: string;
@@ -39,7 +40,6 @@ const AdminBookings = () => {
   const [error, setError] = useState<string | null>(null);
 
   const fetchRequests = async () => {
-    setLoading(true);
     setError(null);
     const { data, error: fetchError } = await supabase
       .from("delivery_requests")
@@ -59,6 +59,7 @@ const AdminBookings = () => {
   useEffect(() => {
     fetchRequests();
   }, []);
+  useLiveRefresh(fetchRequests);
 
   const deleteRequest = async (id: string): Promise<string | null> => {
     const { data, error: deleteError } = await supabase.from("delivery_requests").delete().eq("id", id).select("id");

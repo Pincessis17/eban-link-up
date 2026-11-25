@@ -13,6 +13,7 @@ import { EvidenceGallery } from "@/components/EvidenceGallery";
 import { RateCounterparty } from "@/components/RateCounterparty";
 import { ReportIssueButton } from "@/components/ReportIssueButton";
 import { IN_FLIGHT, errMsg, money, autoReleaseDate } from "@/lib/marketplace";
+import { useLiveRefresh } from "@/lib/liveRefresh";
 
 interface DeliveryRequest {
   id: string;
@@ -83,7 +84,6 @@ const TravelerRequestDetail = () => {
 
   const load = useCallback(async () => {
     if (!id) return;
-    setLoading(true);
     const { data: matchData } = await supabase
       .from("matches")
       .select("id, status, delivery_requests(*)")
@@ -110,6 +110,7 @@ const TravelerRequestDetail = () => {
     }
     setLoading(false);
   }, [id]);
+  useLiveRefresh(load);
 
   useEffect(() => {
     load();

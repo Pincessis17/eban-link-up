@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { SenderNav } from "@/components/SenderNav";
 import { DeleteButton } from "@/components/AdminDeleteButton";
 import { SENDER_STATUS_LABEL as STATUS_LABEL, STATUS_BADGE, SENDER_DELETABLE, errMsg } from "@/lib/marketplace";
+import { useLiveTick } from "@/lib/liveRefresh";
 
 interface DeliveryRequestRow {
   id: string;
@@ -26,6 +27,7 @@ const SenderRequests = () => {
   const [filter, setFilter] = useState<"all" | "active" | "delivered">("all");
   const [loading, setLoading] = useState(true);
 
+  const live = useLiveTick();
   useEffect(() => {
     if (!user) {
       if (!authLoading) setLoading(false);
@@ -33,7 +35,6 @@ const SenderRequests = () => {
     }
 
     const load = async () => {
-      setLoading(true);
       const { data } = await supabase
         .from("delivery_requests")
         .select("id, origin_city, origin_country, destination_city, destination_country, item_type, weight_kg, status, created_at")
@@ -45,7 +46,7 @@ const SenderRequests = () => {
     };
 
     load();
-  }, [user, authLoading]);
+  }, [user, authLoading, live]);
 
   const deleteRequest = async (id: string): Promise<string | null> => {
     const { data, error } = await supabase.from("delivery_requests").delete().eq("id", id).select("id");

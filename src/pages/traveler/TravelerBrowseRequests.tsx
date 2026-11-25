@@ -9,6 +9,7 @@ import { toast } from "@/hooks/use-toast";
 import { TravelerNav } from "@/components/TravelerNav";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { errMsg, formatDate, money } from "@/lib/marketplace";
+import { useLiveTick } from "@/lib/liveRefresh";
 
 type OpenRequest = Database["public"]["Functions"]["browse_open_requests"]["Returns"][number];
 type MyTrip = Pick<
@@ -32,6 +33,7 @@ const TravelerBrowseRequests = () => {
 
   const verified = travellerProfile?.verification_status === "approved";
 
+  const live = useLiveTick();
   useEffect(() => {
     if (!travellerProfile) {
       if (!profileLoading) setLoading(false);
@@ -53,7 +55,7 @@ const TravelerBrowseRequests = () => {
       setLoading(false);
     };
     load();
-  }, [travellerProfile, profileLoading]);
+  }, [travellerProfile, profileLoading, live]);
 
   const tripsFor = (r: OpenRequest) =>
     trips.filter(

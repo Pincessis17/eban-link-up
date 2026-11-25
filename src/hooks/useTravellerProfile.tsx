@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useLiveRefresh } from "@/lib/liveRefresh";
 
 export interface TravellerProfile {
   id: string;
@@ -28,7 +29,6 @@ export function useTravellerProfile() {
       setLoading(false);
       return;
     }
-    setLoading(true);
     const { data } = await supabase.from("traveller_profiles").select("*").eq("user_id", user.id).maybeSingle();
     let row = data;
     // Self-heal: a traveler account whose profile row is missing (for example it was
@@ -48,6 +48,7 @@ export function useTravellerProfile() {
   useEffect(() => {
     refresh();
   }, [refresh]);
+  useLiveRefresh(refresh);
 
   return { travellerProfile, loading, refresh };
 }

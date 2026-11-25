@@ -6,6 +6,7 @@ import { toast } from "@/hooks/use-toast";
 import { AdminNav, ADMIN_SIDEBAR_OFFSET_CLASS } from "@/components/AdminNav";
 import { AdminDeleteButton } from "@/components/AdminDeleteButton";
 import { ReviewBadge, ReviewTabs, type ReviewFilter } from "@/components/ReviewStatus";
+import { useLiveRefresh } from "@/lib/liveRefresh";
 
 /** One row on the page, from either the shared ID table (everyone) or the older traveller-only table. */
 type Item = {
@@ -31,7 +32,6 @@ const AdminVerifications = () => {
   const [filter, setFilter] = useState<ReviewFilter>("all");
 
   const load = useCallback(async () => {
-    setLoading(true);
     const [{ data: idData }, { data: legacy }] = await Promise.all([
       (supabase as any)
         .from("id_documents")
@@ -76,6 +76,7 @@ const AdminVerifications = () => {
     setItems([...a, ...b].sort((x, y) => rank(x.status) - rank(y.status) || y.createdAt.localeCompare(x.createdAt)));
     setLoading(false);
   }, []);
+  useLiveRefresh(load);
 
   useEffect(() => {
     load();

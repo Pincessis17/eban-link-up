@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useTravellerProfile } from "@/hooks/useTravellerProfile";
 import { toast } from "@/hooks/use-toast";
 import { TravelerNav } from "@/components/TravelerNav";
+import { useLiveRefresh } from "@/lib/liveRefresh";
 
 // TESTING MODE: when true, uploading an ID verifies the traveler immediately, with no admin review.
 // Set to false before launch so every ID goes through Admin > ID Verifications.
@@ -39,7 +40,6 @@ const TravelerVerification = () => {
       setLoading(false);
       return;
     }
-    setLoading(true);
     const { data } = await supabase
       .from("verifications")
       .select("id, status, id_document_type, created_at")
@@ -48,6 +48,7 @@ const TravelerVerification = () => {
     setRows(data || []);
     setLoading(false);
   }, [travellerProfile]);
+  useLiveRefresh(load);
 
   useEffect(() => {
     load();

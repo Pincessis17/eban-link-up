@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Video, CheckCircle2, Clock, XCircle, RotateCcw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -8,6 +8,7 @@ import { errMsg } from "@/lib/marketplace";
 import { SenderNav } from "@/components/SenderNav";
 import { TravelerNav } from "@/components/TravelerNav";
 import { AdminNav } from "@/components/AdminNav";
+import { useLiveRefresh } from "@/lib/liveRefresh";
 
 const SECONDS = 12;
 const MIME_CHOICES = ["video/webm;codecs=vp9,opus", "video/webm;codecs=vp8,opus", "video/webm", "video/mp4"];
@@ -18,6 +19,7 @@ type Check = { id: string; status: string; reviewer_note: string | null; created
 
 const VerifyIdentity = () => {
   const { user, profile } = useAuth();
+  const navigate = useNavigate();
   const [latest, setLatest] = useState<Check | null>(null);
   const [consent, setConsent] = useState(false);
   const [phase, setPhase] = useState<"idle" | "ready" | "recording" | "review" | "uploading" | "done">("idle");
@@ -38,6 +40,7 @@ const VerifyIdentity = () => {
     const { data } = await (supabase as any).from("identity_checks").select("id, status, reviewer_note, created_at").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1).maybeSingle();
     setLatest((data as Check) ?? null);
   }, [user]);
+  useLiveRefresh(loadLatest);
 
   useEffect(() => {
     loadLatest();
@@ -126,7 +129,10 @@ const VerifyIdentity = () => {
       return toast({ title: "Couldn't submit", description: errMsg(error), variant: "destructive" });
     }
     setPhase("done");
-    loadLatest();
+    if (clipUrl) URL.revokeObjectURL(clipUrl);
+    toast({ title: "Video submitted", description: "Our team will review it, usually within a day. You'll get a notification when it's done." });
+    // Back to the profile, where both checks show their up-to-date status.
+    navigate("/profile", { replace: true });
   };
 
   const step = elapsed < 3 ? "Look straight at the camera" : elapsed < 6 ? `Slowly turn your head ${turnLeftFirst ? "left" : "right"}` : elapsed < 9 ? `Now turn ${turnLeftFirst ? "right" : "left"}` : `Say your full name and the numbers ${code.split("").join(" ")}`;

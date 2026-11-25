@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { AdminNav, ADMIN_SIDEBAR_OFFSET_CLASS } from "@/components/AdminNav";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminDeleteButton } from "@/components/AdminDeleteButton";
+import { useLiveRefresh } from "@/lib/liveRefresh";
 
 interface TripRow {
   id: string;
@@ -37,7 +38,6 @@ const AdminTravelers = () => {
   const [filter, setFilter] = useState<"all" | "approved" | "pending" | "rejected">("all");
 
   const load = useCallback(async () => {
-    setLoading(true);
     const { data } = await supabase
       .from("traveller_profiles")
       .select(
@@ -47,6 +47,7 @@ const AdminTravelers = () => {
     setRows((data as unknown as TravelerRow[]) || []);
     setLoading(false);
   }, []);
+  useLiveRefresh(load);
 
   useEffect(() => {
     load();

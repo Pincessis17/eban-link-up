@@ -9,6 +9,7 @@ import { errMsg } from "@/lib/marketplace";
 import { SenderNav } from "@/components/SenderNav";
 import { TravelerNav } from "@/components/TravelerNav";
 import { AdminNav } from "@/components/AdminNav";
+import { useLiveRefresh, useLiveTick } from "@/lib/liveRefresh";
 
 type ProfileData = {
   user_id: string; first_name: string; full_name: string | null; is_self: boolean; avg_rating: number | null;
@@ -40,7 +41,6 @@ const Profile = () => {
 
   const load = useCallback(async () => {
     if (!id) return;
-    setLoading(true);
     const [{ data: p }, { data: r }] = await Promise.all([
       supabase.rpc("get_profile", { p_user_id: id }),
       supabase.rpc("get_reviews", { p_user_id: id }),
@@ -49,11 +49,13 @@ const Profile = () => {
     setReviews(r ?? []);
     setLoading(false);
   }, [id]);
+  useLiveRefresh(load);
 
   useEffect(() => {
     load();
   }, [load]);
 
+  const live = useLiveTick();
   useEffect(() => {
     if (!user || (userId && userId !== user.id)) return;
     (supabase as any).from("id_documents").select("status").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1).maybeSingle()
@@ -62,7 +64,7 @@ const Profile = () => {
       .then(({ data: d }: { data: { status: string } | null }) => setFaceStatus(d?.status ?? "none"));
     supabase.from("profiles").select("email_notifications").eq("id", user.id).maybeSingle()
       .then(({ data: d }) => setEmailOn(d?.email_notifications ?? true));
-  }, [user, userId]);
+  }, [user, userId, live]);
 
   const toggleEmail = async (on: boolean) => {
     if (!user) return;

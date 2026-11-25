@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AdminNav, ADMIN_SIDEBAR_OFFSET_CLASS } from "@/components/AdminNav";
 import { DeleteButton } from "@/components/AdminDeleteButton";
 import { errMsg } from "@/lib/marketplace";
+import { useLiveRefresh } from "@/lib/liveRefresh";
 
 interface Row {
   id: string;
@@ -27,7 +28,6 @@ const AdminFeedback = () => {
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    setLoading(true);
     const { data, error } = await supabase
       .from("feedback")
       .select("id, rating, comment, status, created_at, profiles:user_id(full_name, role)")
@@ -36,6 +36,7 @@ const AdminFeedback = () => {
     setRows((data as unknown as Row[]) || []);
     setLoading(false);
   }, []);
+  useLiveRefresh(load);
   useEffect(() => {
     load();
   }, [load]);

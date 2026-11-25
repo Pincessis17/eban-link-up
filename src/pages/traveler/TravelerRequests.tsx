@@ -5,6 +5,7 @@ import { Package } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTravellerProfile } from "@/hooks/useTravellerProfile";
 import { TravelerNav } from "@/components/TravelerNav";
+import { useLiveTick } from "@/lib/liveRefresh";
 
 interface MatchRow {
   id: string;
@@ -46,6 +47,7 @@ const TravelerRequests = () => {
   const [matches, setMatches] = useState<MatchRow[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const live = useLiveTick();
   useEffect(() => {
     if (!travellerProfile) {
       if (!profileLoading) setLoading(false);
@@ -53,7 +55,6 @@ const TravelerRequests = () => {
     }
 
     const load = async () => {
-      setLoading(true);
       const { data } = await supabase
         .from("matches")
         .select(
@@ -67,7 +68,7 @@ const TravelerRequests = () => {
     };
 
     load();
-  }, [travellerProfile, profileLoading]);
+  }, [travellerProfile, profileLoading, live]);
 
   return (
     <div className="min-h-screen bg-background">
