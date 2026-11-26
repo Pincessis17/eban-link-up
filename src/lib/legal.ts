@@ -10,7 +10,7 @@
  */
 
 export const TERMS_VERSION = "2026-11-20-2"; // fee minimum lowered to USD 3
-export const PRIVACY_VERSION = "2026-11-20";
+export const PRIVACY_VERSION = "2026-11-26"; // device notifications; email only for important things
 
 // Eban isn't registered as a business yet, so it is run by its founder personally.
 // When it's registered: put the business name and registered address here and change both versions above.
@@ -154,10 +154,12 @@ Eban is used by people in many countries. Wherever you live, we apply the protec
 | Delivery proof | Photos of the item at collection and delivery, the handover signature | The traveller |
 | Messages and reviews | Chat messages on a request, ratings and comments, problem reports, feedback | You and the other person on the request |
 | Agreements | Which version of these terms and this policy you agreed to, and when | Our records |
-| Notifications | What we told you and when, by app and email | Our records |
+| Notifications | What we told you and when (in the app, on your devices, and by email for important things). If you turn on device notifications: a notification token for each device and a short description of it, such as "Android, Chrome" | Our records, and your device |
 | Technical | IP address, device and browser type, sign-in times, error logs | Your device, through our hosting providers |
 
 We don't use advertising or tracking cookies. The app stores your sign-in in your browser's local storage so you stay signed in, and keeps a copy of the app's files so it opens on a bad connection.
+
+**Device notifications.** If you turn on notifications, we store a notification token for your device and a short description of it (for example "Android, Chrome") so we can send you updates, even when Eban is closed. The message passes through your browser or phone maker's notification service (such as Google or Apple) to reach you. The token can only be used to send notifications to that device; it doesn't give us your phone number, location or anything else on it. You can turn notifications off at any time on your profile or in your device settings, and signing out removes the token for that device.
 
 ### 2. Why we use it
 
@@ -167,7 +169,7 @@ We don't use advertising or tracking cookies. The app stores your sign-in in you
 | Checking identities and preventing fraud, smuggling and misuse | Our legitimate interest in a safe marketplace, and your consent for the face video |
 | Holding and releasing payments, refunds and payouts | Performing our contract; keeping financial records is a legal obligation |
 | Settling disputes using messages, photos and receipts | Our legitimate interest, and to establish or defend legal claims |
-| Sending notifications and account emails | Performing our contract (you can turn off notification emails on your profile) |
+| Sending notifications and account emails | Performing our contract. Device notifications are optional and you can turn them off at any time. We email you only about important things (identity check results, refunds, payouts and reported problems), and you can turn those emails off on your profile |
 | Keeping a record of what our admins change | Our legitimate interest in accountability and security |
 | Responding to authorities | Legal obligation, where a valid request is made |
 
@@ -180,7 +182,8 @@ We don't sell your information and don't use it for advertising. We don't make d
 - **Service providers** that run Eban for us, under contracts that limit them to our instructions:
   - Supabase: database, file storage and sign-in (data stored in Ireland, EU)
   - Vercel: hosts the website
-  - Resend: sends our emails (Ireland, EU)
+  - Resend: sends account emails and important updates (Ireland, EU)
+  - Google, Apple or Mozilla: deliver notifications to your phone or computer, if you turn them on (they receive the notification text and your device's token)
   - Our bank and mobile money providers: payments and payouts
 - **Authorities** (police, customs, courts, regulators) when the law requires it or to protect someone's safety.
 
@@ -197,6 +200,7 @@ Eban is based in Mauritius and serves people in many countries. Your information
 | Payment and payout records | 7 years, as required for accounting and tax |
 | Admin audit log and agreement records | 7 years |
 | Notifications | 90 days after you read them |
+| Device notification tokens | Until you turn notifications off, sign out on that device, or the device stops accepting them |
 | Your account | Until you close it, or 3 years without signing in; then deleted or anonymised except where we must keep records |
 
 ### 6. How we protect it
